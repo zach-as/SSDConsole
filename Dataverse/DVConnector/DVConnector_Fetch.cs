@@ -37,7 +37,7 @@ namespace SSDConsole.Dataverse.DVConnector
             query.PageInfo.PageNumber = 1;
             query.PageInfo.Count = PAGE_SIZE;
 
-            var type_str = entityType is not null ? $" of type {entityType?.LogicalName()}";
+            var type_str = entityType is not null ? $" of type {entityType?.LogicalName()}" : "";
             
             if (!skipDisplay)
             {
