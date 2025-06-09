@@ -2,7 +2,7 @@
 using SSDConsole.CMS.Data.Associable;
 using SSDConsole.SSDDisplay;
 
-namespace SSDConsole.Dataverse.DVConnector
+namespace SSDConsole.Dataverse.DVConnector.DVConnector
 {
 
     internal static partial class DVConnector

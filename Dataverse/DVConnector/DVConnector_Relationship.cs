@@ -10,9 +10,9 @@ using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Client;
 
-namespace SSDConsole.Dataverse
+namespace SSDConsole.Dataverse.DVConnector.DVConnector
 {
-    internal static class DVRelationship
+    internal static partial class DVConnector
     {
 
         private static Relationship Relationship(EntityType referencing, EntityType referenced)
@@ -30,8 +30,14 @@ namespace SSDConsole.Dataverse
         private static string LogicalName(this Relationship relationship)
             => relationship.SchemaName.ToLower();
 
+        internal static void CreateRelationships(Dictionary<Associable, Entity> dict)
+        {
+            var relationshipSets = BuildRelationships(dict);
+            AddRelationships(relationshipSets);
+        }
+
         #region relationshipschema
-        internal static void CreateRelationshipSchemas(IOrganizationService service)
+        internal static void CreateRelationshipSchemas()
         {
             Console.WriteLine("Creating relationship schemas for all entity types as needed.");
             var entityTypes = Enum.GetValues(typeof(EntityType));
@@ -40,22 +46,22 @@ namespace SSDConsole.Dataverse
                 foreach (var referenced in entityTypes)
                 {
                     if (referencing.Equals(referenced)) continue; // do not create a relationship schema for the same entity type
-                    TryCreateRelationshipSchema(service, (EntityType)referencing, (EntityType)referenced);
+                    TryCreateRelationshipSchema((EntityType)referencing, (EntityType)referenced);
                 }
             }
         }
 
-        private static void TryCreateRelationshipSchema(IOrganizationService service, EntityType referencing, EntityType referenced)
+        private static void TryCreateRelationshipSchema( EntityType referencing, EntityType referenced)
         {
 
-            if (!RelationshipSchemaExists(service, referencing, referenced))
+            if (!RelationshipSchemaExists(referencing, referenced))
             {
-                CreateRelationshipSchema(service, referencing, referenced);
+                CreateRelationshipSchema(referencing, referenced);
             }
 
         }
 
-        private static void CreateRelationshipSchema(IOrganizationService service, EntityType referencing, EntityType referenced)
+        private static void CreateRelationshipSchema(EntityType referencing, EntityType referenced)
         {
             var relationship = Relationship(referencing, referenced);
             Console.WriteLine($"Creating relationship schema for {relationship.SchemaName}.");
@@ -87,14 +93,14 @@ namespace SSDConsole.Dataverse
                             Order = 10000
                         }
                 },
-                SolutionUniqueName = DVConnector.SOLUTION
+                SolutionUniqueName = SOLUTION
             };
 
-            service.Execute(request);
+            Service().Execute(request);
             Console.WriteLine($"Relationship schema for {relationship.SchemaName} created successfully.");
         }
 
-        private static bool RelationshipSchemaExists(IOrganizationService service, EntityType referencing, EntityType referenced)
+        private static bool RelationshipSchemaExists(EntityType referencing, EntityType referenced)
         {
             var relationship = Relationship(referencing, referenced);
             try
@@ -104,7 +110,7 @@ namespace SSDConsole.Dataverse
                     Name = relationship.SchemaName,
                     RetrieveAsIfPublished = true
                 };
-                var response = (RetrieveRelationshipResponse)service.Execute(request);
+                var response = (RetrieveRelationshipResponse)Service().Execute(request);
                 return true;
             }
             catch (Exception ex)
@@ -115,17 +121,17 @@ namespace SSDConsole.Dataverse
         }
         #endregion relationshipschema
 
-        private static bool Related(IOrganizationService service, EntityReference a, EntityReference b)
-            => Related(service, a.Id, a.EntityType(), b.Id, b.EntityType());
-        private static bool Related(IOrganizationService service, Entity a, Entity b)
-            => Related(service, a.Id, a.EntityType(), b.Id, b.EntityType());
-        private static bool Related(IOrganizationService service, Entity a, EntityReference b)
-            => Related(service, a.Id, a.EntityType(), b.Id, b.EntityType());
-        private static bool Related(IOrganizationService service, Guid aId, EntityType aType, Guid bId, EntityType bType)
+        private static bool Related(EntityReference a, EntityReference b)
+            => Related(a.Id, a.EntityType(), b.Id, b.EntityType());
+        private static bool Related(Entity a, Entity b)
+            => Related(a.Id, a.EntityType(), b.Id, b.EntityType());
+        private static bool Related(Entity a, EntityReference b)
+            => Related(a.Id, a.EntityType(), b.Id, b.EntityType());
+        private static bool Related(Guid aId, EntityType aType, Guid bId, EntityType bType)
         {
             if (aType == bType) return false;
 
-            var context = new OrganizationServiceContext(service);
+            var context = new OrganizationServiceContext(Service());
             
             var aGoesFirst = aType.GoesBefore(bType);
 
@@ -144,7 +150,7 @@ namespace SSDConsole.Dataverse
             return relatedRecords.ToArray().Any();
         }
 
-        internal static Dictionary<Entity, Dictionary<EntityType, EntityReferenceCollection>> BuildRelationships(IOrganizationService service, Dictionary<Associable, Entity> dict)
+        internal static Dictionary<Entity, Dictionary<EntityType, EntityReferenceCollection>> BuildRelationships(Dictionary<Associable, Entity> dict)
         {
             Console.WriteLine("BuildRelationships() called. Establishing relationship links.");
             var relationships = new Dictionary<Entity, Dictionary<EntityType, EntityReferenceCollection>>();
@@ -173,7 +179,7 @@ namespace SSDConsole.Dataverse
                             skipped++;
                             continue;
                         }
-                        if (!Related(service, entity, dict[association]))
+                        if (!Related(entity, dict[association]))
                         {
                             relatedEntities.Add(dict[association].ToEntityReference());
                         }
@@ -198,7 +204,7 @@ namespace SSDConsole.Dataverse
             return relationships;
         }
 
-        internal static void AddRelationships(IOrganizationService service, Dictionary<Entity, Dictionary<EntityType, EntityReferenceCollection>> relationshipSets)
+        internal static void AddRelationships(Dictionary<Entity, Dictionary<EntityType, EntityReferenceCollection>> relationshipSets)
         {
             Console.WriteLine("AddRelationships() called. Adding relationship sets to entities in Dataverse.");
             int count = 0;
@@ -220,8 +226,8 @@ namespace SSDConsole.Dataverse
                             Target = entity.ToEntityReference()
                         };
 
-                        service.Execute(request);
-                        //service.Associate(entity.LogicalName, entity.Id, Relationship(referencingType, referencedType), entityReferences);
+                        Service().Execute(request);
+                        //Service().Associate(entity.LogicalName, entity.Id, Relationship(referencingType, referencedType), entityReferences);
                     } catch (Exception ex) { Console.WriteLine(ex.Message); }
                 }
                 count++;

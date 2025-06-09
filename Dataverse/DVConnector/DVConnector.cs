@@ -7,7 +7,7 @@ using Microsoft.Xrm.Sdk.Query;
 using Newtonsoft.Json.Bson;
 using SSDConsole.CMS.Data.Associable;
 
-namespace SSDConsole.Dataverse.DVConnector
+namespace SSDConsole.Dataverse.DVConnector.DVConnector
 {
 
     internal static partial class DVConnector
@@ -44,8 +44,7 @@ namespace SSDConsole.Dataverse.DVConnector
         }
 
         #region entity
-
-        // This creates the basic entity objects for later use
+        
         internal static Dictionary<EntityType, List<AEPair>> CreateAndUpdateEntities(List<Associable> associables)
         {
             Console.WriteLine("CreateAndUpdateEntities() called.");
@@ -76,14 +75,8 @@ namespace SSDConsole.Dataverse.DVConnector
         #endregion entity
 
         #region relationship
-        internal static void CreateRelationshipSchemas()
-            => DVRelationship.CreateRelationshipSchemas(Service());
 
-        internal static void CreateRelationships(Dictionary<Associable, Entity> dict)
-        {
-            var relationshipSets = DVRelationship.BuildRelationships(Service(), dict);
-            DVRelationship.AddRelationships(Service(), relationshipSets);
-        }
+        
         #endregion relationship
 
         #region optionset

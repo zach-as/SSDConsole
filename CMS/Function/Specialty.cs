@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using SSDConsole.CMS.Data.Associable;
-using SSDConsole.Dataverse;
+using SSDConsole.Dataverse.DVConnector;
+using SSDConsole.Dataverse.DVConnector.DVConnector;
 
 namespace SSDConsole.CMS.Function
 {
@@ -102,7 +103,6 @@ namespace SSDConsole.CMS.Function
         {
             if (!specialtyData.ContainsKey(specialty))
             {
-                Program.Display(specialtyData.Keys);
                 throw new Exception($"ValidateSpecialty({specialty}) did not find any matching specialties in {Program.OPTIONSET_CLINICIANSPECIALTY}.");
             }
 

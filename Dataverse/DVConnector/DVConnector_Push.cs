@@ -8,7 +8,7 @@ using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Xrm.Sdk;
 using SSDConsole.SSDDisplay;
 
-namespace SSDConsole.Dataverse.DVConnector
+namespace SSDConsole.Dataverse.DVConnector.DVConnector
 {
     internal static partial class DVConnector
     {
