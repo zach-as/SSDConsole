@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xrm.Sdk;
@@ -22,6 +23,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             {
                 this.a = a;
                 this.e = e;
+                if (a.EntityType() != e.EntityType()) throw new ArgumentException($"Associable type {a.EntityType()} does not match Entity type {e.EntityType()}");
             }
 
             internal Associable Associable()
@@ -34,6 +36,9 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
 
             internal string LogicalName()
                 => a.LogicalName();
+
+            internal EntityType EntityType()
+                => a.EntityType();
         }
 
         internal class AEDuplicate
@@ -101,15 +106,23 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
         }
 
         internal static AEPair? Find(this List<AEPair> pairs, Associable a)
-        {
-            if (a is null) throw new ArgumentNullException(nameof(a), "In List<AEPair>.Find(), Cannot find pair for null Associable.");
-            return pairs.FirstOrDefault(p => p.Associable().Matches(a));
-        }
+            => pairs.FirstOrDefault(p => p.Associable().Matches(a));
         internal static AEPair? Find(this List<AEPair> pairs, Entity e)
-        {
-            if (e is null) throw new ArgumentNullException(nameof(e), "In List<AEPair>.Find(), Cannot find pair for null Entity.");
-            return pairs.FirstOrDefault(p => p.Entity().Matches(e));
-        }
+            => pairs.FirstOrDefault(p => p.Entity().Matches(e));
 
+        internal static List<Entity> Entities(this List<AEPair> pairs)
+            => pairs.Select(p => p.Entity()).ToList();
+        internal static List<Associable> Associables(this List<AEPair> pairs)
+            => pairs.Select(p => p.Associable()).ToList();
+
+        internal static EntityCollection EntityCollection(this List<AEPair> pairs)
+            => pairs.Count() == 0 ? new EntityCollection()
+                : new EntityCollection(pairs.Entities())
+                { EntityName = pairs.ElementAt(0).LogicalName() };
+        internal static EntityReferenceCollection ReferenceCollection(this List<AEPair> pairs)
+            => pairs.Count() == 0 ? new EntityReferenceCollection()
+                : new EntityReferenceCollection(
+                    pairs.Entities()
+                    .Select(e => e.ToEntityReference()).ToList());
     }
 }
