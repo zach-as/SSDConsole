@@ -15,23 +15,14 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
 
         #region push_create
         internal static Dictionary<EntityType, EntityCollection> PushCreates(Dictionary<EntityType, List<AEPair>> data)
-        {
-
-
-        }
+            => data.ToDictionary(
+                pair => pair.Key,
+                pair => PushCreates(pair.Value));
 
         private static EntityCollection PushCreates(List<AEPair> pairs)
-            => PushCreates(DVEntity.EntityCollection(
-                pairs.Select(p => p.Entity())
-                .ToList()));
+            => PushCreates(pairs.EntityCollection());
 
-            /*=> PushCreates(DVEntity.EntityCollection(
-                data.Values.SelectMany(
-                    l => l.Select(
-                        p => p.Entity()))
-                .ToList()));*/
-
-        // This pushes creation of new entities to dataverse
+        // This pushes creation of new entities to dataverse using pagination to avoid exceeding the maximum request size
         private static EntityCollection PushCreates(EntityCollection collection)
         {
             var total_entities = collection.Entities.Count();
@@ -77,7 +68,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
                 }
             };
 
-            return FetchEntities(query, entityType);
+            return FetchEntities(query, entityType, true);
         }
 
         
