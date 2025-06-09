@@ -70,6 +70,30 @@ namespace SSDConsole.Dataverse
                 EntityName = entities.ElementAt(0).LogicalName
             };
         }
+        
+        internal static bool Matches(this Entity e1, Entity? e2)
+        {
+            if (e1 == null || e2 == null) return false;
+            if (e1.LogicalName != e2.LogicalName) return false;
+            if (e1.Id != e2.Id) return false;
+            // Check if all attributes match
+            foreach (var attr in e1.Attributes)
+            {
+                if (!e2.Attributes.TryGetValue(attr.Key, out var value) || !object.Equals(attr.Value, value))
+                {
+                    return false;
+                }
+            }
+            // Check if e2 has any additional attributes that e1 does not have
+            foreach (var attr in e2.Attributes)
+            {
+                if (!e1.Attributes.ContainsKey(attr.Key))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
