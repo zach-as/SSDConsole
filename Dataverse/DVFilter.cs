@@ -248,5 +248,18 @@ namespace SSDConsole.Dataverse
 
         #endregion attribute
 
+        #region filtergeneration
+        internal static FilterExpression FilterAny<T>(Attribute a, List<T> values)
+            => FilterMatch(a, LogicalOperator.Or, values);
+        internal static FilterExpression FilterAll<T>(Attribute a, List<T> values)
+            => FilterMatch(a, LogicalOperator.And, values);
+        private static FilterExpression FilterMatch<T>(Attribute a, LogicalOperator op, List<T> values)
+        {
+            FilterExpression f = new FilterExpression(op);
+            values.ForEach(v => f.AddCondition(a.Attribute(), ConditionOperator.Equal, v));
+            return f;
+        }
+        
+        #endregion filtergeneration
     }
 }

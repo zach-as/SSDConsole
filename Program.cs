@@ -10,6 +10,7 @@ using SSDConsole.CMS.Function;
 using Microsoft.Xrm.Sdk;
 using SSDConsole.CMS.Data.Associable;
 using SSDConsole.SSDDisplay;
+using SSDConsole.Dataverse.DVConnector.DVConnector;
 
 namespace SSDConsole
 {
@@ -27,9 +28,9 @@ namespace SSDConsole
         {
             Display.BeginDisplay();
 
-            //DVConnector.AddOptionSetData(OPTIONSET_CLINICIANSPECIALTY, await Specialty.Specialties());
+            DVConnector.AddOptionSetData(OPTIONSET_CLINICIANSPECIALTY, await Specialty.Specialties());
 
-            //var entities = DVConnector.CreateAndUpdateEntities(await CMSConnector.GetAssociables());
+            var entities = DVConnector.CreateAndUpdateEntities((await CMSConnector.GetAssociables()).ToList());
 
             //DVConnector.CreateRelationshipSchemas();
             //DVConnector.CreateRelationships(entities);

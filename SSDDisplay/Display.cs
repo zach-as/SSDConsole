@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
+using System.Net.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -90,7 +91,7 @@ namespace SSDConsole.SSDDisplay
             // Clear the previous line if it's a printed progress bar
             if (previousMessage is not null
                 && previousMessage.Source() == MessageSource.ProgressBar) ClearLine();
-
+            
             Console.ForegroundColor = message.Color();
             Console.Write(message.Text());
 

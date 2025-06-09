@@ -6,6 +6,7 @@ using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using Newtonsoft.Json.Bson;
 using SSDConsole.CMS.Data.Associable;
+using SSDConsole.SSDDisplay;
 
 namespace SSDConsole.Dataverse.DVConnector.DVConnector
 {
@@ -47,7 +48,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
         
         internal static Dictionary<EntityType, List<AEPair>> CreateAndUpdateEntities(List<Associable> associables)
         {
-            Console.WriteLine("CreateAndUpdateEntities() called.");
+            Display.Print("CreateAndUpdateEntities() called.");
 
             // Retrieve all existing entities
             var existingEntities = FetchEntities();
@@ -74,11 +75,6 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
 
         #endregion entity
 
-        #region relationship
-
-        
-        #endregion relationship
-
         #region optionset
         // The "key" will be the label of the option set whereas the "value" will be the corresponding code
         internal static Dictionary<string, int> GetOptionSetData(string logicalname)
@@ -93,7 +89,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
         // This adds the provided labels to the option set with the provided logical name
         internal static void AddOptionSetData(string logicalname, IEnumerable<string> labels)
         {
-            Console.WriteLine($"Adding {labels.Count()} labels to the option set: {logicalname}.");
+            Display.Print($"Adding {labels.Count()} labels to the option set: {logicalname}.");
 
             var meta = GetOptionSetMeta(logicalname);
             var existingLabels = meta.Options.Select(o => o.Label.UserLocalizedLabel.Label);

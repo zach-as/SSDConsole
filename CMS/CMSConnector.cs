@@ -59,8 +59,8 @@ namespace SSDConsole.CMS
             Console.WriteLine("Updating records. This will take a few minutes.");
 
             ParametersBase parameters = new ParametersBase();
-            parameters.Limit = 30;
-            int? recordTotal = 30;
+            parameters.Limit = 15;
+            int? recordTotal = 15;
             int recordsRecorded = 0;
 
             do

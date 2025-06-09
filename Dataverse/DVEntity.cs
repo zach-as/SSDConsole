@@ -36,6 +36,17 @@ namespace SSDConsole.Dataverse
             throw new ArgumentException("Unknown Associable type", nameof(a));
         }
 
+        internal static EntityCollection EntityCollection(List<Entity>? entities)
+        {
+            if (entities == null) return new EntityCollection();
+            if (entities.Count == 0) return new EntityCollection();
+            return new EntityCollection(entities)
+            {
+                EntityName = entities.ElementAt(0).LogicalName
+            };
+        }
+
+        #region extension_entity
         internal static EntityType EntityType(this Entity e)
             => EntityType(e.LogicalName);
         internal static EntityType EntityType(this EntityReference er)
@@ -60,16 +71,6 @@ namespace SSDConsole.Dataverse
             => e.Attributes.TryGetValue(attrName, out var value) ? value : null;
         internal static bool HasAttribute(this Entity e, string attrName)
             => e.Attributes.ContainsKey(attrName);
-
-        internal static EntityCollection EntityCollection(List<Entity>? entities)
-        {
-            if (entities == null) return new EntityCollection();
-            if (entities.Count == 0) return new EntityCollection();
-            return new EntityCollection(entities)
-            {
-                EntityName = entities.ElementAt(0).LogicalName
-            };
-        }
         
         internal static bool Matches(this Entity e1, Entity? e2)
         {
@@ -94,8 +95,12 @@ namespace SSDConsole.Dataverse
             }
             return true;
         }
+        #endregion extension_entity
+        
+        
     }
 
+    #region entityattribute
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
     internal class EntityAttribute : System.Attribute
     {
@@ -118,7 +123,9 @@ namespace SSDConsole.Dataverse
             return new ColumnSet(attrs.Where(a => a.UseInColumnSet()).Select(a => a.Attribute()).ToArray());
         }
     }
+    #endregion entityattribute
 
+    #region entitytype
     internal enum EntityType
     {
         [Entity("Clinician")]
@@ -216,5 +223,5 @@ namespace SSDConsole.Dataverse
             };
         }
     }
-
+    #endregion entitytype
 }

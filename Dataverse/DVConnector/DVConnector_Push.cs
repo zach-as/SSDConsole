@@ -26,6 +26,13 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
         private static EntityCollection PushCreates(EntityCollection collection)
         {
             var total_entities = collection.Entities.Count();
+            
+            if (total_entities == 0)
+            {
+                Display.Print($"No entities to push of type {collection.EntityName}. Skipping push.");
+                return collection;
+            }
+            
             var entities_to_push = Util.SplitList(collection.Entities.ToList(), PAGE_SIZE);
             var entities_pushed = new List<Entity>();
 
@@ -58,15 +65,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             // Build a query that retrieves all entities with IDs matching the newly created entities
             // We do this so that we can retrieve all relevant data regarding these entities, not just the IDs
             var query = entityType.QueryExpression();
-            query.Criteria = new FilterExpression
-            {
-                Conditions =
-                {
-                    new ConditionExpression(entityType.IdAttribute().Attribute(),
-                                            ConditionOperator.Equal,
-                                            response.Ids)
-                }
-            };
+            query.Criteria = DVFilter.FilterAny(entityType.IdAttribute(), response.Ids.ToList());
 
             return FetchEntities(query, entityType, true);
         }
@@ -81,6 +80,11 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             var total_entities = collection.Entities.Count();
             var entities_to_push = Util.SplitList(collection.Entities.ToList(), PAGE_SIZE);
 
+            if (entities_to_push.Count() == 0 || entities_to_push.ElementAt(0).Count() == 0)
+            {
+                return; // no entities of this type to update
+            }
+            
             Display.Interrupt($"Updating {total_entities} entities of type {collection.EntityName}.");
             Display.StartProgressBar("Entities updated", total_entities);
             foreach (var entity_list in entities_to_push)

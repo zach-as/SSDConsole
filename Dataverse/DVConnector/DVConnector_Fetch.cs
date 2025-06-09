@@ -30,7 +30,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             => FetchEntities(entityType.QueryExpression(), entityType);
 
         // Fetches entities that match the specified query from dataverse
-        internal static EntityCollection FetchEntities(QueryExpression query, EntityType? entityType = null, bool skipDisplay = true)
+        internal static EntityCollection FetchEntities(QueryExpression query, EntityType? entityType = null, bool skipDisplay = false)
         {
             List<Entity> entities = new List<Entity>();
 
@@ -65,10 +65,11 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
                 query.PageInfo.PageNumber++;
             }
 
-            Display.StopProgressBar();
 
             if (!skipDisplay)
             {
+                Display.StopProgressBar();
+                
                 if (entities.Count == 0)
                 {
                     Display.Interrupt($"No entities found{type_str}.",
