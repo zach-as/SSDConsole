@@ -43,6 +43,39 @@ namespace SSDConsole.Dataverse.DVConnector
             return service;
         }
 
+        #region entity
+
+        // This creates the basic entity objects for later use
+        internal static Dictionary<EntityType, List<AEPair>> CreateAndUpdateEntities(List<Associable> associables)
+        {
+            Console.WriteLine("CreateAndUpdateEntities() called.");
+
+            // Retrieve all existing entities
+            var existingEntities = FetchEntities();
+            // Pair entities with provided asociables
+            var pairedEntities = PairedList(associables, existingEntities);
+            // Update entities that have matching associables
+            ApplyAttributes(pairedEntities);
+            // Push updated entities to dataverse
+            PushUpdates(pairedEntities);
+            // Create new entities for each associable that does not have a matching entity in Dataverse
+            var newEntities = CreateEntities(associables, pairedEntities);
+            // Push the newly created entities to dataverse
+            var pushedEntities = PushCreates(newEntities);
+            // Pair the newly created entities with the associables
+            var pairedNewEntities = PairedList(associables, pushedEntities);
+            // Merge the newly created entities with the existing paired entities
+            var allEntities = pairedEntities.ToDictionary(
+                                    p => p.Key, // key is the entity type 
+                                    p => p.Value.Concat(pairedNewEntities[p.Key]).ToList()); // value is the concatenation of existing and new entities
+
+            // Return the complete dictionary of entities
+            return allEntities;
+        }
+
+        #endregion entity
+
+        #region relationship
         internal static void CreateRelationshipSchemas()
             => DVRelationship.CreateRelationshipSchemas(Service());
 
@@ -51,6 +84,7 @@ namespace SSDConsole.Dataverse.DVConnector
             var relationshipSets = DVRelationship.BuildRelationships(Service(), dict);
             DVRelationship.AddRelationships(Service(), relationshipSets);
         }
+        #endregion relationship
 
         #region optionset
         // The "key" will be the label of the option set whereas the "value" will be the corresponding code
