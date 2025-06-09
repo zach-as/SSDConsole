@@ -88,8 +88,19 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             => pair.Associable()
                 .ApplyAttributes(pair.Entity());
 
-        
+        internal static bool Contains(this List<AEPair> pairs, Associable a)
+            => pairs.Contains(a, null);
+        internal static bool Contains(this List<AEPair> pairs, Entity e)
+            => pairs.Contains(null, e);
+        private static bool Contains(this List<AEPair> pairs, Associable? a, Entity? e)
+        {
+            if (a is null & e is null) throw new ArgumentNullException("In List<AePair>.Contains(), cannot check if both Associable and Entity are null!");
+            if (a is not null) return pairs.Any(p => p.Associable().Matches(a));
+            if (e is not null) return pairs.Any(p => p.Entity().Matches(e));
+            return false; // should never reach here, but just in case
+        }
 
-        
+
+
     }
 }
