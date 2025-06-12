@@ -14,6 +14,7 @@ using SSDConsole.CMS.Params;
 using SSDConsole.CMS.Record;
 using SSDConsole.CMS.Path;
 using SSDConsole.CMS.Data.Associable;
+using SSDConsole.SSDDisplay;
 
 namespace SSDConsole.CMS
 {
@@ -56,7 +57,7 @@ namespace SSDConsole.CMS
         {
             if (!ShouldUpdateRecords()) return;
 
-            Console.WriteLine("Updating records. This will take a few minutes.");
+            Display.Print("Pulling records from CMS. This may take a few minutes.");
 
             ParametersBase parameters = new ParametersBase();
             parameters.Limit = 15;
@@ -72,24 +73,27 @@ namespace SSDConsole.CMS
                 if (response is null) throw new Exception("Failed to build record response from text.");
                 if (recordTotal is null || recordTotal == 0) recordTotal = response.RecordCountDB; // note the total # of records
 
+                if (!Display.InProgress()) Display.StartProgressBar("CMS records pulled and formatted:", recordTotal);
+                
                 if(records is null) records = new RecordOutput();
                 records.AddRecordInput(response); // Convert the response to most usable form (clinicians, clinics, orgs, etc)
 
+                int recordsPulled = response.Records().Count();
+                
+                Display.UpdateProgressBar(recordsPulled);
+                
                 // Increment the offset so that the query will return the next set of records (default 2000 at a time)
-                parameters.Offset += response.Records().Count();
+                parameters.Offset += recordsPulled;
 
                 // update the number of records recorded so we know when to stop looping
-                recordsRecorded += response.Records().Count();
-
-                Console.CursorLeft = 0;
-                Console.Write($"Records updated: {recordsRecorded} / {recordTotal}"); // show progress
+                recordsRecorded += recordsPulled;
 
                 // keep looping until we have all the records
             } while (recordTotal is not null
                     && recordsRecorded < recordTotal);
 
-            Console.WriteLine();
-            Console.WriteLine("Record update complete.");
+            Display.StopProgressBar();
+            Display.Print("Records from CMS pulled and updated.");
 
         }
         private static bool ShouldUpdateRecords()
