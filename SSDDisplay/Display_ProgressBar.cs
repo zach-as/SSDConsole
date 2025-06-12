@@ -8,14 +8,19 @@ namespace SSDConsole.SSDDisplay
 {
     internal static partial class Display
     {
-
+        // Returns true if there is an active progress bar
+        internal static bool InProgress()
+        {
+            return currentProgressBar is not null && !currentProgressBar.IsFinished();
+        }
 
         // this will start a progress bar which will be monitored and displayed on the console
         internal static void StartProgressBar(string message, int? max_progress, params ProgressBarInfo[] info)
         {
-            if (currentProgressBar is not null && !currentProgressBar.IsFinished())
+            if (InProgress())
             {
-                Interrupt("Starting progress bar when one is already underway. Overriding existing progress bar.", MessageSeverity.Warning);
+                Interrupt("Starting progress bar when one is already underway. Overriding existing progress bar.",
+                                MessageSeverity.Warning);
             }
             currentProgressBar = new ProgressBar(message, max_progress, info);
         }
