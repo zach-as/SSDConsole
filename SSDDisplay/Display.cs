@@ -15,8 +15,15 @@ namespace SSDConsole.SSDDisplay
         Misc
     }
 
+    internal enum Verbosity
+    {
+        Standard,
+        Debug
+    }
+
     internal static partial class Display
     {
+        
         private const int TIME_BETWEEN_UPDATES = 50; // in milliseconds, aka 10 updates per second
 
         private static Message? previousMessage; // the most recent message printed
@@ -52,7 +59,7 @@ namespace SSDConsole.SSDDisplay
         // for public use, this will print a message to the console with low priority
         internal static void Print(string message, MessageSeverity severity = MessageSeverity.Info)
             => messages.Add(new Message(message, MessageSource.Misc, severity));
-
+        
         private static void Print()
         {
             // First print any interrupt messages if present
@@ -102,6 +109,21 @@ namespace SSDConsole.SSDDisplay
             previousMessage = message;
         }
 
+        #region debug
+        private static Verbosity verbosity = Verbosity.Standard;
+        internal static void SetVerbose(bool verbose) // if verbose is set to true, debug statements will print
+        {
+            if (verbose) verbosity = Verbosity.Debug;
+            else verbosity = Verbosity.Standard;
+        }
+        internal static bool IsVerbose() // returns true if verbosity is set to debug
+            => verbosity == Verbosity.Debug ? true : false;
+        internal static void Debug(string message) // these statements will only print if SetVerbose(true) is called beforehand
+        {
+            if (IsVerbose())
+                messages.Add(new Message(message, MessageSource.Misc, MessageSeverity.Debug));
+        }
+        #endregion debug
         private static void ClearLine()
         {
             Console.CursorLeft = 0;

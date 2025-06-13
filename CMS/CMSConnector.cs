@@ -60,8 +60,8 @@ namespace SSDConsole.CMS
             Display.Print("Pulling records from CMS. This may take a few minutes.");
 
             ParametersBase parameters = new ParametersBase();
-            parameters.Limit = 15;
-            int? recordTotal = 15;
+            parameters.Limit = 60;
+            int? recordTotal = 60;
             int recordsRecorded = 0;
 
             do

@@ -43,24 +43,33 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
         {
             Display.Interrupt("CreateRelationshipSchemas() called. Creating relationship schemas for all entity types as needed.");
             var entityTypes = Enum.GetValues(typeof(EntityType));
+            var schemaCreated = false;
             foreach (var referencing in entityTypes)
             {
                 foreach (var referenced in entityTypes)
                 {
                     if (referencing.Equals(referenced)) continue; // do not create a relationship schema for the same entity type
-                    TryCreateRelationshipSchema((EntityType)referencing, (EntityType)referenced);
+                    schemaCreated = schemaCreated || TryCreateRelationshipSchema((EntityType)referencing, (EntityType)referenced);
                 }
+            }
+            if (!schemaCreated)
+            {
+                Display.Interrupt("No relationship schemas created.");
+            } else
+            {
+                Display.Interrupt("Schema creation finished.");
             }
         }
 
-        private static void TryCreateRelationshipSchema( EntityType referencing, EntityType referenced)
+        private static bool TryCreateRelationshipSchema( EntityType referencing, EntityType referenced)
         {
 
             if (!RelationshipSchemaExists(referencing, referenced))
             {
                 CreateRelationshipSchema(referencing, referenced);
+                return true;
             }
-
+            return false;
         }
 
         private static void CreateRelationshipSchema(EntityType referencing, EntityType referenced)

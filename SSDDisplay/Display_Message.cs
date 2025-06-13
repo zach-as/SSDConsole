@@ -49,7 +49,9 @@ namespace SSDConsole.SSDDisplay
             [Severity(ConsoleColor.Red)]
             Error,
             [Severity(ConsoleColor.Green)]
-            Success
+            Success,
+            [Severity(ConsoleColor.Cyan)]
+            Debug,
         }
 
         internal static ConsoleColor Color(this MessageSeverity severity)

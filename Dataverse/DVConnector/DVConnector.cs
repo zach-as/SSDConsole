@@ -46,7 +46,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
 
         #region entity
         
-        internal static Dictionary<EntityType, List<AEPair>> CreateAndUpdateEntities(List<Associable> associables)
+        internal static List<AEPair> CreateAndUpdateEntities(List<Associable> associables)
         {
             Display.Print("CreateAndUpdateEntities() called.");
 
@@ -65,9 +65,9 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             // Pair the newly created entities with the associables
             var pairedNewEntities = PairedList(associables, pushedEntities);
             // Merge the newly created entities with the existing paired entities
-            var allEntities = pairedEntities.ToDictionary(
-                                    p => p.Key, // key is the entity type 
-                                    p => p.Value.Concat(pairedNewEntities[p.Key]).ToList()); // value is the concatenation of existing and new entities
+            var allEntities = pairedEntities.Values.SelectMany(p => p)
+                                .Concat(pairedNewEntities.Values.SelectMany(p => p))
+                                .ToList();
 
             // Return the complete dictionary of entities
             return allEntities;

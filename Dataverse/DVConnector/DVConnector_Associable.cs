@@ -56,6 +56,10 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
                         Display.UpdateProgressBar(infoid_nomatch);
                         entitiesWithNoMatch.Add(entity);
                         entitiesOfTypeWithNoMatch++;
+                        //Display.SetVerbose(true);
+                        //Display.Debug("Found Associable with no match. Engaging debug.");
+                        //FindMatchingAssociable(associables, entity);
+                        //Display.SetVerbose(false);
                         continue;
                     }
 
