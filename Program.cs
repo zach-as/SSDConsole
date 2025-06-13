@@ -32,8 +32,8 @@ namespace SSDConsole
 
             var entities = DVConnector.CreateAndUpdateEntities((await CMSConnector.GetAssociables()).ToList());
 
-            //DVConnector.CreateRelationshipSchemas();
-            //DVConnector.CreateRelationships(entities);
+            DVConnector.CreateRelationshipSchemas();
+            DVConnector.CreateRelationships(entities);
         }
     }
 }

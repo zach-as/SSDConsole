@@ -23,7 +23,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             bool referencingFirst = referencing.GoesBefore(referenced);
             var first = referencingFirst ? referencing.SchemaName() : referenced.SchemaName();
             var second = referencingFirst ? referenced.SchemaName() : referencing.SchemaName();
-            return new Relationship($"{first}_{second}");
+            return new Relationship($"{first}at{second}");
         }
         private static Relationship Relationship(Associable referencing, Associable referenced)
             => Relationship(referencing.EntityType(), referenced.EntityType());
@@ -259,6 +259,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
                 var referencingType = entity.EntityType();
                 var relationshipSet = pair.Value;
                 var entityReferences = relationshipSet.ReferenceCollection();
+                if (entityReferences.Values.Count() == 0) continue; // skip adding relationships if there are none to add
                 
                 foreach (var referencedType in entityReferences.Keys)
                 {

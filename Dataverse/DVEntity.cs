@@ -129,14 +129,12 @@ namespace SSDConsole.Dataverse
     internal enum EntityType
     {
         [Entity("Clinician")]
-        Clinician,
+        Clinician = 0,
         [Entity("Clinic")]
-        Clinic,
+        Clinic = 1,
         [Entity("Medical Group")]
-        MedicalGroup // aka Organization
+        MedicalGroup = 2 // aka Organization
     }
-
-    
 
     internal static class EntityType_Extension
     {
@@ -208,9 +206,9 @@ namespace SSDConsole.Dataverse
             };
         }
 
-        // Returns true if *this* EntityType should go before the provided EntityType, lexographically sorted
+        // Returns true if *this* EntityType should go before the provided EntityType, sorted through the enum initialization
         internal static bool GoesBefore(this EntityType a, EntityType b)
-            => a.ToString().CompareTo(b.ToString()) > 0;
+            => a < b;
 
         internal static Attribute IdAttribute(this EntityType e)
         {
