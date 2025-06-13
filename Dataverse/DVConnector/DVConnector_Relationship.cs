@@ -10,193 +10,105 @@ using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Client;
 using SSDConsole.SSDDisplay;
+using SSDConsole.Dataverse;
 using System.Drawing.Printing;
+using Microsoft.Xrm.Sdk.Query;
 
 namespace SSDConsole.Dataverse.DVConnector.DVConnector
 {
+    
     internal static partial class DVConnector
     {
-
-        private static Relationship Relationship(EntityType referencing, EntityType referenced)
+        internal class EntityRelationshipSet
         {
-            if (referencing == referenced) throw new ArgumentException("Cannot create a relationship schema for the same entity type.", nameof(referencing));
-            bool referencingFirst = referencing.GoesBefore(referenced);
-            var first = referencingFirst ? referencing.SchemaName() : referenced.SchemaName();
-            var second = referencingFirst ? referenced.SchemaName() : referencing.SchemaName();
-            return new Relationship($"{first}at{second}");
-        }
-        private static Relationship Relationship(Associable referencing, Associable referenced)
-            => Relationship(referencing.EntityType(), referenced.EntityType());
-        private static Relationship Relationship(Entity referencing, Entity referenced)
-            => Relationship(referencing.EntityType(), referenced.EntityType());
-        private static string LogicalName(this Relationship relationship)
-            => relationship.SchemaName.ToLower();
+            private Dictionary<DVRelationshipType, List<Entity>> relatedEntities = new Dictionary<DVRelationshipType, List<Entity>>();
 
-        internal static void CreateRelationships(List<AEPair> pairs)
-        {
-            var relationshipSets = BuildRelationships(pairs);
-            AddRelationships(relationshipSets);
-        }
-
-        #region relationshipschema
-        internal static void CreateRelationshipSchemas()
-        {
-            Display.Interrupt("CreateRelationshipSchemas() called. Creating relationship schemas for all entity types as needed.");
-            var entityTypes = Enum.GetValues(typeof(EntityType));
-            var schemaCreated = false;
-            foreach (var referencing in entityTypes)
+            // Adds the provided entity to the lists of related entities
+            internal void Add(Entity entity)
             {
-                foreach (var referenced in entityTypes)
+                var relType = DVRelationship.RelationshipType(entity);
+                if (!relatedEntities.ContainsKey(relType))
                 {
-                    if (referencing.Equals(referenced)) continue; // do not create a relationship schema for the same entity type
-                    schemaCreated = schemaCreated || TryCreateRelationshipSchema((EntityType)referencing, (EntityType)referenced);
+                    relatedEntities[relType] = new List<Entity>();
+                }
+                if (!relatedEntities[relType].Contains(entity))
+                {
+                    relatedEntities[relType].Add(entity);
                 }
             }
-            if (!schemaCreated)
-            {
-                Display.Interrupt("No relationship schemas created.");
-            } else
-            {
-                Display.Interrupt("Schema creation finished.");
-            }
+
+            // Returns the most suitable form of the related entities for the purpose of establishing newRelationships
+            internal Dictionary<DVRelationshipType, EntityCollection> Collection()
+                => relatedEntities.ToDictionary(
+                    pair => pair.Key,
+                    pair => relatedEntities[pair.Key].EntityCollection());
         }
-
-        private static bool TryCreateRelationshipSchema( EntityType referencing, EntityType referenced)
+        
+        internal static void CreateAndPushRelationships(List<AEPair> pairs)
         {
+            var existingRelationships = ExistingRelationships();
+            var newRelationships = CreateRelationships(existingRelationships, pairs);
+            PushRelationships(newRelationships);
+        }
+        
+        internal static Dictionary<DVRelationshipType, List<Entity>> ExistingRelationships()
+        {
+            var relTypes = DVRelationship.RelationshipTypes();
+            var results = new Dictionary<DVRelationshipType, List<Entity>>();
 
-            if (!RelationshipSchemaExists(referencing, referenced))
+            Display.Print("Fetching existing newRelationships.");
+            foreach (var relType in relTypes)
             {
-                CreateRelationshipSchema(referencing, referenced);
-                return true;
+                var relName = relType.FriendlyName();
+                Display.Print($"Fetching {relName} newRelationships.");
+                var query = relType.QueryExpression();
+                var response = FetchEntities(query, null, false);
+                if (response is null || response.Entities.Count == 0)
+                {
+                    Display.Print($"No relationship found of type {relName}.");
+                    results[relType] = new List<Entity>();
+                } else
+                {
+                    Display.Print($"Found {response.Entities.Count} newRelationships of type {relName}.");
+                    results[relType] = response.Entities.ToList();
+                }
+            }
+            Display.Print("Existing newRelationships fetched.",
+                            Display.MessageSeverity.Success);
+
+            return results;
+        }
+        
+        private static bool Related(
+            Dictionary<DVRelationshipType, List<Entity>> relationships,
+            Entity a,
+            Entity b)
+        {
+            var aType = a.EntityType();
+            var bType = b.EntityType();
+            if (aType == bType) return false;
+            
+            var relType = DVRelationship.RelationshipType(aType, bType);
+            
+            foreach (var relationshipEntity in relationships[relType])
+            {
+                var matching = DVRelationship.RelationshipMatch(relationshipEntity, a, b);
+                if (matching) return true;
             }
             return false;
         }
-
-        private static void CreateRelationshipSchema(EntityType referencing, EntityType referenced)
-        {
-            var relationship = Relationship(referencing, referenced);
-            Display.Print($"Creating relationship schema for {relationship.SchemaName}");
-
-            var request = new CreateManyToManyRequest()
-            {
-                IntersectEntitySchemaName = relationship.SchemaName,
-                ManyToManyRelationship =
-                new ManyToManyRelationshipMetadata()
-                {
-                    SchemaName = relationship.SchemaName,
-                    Entity1LogicalName = referencing.LogicalName(),
-                    Entity1AssociatedMenuConfiguration =
-                        new AssociatedMenuConfiguration()
-                        {
-                            Behavior = AssociatedMenuBehavior.UseLabel,
-                            Group = AssociatedMenuGroup.Details,
-                            Label = new Label(referencing.FriendlyName(), 1033),
-                            Order = 10000
-
-                        },
-                    Entity2LogicalName = referenced.LogicalName(),
-                    Entity2AssociatedMenuConfiguration =
-                        new AssociatedMenuConfiguration()
-                        {
-                            Behavior = AssociatedMenuBehavior.UseLabel,
-                            Group = AssociatedMenuGroup.Details,
-                            Label = new Label(referenced.FriendlyName(), 1033),
-                            Order = 10000
-                        }
-                },
-                SolutionUniqueName = SOLUTION
-            };
-
-            Service().Execute(request);
-            Display.Print($"Relationship schema for {relationship.SchemaName} created successfully.",
-                                Display.MessageSeverity.Success);
-        }
-
-        private static bool RelationshipSchemaExists(EntityType referencing, EntityType referenced)
-        {
-            var relationship = Relationship(referencing, referenced);
-            try
-            {
-                var request = new RetrieveRelationshipRequest()
-                {
-                    Name = relationship.SchemaName,
-                    RetrieveAsIfPublished = true
-                };
-                var response = (RetrieveRelationshipResponse)Service().Execute(request);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Display.Print($"Relationship schema for {relationship.SchemaName} does not exist.",
-                                    Display.MessageSeverity.Warning);
-                return false;
-            }
-        }
-        #endregion relationshipschema
-
-        private static bool Related(EntityReference a, EntityReference b)
-            => Related(a.Id, a.EntityType(), b.Id, b.EntityType());
-        private static bool Related(Entity a, Entity b)
-            => Related(a.Id, a.EntityType(), b.Id, b.EntityType());
-        private static bool Related(Entity a, EntityReference b)
-            => Related(a.Id, a.EntityType(), b.Id, b.EntityType());
-        private static bool Related(Guid aId, EntityType aType, Guid bId, EntityType bType)
-        {
-            if (aType == bType) return false;
-
-            var context = new OrganizationServiceContext(Service());
-            
-            var aGoesFirst = aType.GoesBefore(bType);
-
-            var aIdAttr = DVAttribute.IdAttribute(aType).Attribute();
-            var bIdAttr = DVAttribute.IdAttribute(bType).Attribute();
-
-            var firstId = aGoesFirst ? aId : bId;
-            var secondId = aGoesFirst ? bId : aId;
-            var firstIdAttr = aGoesFirst ? aIdAttr : bIdAttr;
-            var secondIdAttr = aGoesFirst ? bIdAttr : aIdAttr;
-
-            var relatedRecords = from rel in context.CreateQuery(Relationship(aType, bType).LogicalName())
-                                  where rel[firstIdAttr].Equals(firstId) && rel[secondIdAttr].Equals(secondId)
-                                  select rel;
-
-            return relatedRecords.ToArray().Any();
-        }
-
-        internal class EntityRelationshipSet
-        {
-            private Dictionary<EntityType, List<AEPair>> relatedPairs = new Dictionary<EntityType, List<AEPair>>();
-            
-            // Adds a pair to the related pairs dictionary, creating a new list if the entity type does not already exist
-            internal void Add(AEPair pair)
-            {
-                var entityType = pair.EntityType();
-                if (!relatedPairs.ContainsKey(entityType))
-                {
-                    relatedPairs[entityType] = [];
-                }
-                if (!relatedPairs[entityType].Contains(pair.Entity()))
-                {
-                    relatedPairs[entityType].Add(pair);
-                }
-            }
-            
-            // Returns the most suitable form of the related entities for the purpose of establishing relationships
-            internal Dictionary<EntityType, EntityReferenceCollection> ReferenceCollection()
-                => relatedPairs.ToDictionary(
-                    pair => pair.Key,
-                    pair => relatedPairs[pair.Key].ReferenceCollection());
-        }
         
-        internal static Dictionary<Entity, EntityRelationshipSet> BuildRelationships(List<AEPair> pairs)
+        internal static Dictionary<Entity, EntityRelationshipSet> CreateRelationships(
+            Dictionary<DVRelationshipType, List<Entity>> existingRelationships,
+            List<AEPair> pairs)
         {
-            var relationships = new Dictionary<Entity, EntityRelationshipSet>();
+            var newRelationships = new Dictionary<Entity, EntityRelationshipSet>();
             
             string id_skip = "id_skip";
             string id_skip_entity = "id_skip_entity";
 
-            Display.Interrupt("BuildRelationships() called. Establishing relationship links.");
-            Display.StartProgressBar($"Entities with relationship links established", pairs.Count(),
+            Display.Interrupt("CreateAndPushRelationships() called. Creating relationship entities.");
+            Display.StartProgressBar($"Entities with relationship created", pairs.Count(),
                                         new Display.ProgressBarInfo(id_skip_entity, "Entities with invalid associations"),
                                         new Display.ProgressBarInfo(id_skip, "Total invalid associations"));
             
@@ -209,7 +121,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
                 var hasInvalidAssociation = false;
 
                 // Initialize the relationship set for this entity
-                relationships[entity] = new EntityRelationshipSet();
+                newRelationships[entity] = new EntityRelationshipSet();
                 
                 foreach (var associatedAssociable in associations)
                 {
@@ -218,7 +130,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
                     // If the associated pair is null, it means an entity matching the associated associable could not be found
                     if (associatedPair is null)
                     {
-                        Display.Interrupt($"Attempting to associate entity of type {associable.LogicalName()} with"
+                        Display.Interrupt($"Attempting to create relationship for entity of type {associable.LogicalName()} with"
                                         + $" target entity of type {associatedAssociable.LogicalName()}, but target could not be found. Skipping.",
                                         Display.MessageSeverity.Warning);
                         Display.UpdateProgressBar(id_skip); // Update the progress bar to reflect the skipped association
@@ -227,27 +139,30 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
                         continue;
                     }
 
+                    var associatedEntity = associatedPair.Entity();
+
                     // Pair is found, so perform the relation if needed
-                    if (!Related(entity, associatedPair.Entity()))
+                    if (!Related(existingRelationships, entity, associatedEntity))
                     {
-                        relationships[entity].Add(associatedPair);
+                        var newRelationship = DVRelationship.NewRelationship(entity, associatedEntity);
+                        newRelationships[entity].Add(newRelationship);
                     }
                 }
 
-                // Update the progress bar to indicate that this entity's relationships have been updated, or that its relationships are already established
+                // Update the progress bar to indicate that this entity's newRelationships have been updated, or that its newRelationships are already established
                 Display.UpdateProgressBar();
             }
 
             Display.StopProgressBar();
-            Display.Interrupt($"Finished establishing relationship links for {pairs.Count} entities.",
+            Display.Interrupt($"Finished creating new relationship for {pairs.Count} entities.",
                                 Display.MessageSeverity.Success);
 
-            return relationships;
+            return newRelationships;
         }
 
-        internal static void AddRelationships(Dictionary<Entity, EntityRelationshipSet> relationshipSets)
+        internal static void PushRelationships(Dictionary<Entity, EntityRelationshipSet> relationshipSets)
         {
-            Display.Interrupt("AddRelationships() called. Adding relationship sets to entities in Dataverse.");
+            Display.Interrupt("PushRelationships() called. Adding relationship sets to entities in Dataverse.");
             
             int total = relationshipSets.Keys.Count;
 
@@ -256,23 +171,15 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             foreach (var pair in relationshipSets)
             {
                 var entity = pair.Key;
-                var referencingType = entity.EntityType();
                 var relationshipSet = pair.Value;
-                var entityReferences = relationshipSet.ReferenceCollection();
-                if (entityReferences.Values.Count() == 0) continue; // skip adding relationships if there are none to add
+                var newRelationships = relationshipSet.Collection();
+                if (newRelationships.Values.Count() == 0) continue; // skip adding newRelationships if there are none to add
                 
-                foreach (var referencedType in entityReferences.Keys)
+                foreach (var bType in newRelationships.Keys)
                 {
+                    PushCreates(newRelationships[bType]);
                     try
                     {
-                        var request = new AssociateRequest
-                        {
-                            RelatedEntities = entityReferences[referencedType],
-                            Relationship = Relationship(referencingType, referencedType),
-                            Target = entity.ToEntityReference()
-                        };
-
-                        Service().Execute(request);
                     }
                     catch (Exception ex) { Display.Interrupt(ex.Message, Display.MessageSeverity.Error); }
                 }

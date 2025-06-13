@@ -45,12 +45,12 @@ namespace SSDConsole.Dataverse
                 EntityName = LogicalName(),
                 Orders = { new OrderExpression()
                     {
-                        AttributeName = a.FriendlyName(),
+                        AttributeName = a.LogicalName(),
                         OrderType = OrderType.Ascending,
                     } }
             };
         internal ColumnSet ColumnSet()
-            => new ColumnSet(a.FriendlyName(), b.FriendlyName());
+            => new ColumnSet(a.LogicalName(), b.LogicalName());
         internal EntityType EntA() => a;
         internal EntityType EntB() => b;
         internal string FriendlyName() => friendlyname;
@@ -91,7 +91,13 @@ namespace SSDConsole.Dataverse
             => t.Attribute().QueryExpression();
         // Retrieve a list of all relationship types
         internal static List<DVRelationshipType> RelationshipTypes()
-            => Enum.GetValues<DVRelationshipType>().ToList();
+            => new List<DVRelationshipType>()
+            {
+                DVRelationshipType.ClinicianAtClinic,
+                DVRelationshipType.ClinicianAtMedicalGroup,
+                DVRelationshipType.ClinicAtMedicalGroup
+            };
+        
         internal static DVRelationshipType RelationshipType(EntityType a, EntityType b)
         {
             if (a == b) throw new ArgumentException($"RelationshipType({a}, {b}): Entities of same type can not be related!");
@@ -108,5 +114,42 @@ namespace SSDConsole.Dataverse
             => RelationshipType(a.EntityType(), b.EntityType());
         internal static DVRelationshipType RelationshipType(Entity a, Entity b)
             => RelationshipType(a.EntityType(), b.EntityType());
+        internal static DVRelationshipType RelationshipType(Entity relationshipEntity)
+            => RelationshipTypes()
+            .First(relType => relType.LogicalName() == relationshipEntity.LogicalName);
+        
+        // Creates a new Entity for the purpose of recording a relationship in DV
+        internal static Entity NewRelationship(Entity a, Entity b)
+        {
+            var relType = RelationshipType(a.EntityType(), b.EntityType());
+            var entity = new Entity(relType.LogicalName());
+            // assign the reference value of A's col to A's id
+            entity[relType.EntA().LogicalName()] = a.ToEntityReference();
+            // assign the reference value of B's col to B's id
+            entity[relType.EntB().LogicalName()] = b.ToEntityReference();
+            return entity;
+        }
+        
+        // This accepts three entities
+        // relationship = the entity storing the relationship information
+        // a = the first entity to check
+        // b = the second entity to check
+        // this function returns true if the relationship entity is of the appropriate relType and if its stored relationship info matches the given  types
+        internal static bool RelationshipMatch(Entity relationship, Entity a, Entity b)
+        {
+            var relType = RelationshipType(a.EntityType(), b.EntityType());
+            if (relationship.LogicalName != relType.LogicalName()) return false;
+            
+            var aId = a.Id;
+            var bId = b.Id;
+
+            var aName = a.LogicalName;
+            var bName = b.LogicalName;
+
+            var aMatch = relationship[aName].Equals(aId);
+            var bMatch = relationship[bName].Equals(bId);
+
+            return aMatch && bMatch;
+        }
     }
 }

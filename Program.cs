@@ -31,9 +31,8 @@ namespace SSDConsole
             DVConnector.AddOptionSetData(OPTIONSET_CLINICIANSPECIALTY, await Specialty.Specialties());
 
             var entities = DVConnector.CreateAndUpdateEntities((await CMSConnector.GetAssociables()).ToList());
-
-            DVConnector.CreateRelationshipSchemas();
-            DVConnector.CreateRelationships(entities);
+            
+            DVConnector.CreateAndPushRelationships(entities);
         }
     }
 }

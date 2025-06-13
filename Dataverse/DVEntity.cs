@@ -36,7 +36,7 @@ namespace SSDConsole.Dataverse
             throw new ArgumentException("Unknown Associable type", nameof(a));
         }
 
-        internal static EntityCollection EntityCollection(List<Entity>? entities)
+        internal static EntityCollection EntityCollection(this List<Entity>? entities)
         {
             if (entities == null) return new EntityCollection();
             if (entities.Count == 0) return new EntityCollection();

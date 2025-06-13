@@ -23,7 +23,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             => PushCreates(pairs.EntityCollection());
 
         // This pushes creation of new entities to dataverse using pagination to avoid exceeding the maximum request size
-        private static EntityCollection PushCreates(EntityCollection collection)
+        internal static EntityCollection PushCreates(EntityCollection collection)
         {
             var total_entities = collection.Entities.Count();
             
