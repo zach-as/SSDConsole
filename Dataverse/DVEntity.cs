@@ -95,6 +95,32 @@ namespace SSDConsole.Dataverse
             }
             return true;
         }
+
+        internal static bool IsValid(this Entity e)
+        {
+            EntityType t = e.EntityType();
+            if (t is EntityType.Clinician)
+            {
+
+            }
+            /*switch(t)
+            {
+                case EntityType.Clinician:
+                    return e.HasAttribute(Attribute.ClinicianID.Attribute()) &&
+                           e.HasAttribute(Attribute.Npi.Attribute()) &&
+                           e.HasAttribute(Attribute.Pac.Attribute());
+                case EntityType.Clinic:
+                    return e.HasAttribute(Attribute.ClinicID.Attribute()) &&
+                           e.HasAttribute(Attribute.Name.Attribute());
+                case EntityType.MedicalGroup:
+                    return e.HasAttribute(Attribute.MedicalGroupID.Attribute()) &&
+                           e.HasAttribute(Attribute.Name.Attribute()) &&
+                           e.HasAttribute(Attribute.Pac.Attribute());
+                default:
+                    return false; // Unknown entity type
+            }*/
+            return true;
+        }
         #endregion extension_entity
         
         

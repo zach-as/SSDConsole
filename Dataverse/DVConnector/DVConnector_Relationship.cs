@@ -142,7 +142,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
                     var associatedEntity = associatedPair.Entity();
 
                     // Pair is found, so perform the relation if needed
-                    if (!Related(existingRelationships, entity, associatedEntity))
+                    if (associatedEntity.IsValid() && !Related(existingRelationships, entity, associatedEntity))
                     {
                         var newRelationship = DVRelationship.NewRelationship(entity, associatedEntity);
                         newRelationships[entity].Add(newRelationship);
