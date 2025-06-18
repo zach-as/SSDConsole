@@ -15,25 +15,23 @@ namespace SSDConsole.Dataverse
 {
     internal static class DVEntity
     {
-        // Returns a ColumnSet that contains all the attributes that are relevant to this object.
-        internal static ColumnSet ColumnSet(Associable a)
+        internal static EntityType[] EntityTypes()
+            => [
+                Dataverse.EntityType.Clinic,
+                Dataverse.EntityType.MedicalGroup,
+                Dataverse.EntityType.Clinician
+                ];
+
+    // Returns a ColumnSet that contains all the attributes that are relevant to this object.
+    internal static ColumnSet ColumnSet(Associable a)
         {
             if (a is null) return new ColumnSet();
-            return EntityType(a).ColumnSet();
+            return a.EntityType().ColumnSet();
         }
 
         internal static string LogicalName(Associable a)
         {
-            return EntityType(a).LogicalName();
-        }
-
-        internal static EntityType EntityType(Associable a)
-        {
-            if (a is null) throw new ArgumentNullException(nameof(a), "Cannot determine EntityType from null Associable");
-            if (a is Clinician) return Dataverse.EntityType.Clinician;
-            if (a is Clinic) return Dataverse.EntityType.Clinic;
-            if (a is Organization) return Dataverse.EntityType.MedicalGroup;
-            throw new ArgumentException("Unknown Associable type", nameof(a));
+            return a.EntityType().LogicalName();
         }
 
         internal static EntityCollection EntityCollection(this List<Entity>? entities)
@@ -46,7 +44,6 @@ namespace SSDConsole.Dataverse
             };
         }
 
-        #region extension_entity
         internal static EntityType EntityType(this Entity e)
             => EntityType(e.LogicalName);
         internal static EntityType EntityType(this EntityReference er)
@@ -54,17 +51,14 @@ namespace SSDConsole.Dataverse
         internal static EntityType EntityType(string logicalname)
         {
             if (string.IsNullOrEmpty(logicalname)) throw new ArgumentNullException(nameof(logicalname), "EntityType cannot be determined from null or empty logical name");
-            switch (logicalname)
+            var entityTypes = EntityTypes();
+            
+            foreach (EntityType t in entityTypes)
             {
-                case var name when name == Dataverse.EntityType.Clinic.LogicalName():
-                    return Dataverse.EntityType.Clinic;
-                case var name when name == Dataverse.EntityType.MedicalGroup.LogicalName():
-                    return Dataverse.EntityType.MedicalGroup;
-                case var name when name == Dataverse.EntityType.Clinician.LogicalName():
-                    return Dataverse.EntityType.Clinician;
-                default:
-                    throw new ArgumentException($"Unknown entity type: {logicalname}", nameof(logicalname));
+                if (t.LogicalName().Equals(logicalname)) return t;
             }
+
+            throw new Exception($"Unrecognized logicalname: {logicalname}");
         }
 
         internal static object? AttributeValue(this Entity e, string attrName)
@@ -95,33 +89,6 @@ namespace SSDConsole.Dataverse
             }
             return true;
         }
-
-        internal static bool IsValid(this Entity e)
-        {
-            EntityType t = e.EntityType();
-            if (t is EntityType.Clinician)
-            {
-
-            }
-            /*switch(t)
-            {
-                case EntityType.Clinician:
-                    return e.HasAttribute(Attribute.ClinicianID.Attribute()) &&
-                           e.HasAttribute(Attribute.Npi.Attribute()) &&
-                           e.HasAttribute(Attribute.Pac.Attribute());
-                case EntityType.Clinic:
-                    return e.HasAttribute(Attribute.ClinicID.Attribute()) &&
-                           e.HasAttribute(Attribute.Name.Attribute());
-                case EntityType.MedicalGroup:
-                    return e.HasAttribute(Attribute.MedicalGroupID.Attribute()) &&
-                           e.HasAttribute(Attribute.Name.Attribute()) &&
-                           e.HasAttribute(Attribute.Pac.Attribute());
-                default:
-                    return false; // Unknown entity type
-            }*/
-            return true;
-        }
-        #endregion extension_entity
         
         
     }
@@ -159,7 +126,7 @@ namespace SSDConsole.Dataverse
         [Entity("Clinic")]
         Clinic = 1,
         [Entity("Medical Group")]
-        MedicalGroup = 2 // aka Organization
+        MedicalGroup = 2, // aka Organization
     }
 
     internal static class EntityType_Extension

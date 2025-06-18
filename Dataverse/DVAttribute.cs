@@ -30,6 +30,11 @@ namespace SSDConsole.Dataverse
         private static void ApplyAttribute(Attribute a, Entity e, object? value)
         {
             e[a.Attribute()] = value;
+
+            // jank-ass logic to make the ssd_name field in MedicalGroup = Pac
+            if (e.EntityType() == EntityType.MedicalGroup)
+                if (a == Attribute.Pac)
+                    e["ssd_name"] = value;
         }
         #endregion applyattribute
 

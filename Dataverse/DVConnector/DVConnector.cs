@@ -98,7 +98,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             int added = 0;
             int total = labelsToAdd.Count();
 
-            // Add the new labels
+            // Relate the new labels
             foreach (string labelToAdd in labelsToAdd)
             {
                 Console.CursorLeft = 0;

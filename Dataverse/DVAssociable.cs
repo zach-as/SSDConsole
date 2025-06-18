@@ -39,7 +39,13 @@ namespace SSDConsole.Dataverse
 
         // Returns the EntityType of the Associable object.
         internal static EntityType EntityType(this Associable a)
-            => DVEntity.EntityType(a);
+        {
+            if (a is null) throw new ArgumentNullException(nameof(a), "Cannot determine EntityType from null Associable");
+            if (a is Clinician) return Dataverse.EntityType.Clinician;
+            if (a is Clinic) return Dataverse.EntityType.Clinic;
+            if (a is Organization) return Dataverse.EntityType.MedicalGroup;
+            throw new ArgumentException("Unknown Associable type", nameof(a));
+        }
 
         // Adds this object's properties to the provided Entity.
         internal static void ApplyAttributes(this Associable a, Entity e)

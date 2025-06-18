@@ -24,7 +24,7 @@ namespace SSDConsole.SSDDisplay
     internal static partial class Display
     {
         
-        private const int TIME_BETWEEN_UPDATES = 50; // in milliseconds, aka 10 updates per second
+        private const int TIME_BETWEEN_UPDATES = 10; // in milliseconds, aka 10 updates per second
 
         private static Message? previousMessage; // the most recent message printed
 

@@ -31,13 +31,15 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
 
         // Fetches entities that match the specified query from dataverse
         internal static EntityCollection FetchEntities(QueryExpression query, EntityType? entityType = null, bool skipDisplay = false)
+            => FetchEntities(query, entityType?.LogicalName(), skipDisplay);
+        internal static EntityCollection FetchEntities(QueryExpression query, string? logicalname = null, bool skipDisplay = false)
         {
             List<Entity> entities = new List<Entity>();
 
             query.PageInfo.PageNumber = 1;
             query.PageInfo.Count = PAGE_SIZE;
 
-            var type_str = entityType is not null ? $" of type {entityType?.LogicalName()}" : "";
+            var type_str = logicalname is not null ? $" of type {logicalname}" : "";
             
             if (!skipDisplay)
             {

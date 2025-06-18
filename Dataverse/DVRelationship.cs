@@ -123,10 +123,12 @@ namespace SSDConsole.Dataverse
         {
             var relType = RelationshipType(a.EntityType(), b.EntityType());
             var entity = new Entity(relType.LogicalName());
+            
             // assign the reference value of A's col to A's id
-            entity[relType.EntA().LogicalName()] = a.ToEntityReference();
+            entity[a.LogicalName] = a.ToEntityReference();
             // assign the reference value of B's col to B's id
-            entity[relType.EntB().LogicalName()] = b.ToEntityReference();
+            entity[b.LogicalName] = b.ToEntityReference();
+
             return entity;
         }
         
@@ -139,15 +141,12 @@ namespace SSDConsole.Dataverse
         {
             var relType = RelationshipType(a.EntityType(), b.EntityType());
             if (relationship.LogicalName != relType.LogicalName()) return false;
-            
-            var aId = a.Id;
-            var bId = b.Id;
 
-            var aName = a.LogicalName;
-            var bName = b.LogicalName;
+            var aRef = (EntityReference)relationship[a.LogicalName];
+            var bRef = (EntityReference)relationship[b.LogicalName];
 
-            var aMatch = relationship[aName].Equals(aId);
-            var bMatch = relationship[bName].Equals(bId);
+            var aMatch = aRef.LogicalName == a.LogicalName && aRef.Id == a.Id;
+            var bMatch = bRef.LogicalName == b.LogicalName && bRef.Id == b.Id;
 
             return aMatch && bMatch;
         }

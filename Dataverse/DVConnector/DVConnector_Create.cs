@@ -20,7 +20,7 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             var results = new Dictionary<EntityType, List<AEPair>>();
 
             var sorted_associables = DVAssociable.SortByType(associables);
-            var entity_types = Enum.GetValues<EntityType>();
+            var entity_types = DVEntity.EntityTypes();
 
             foreach ( var entity_type in entity_types )
             {

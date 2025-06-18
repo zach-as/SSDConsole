@@ -60,14 +60,25 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
             };
             var response = (CreateMultipleResponse)Service().Execute(request);
 
-            var entityType = entities.ElementAt(0).EntityType();
+            var firstEntity = entities.ElementAt(0);
+            var isStandardEntity = DVEntity.EntityTypes().Select(t => t.LogicalName()).Contains(firstEntity.LogicalName);
+
 
             // Build a query that retrieves all entities with IDs matching the newly created entities
             // We do this so that we can retrieve all relevant data regarding these entities, not just the IDs
-            var query = entityType.QueryExpression();
-            query.Criteria = DVFilter.FilterAny(entityType.IdAttribute(), response.Ids.ToList());
+            var query = isStandardEntity ? firstEntity.EntityType().QueryExpression()
+                            : DVRelationship.RelationshipType(firstEntity).QueryExpression();
 
-            return FetchEntities(query, entityType, true);
+            if (isStandardEntity)
+            {
+                query.Criteria = DVFilter.FilterAny(firstEntity.IdAttribute(), response.Ids.ToList());
+                return FetchEntities(query, firstEntity.EntityType(), true);
+            } else
+            {
+                query.Criteria = DVFilter.FilterAny(firstEntity.LogicalName + "id", response.Ids.ToList());
+                return FetchEntities(query, firstEntity.LogicalName, true);
+            }
+                
         }
 
         

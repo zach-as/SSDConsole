@@ -84,13 +84,23 @@ namespace SSDConsole.Dataverse
 
         internal static void AddEquals(this FilterExpression f, Attribute a, object value)
             => f.AddCondition(a, ConditionOperator.Equal, value);
+        internal static void AddEquals(this FilterExpression f, string a, object value)
+            => f.AddCondition(a, ConditionOperator.Equal, value);
         internal static void AddNotEquals(this FilterExpression f, Attribute a, object value)
+            => f.AddCondition(a, ConditionOperator.NotEqual, value);
+        internal static void AddNotEquals(this FilterExpression f, string a, object value)
             => f.AddCondition(a, ConditionOperator.NotEqual, value);
         internal static void AddNull(this FilterExpression f, Attribute a)
             => f.AddCondition(a, ConditionOperator.Null);
+        internal static void AddNull(this FilterExpression f, string a)
+            => f.AddCondition(a, ConditionOperator.Null);
         internal static void AddNotNull(this FilterExpression f, Attribute a)
             => f.AddCondition(a, ConditionOperator.NotNull);
+        internal static void AddNotNull(this FilterExpression f, string a)
+            => f.AddCondition(a, ConditionOperator.NotNull);
         internal static void AddCondition(this FilterExpression f, Attribute a, ConditionOperator op, object? value = null)
+            => AddCondition(f, a.Attribute(), op, value);
+        internal static void AddCondition(this FilterExpression f, string a, ConditionOperator op, object? value = null)
         {
             switch (op)
             {
@@ -101,29 +111,38 @@ namespace SSDConsole.Dataverse
                                     : false;
                     if (isNull)
                     {
-                        if (op == ConditionOperator.Equal) f.AddCondition(a.Attribute(), ConditionOperator.Null);
-                        if (op == ConditionOperator.NotEqual) f.AddCondition(a.Attribute(), ConditionOperator.NotNull);
+                        if (op == ConditionOperator.Equal) f.AddCondition(a, ConditionOperator.Null);
+                        if (op == ConditionOperator.NotEqual) f.AddCondition(a, ConditionOperator.NotNull);
                     }
                     else
                     {
-                        f.AddCondition(a.Attribute(), op, value);
+                        f.AddCondition(a, op, value);
                     }
                     break;
                 case ConditionOperator.Null:
                 case ConditionOperator.NotNull:
-                    f.AddCondition(a.Attribute(), op);
+                    f.AddCondition(a, op);
                     break;
                 default:
                     throw new Exception($"In EqualExpression(), attempted to add condition with operator that is not (equal, not equal, null, not null, contains): {op}");
 
             }
         }
+
+
+        internal static FilterExpression FilterAny<T>(Attribute a, T value)
+            => FilterAny(a.Attribute(), new List<T> { value });
+        internal static FilterExpression FilterAny<T>(string attrName, T value)
+            => FilterAny(attrName, new List<T> { value });
+        internal static FilterExpression FilterAny<T>(Attribute a, params T[] values)
+            => FilterAny(a.Attribute(), values.ToList());
+        internal static FilterExpression FilterAny<T>(string attrName, params T[] values)
+            => FilterAny(attrName, values.ToList());
         internal static FilterExpression FilterAny<T>(Attribute a, List<T> values)
             => FilterMatch(a, LogicalOperator.Or, values, true);
-        internal static FilterExpression FilterAny<T>(Attribute a, T value)
-            => FilterAny(a, new List<T> { value });
-        internal static FilterExpression FilterAny<T>(Attribute a, params T[] values)
-            => FilterAny(a, values.ToList());
+        internal static FilterExpression FilterAny<T>(string attrName, List<T> values)
+            => FilterMatch(attrName, LogicalOperator.Or, values, true);
+
         internal static FilterExpression FilterAll<T>(Attribute a, List<T> values)
             => FilterMatch(a, LogicalOperator.And, values, true);
         internal static FilterExpression FilterAll<T>(Attribute a, T value)
@@ -137,6 +156,8 @@ namespace SSDConsole.Dataverse
         internal static FilterExpression FilterNone<T>(Attribute a, params T[] values)
             => FilterNone(a, values.ToList());
         private static FilterExpression FilterMatch<T>(Attribute a, LogicalOperator op, List<T> values, bool equals)
+            => FilterMatch(a.Attribute(), op, values, equals);
+        private static FilterExpression FilterMatch<T>(string a, LogicalOperator op, List<T> values, bool equals)
         {
             FilterExpression f = new FilterExpression(op);
             bool addedNull = false;

@@ -37,7 +37,7 @@ namespace SSDConsole.CMS
                 {
                     Timeout = new TimeSpan(0, 2, 0)
                 };
-                // Add the default headers to the new client
+                // Relate the default headers to the new client
                 AddDefaultHeaders();
             }
             return client;

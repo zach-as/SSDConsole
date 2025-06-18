@@ -13,6 +13,7 @@ using SSDConsole.SSDDisplay;
 using SSDConsole.Dataverse;
 using System.Drawing.Printing;
 using Microsoft.Xrm.Sdk.Query;
+using System.Xml;
 
 namespace SSDConsole.Dataverse.DVConnector.DVConnector
 {
@@ -23,22 +24,38 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
         {
             private Dictionary<DVRelationshipType, List<Entity>> relatedEntities = new Dictionary<DVRelationshipType, List<Entity>>();
 
-            // Adds the provided entity to the lists of related entities
-            internal void Add(Entity entity)
+            internal EntityRelationshipSet() { }
+            internal EntityRelationshipSet(Dictionary<DVRelationshipType, List<Entity>> relatedEntities)
             {
-                var relType = DVRelationship.RelationshipType(entity);
+                this.relatedEntities = relatedEntities;
+            }
+
+            // Adds the provided entity to the lists of related entities
+            internal void Relate(Entity a, Entity b)
+            {
+                var relEntity = DVRelationship.NewRelationship(a, b);
+                var relType = DVRelationship.RelationshipType(relEntity);
                 if (!relatedEntities.ContainsKey(relType))
                 {
                     relatedEntities[relType] = new List<Entity>();
                 }
-                if (!relatedEntities[relType].Contains(entity))
+                if (!relatedEntities[relType].Contains(relEntity))
                 {
-                    relatedEntities[relType].Add(entity);
+                    relatedEntities[relType].Add(relEntity);
                 }
             }
 
+            // Returns true if the two entities are related
+            internal bool Related(Entity a, Entity b)
+            {
+                var relType = DVRelationship.RelationshipType(a, b);
+                if (!relatedEntities.ContainsKey(relType)) return false;
+                return relatedEntities[relType]
+                    .Any(relationshipEntity => DVRelationship.RelationshipMatch(relationshipEntity, a, b));
+            }
+
             // Returns the most suitable form of the related entities for the purpose of establishing newRelationships
-            internal Dictionary<DVRelationshipType, EntityCollection> Collection()
+            internal Dictionary<DVRelationshipType, EntityCollection> Collections()
                 => relatedEntities.ToDictionary(
                     pair => pair.Key,
                     pair => relatedEntities[pair.Key].EntityCollection());
@@ -48,69 +65,50 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
         {
             var existingRelationships = ExistingRelationships();
             var newRelationships = CreateRelationships(existingRelationships, pairs);
+            Console.WriteLine($"{newRelationships.Collections().Values.Count()} new relationships to add.");
             PushRelationships(newRelationships);
         }
         
-        internal static Dictionary<DVRelationshipType, List<Entity>> ExistingRelationships()
+        internal static EntityRelationshipSet ExistingRelationships()
         {
             var relTypes = DVRelationship.RelationshipTypes();
             var results = new Dictionary<DVRelationshipType, List<Entity>>();
 
-            Display.Print("Fetching existing newRelationships.");
             foreach (var relType in relTypes)
             {
                 var relName = relType.FriendlyName();
-                Display.Print($"Fetching {relName} newRelationships.");
                 var query = relType.QueryExpression();
-                var response = FetchEntities(query, null, false);
+                var response = FetchEntities(query, relName, false);
                 if (response is null || response.Entities.Count == 0)
                 {
-                    Display.Print($"No relationship found of type {relName}.");
                     results[relType] = new List<Entity>();
                 } else
                 {
-                    Display.Print($"Found {response.Entities.Count} newRelationships of type {relName}.");
                     results[relType] = response.Entities.ToList();
                 }
             }
-            Display.Print("Existing newRelationships fetched.",
-                            Display.MessageSeverity.Success);
 
-            return results;
+            return new EntityRelationshipSet(results);
         }
         
-        private static bool Related(
-            Dictionary<DVRelationshipType, List<Entity>> relationships,
-            Entity a,
-            Entity b)
-        {
-            var aType = a.EntityType();
-            var bType = b.EntityType();
-            if (aType == bType) return false;
-            
-            var relType = DVRelationship.RelationshipType(aType, bType);
-            
-            foreach (var relationshipEntity in relationships[relType])
-            {
-                var matching = DVRelationship.RelationshipMatch(relationshipEntity, a, b);
-                if (matching) return true;
-            }
-            return false;
-        }
         
-        internal static Dictionary<Entity, EntityRelationshipSet> CreateRelationships(
-            Dictionary<DVRelationshipType, List<Entity>> existingRelationships,
-            List<AEPair> pairs)
+        
+        internal static EntityRelationshipSet CreateRelationships(EntityRelationshipSet existingRelationships, List<AEPair> pairs)
         {
-            var newRelationships = new Dictionary<Entity, EntityRelationshipSet>();
-            
+
+            EntityRelationshipSet newRelationships = new EntityRelationshipSet();
+
             string id_skip = "id_skip";
             string id_skip_entity = "id_skip_entity";
+            string id_already_related = "id_already_related";
+
+            var relationshipsCreated = 0;
 
             Display.Interrupt("CreateAndPushRelationships() called. Creating relationship entities.");
             Display.StartProgressBar($"Entities with relationship created", pairs.Count(),
                                         new Display.ProgressBarInfo(id_skip_entity, "Entities with invalid associations"),
-                                        new Display.ProgressBarInfo(id_skip, "Total invalid associations"));
+                                        new Display.ProgressBarInfo(id_skip, "Total invalid associations"),
+                                        new Display.ProgressBarInfo(id_already_related, "Entities skipped due to existing relations"));
             
             foreach (var pair in pairs)
             {
@@ -119,9 +117,6 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
                 var associable = pair.Associable();
                 var associations = associable.Associations();
                 var hasInvalidAssociation = false;
-
-                // Initialize the relationship set for this entity
-                newRelationships[entity] = new EntityRelationshipSet();
                 
                 foreach (var associatedAssociable in associations)
                 {
@@ -141,55 +136,36 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
 
                     var associatedEntity = associatedPair.Entity();
 
-                    // Pair is found, so perform the relation if needed
-                    if (associatedEntity.IsValid() && !Related(existingRelationships, entity, associatedEntity))
+                    // Pair is found, so perform the relation if not related
+                    if (!existingRelationships.Related(entity, associatedEntity) && !newRelationships.Related(entity, associatedEntity))
                     {
-                        var newRelationship = DVRelationship.NewRelationship(entity, associatedEntity);
-                        newRelationships[entity].Add(newRelationship);
+                        relationshipsCreated++;
+                        newRelationships.Relate(entity, associatedEntity);
                     }
                 }
-
+                
                 // Update the progress bar to indicate that this entity's newRelationships have been updated, or that its newRelationships are already established
                 Display.UpdateProgressBar();
             }
 
             Display.StopProgressBar();
-            Display.Interrupt($"Finished creating new relationship for {pairs.Count} entities.",
+            Display.Interrupt($"Finished creating new {relationshipsCreated} relationships entities.",
                                 Display.MessageSeverity.Success);
 
             return newRelationships;
         }
 
-        internal static void PushRelationships(Dictionary<Entity, EntityRelationshipSet> relationshipSets)
+        internal static void PushRelationships(EntityRelationshipSet relationshipSet)
         {
-            Display.Interrupt("PushRelationships() called. Adding relationship sets to entities in Dataverse.");
-            
-            int total = relationshipSets.Keys.Count;
+            Display.Print("PushRelationships() called. Adding relationship sets to entities in Dataverse.");
 
-            Display.StartProgressBar("$Relationship sets added to entities", total);
-            
-            foreach (var pair in relationshipSets)
-            {
-                var entity = pair.Key;
-                var relationshipSet = pair.Value;
-                var newRelationships = relationshipSet.Collection();
-                if (newRelationships.Values.Count() == 0) continue; // skip adding newRelationships if there are none to add
-                
-                foreach (var bType in newRelationships.Keys)
-                {
-                    PushCreates(newRelationships[bType]);
-                    try
-                    {
-                    }
-                    catch (Exception ex) { Display.Interrupt(ex.Message, Display.MessageSeverity.Error); }
-                }
-                
-                Display.UpdateProgressBar();
-            }
+            var newRelationships = relationshipSet.Collections();
 
-            Display.StopProgressBar();
+            // Push the newly created relationship entities
+            newRelationships.Keys.ToList().ForEach(
+                relType => PushCreates(newRelationships[relType]));
             
-            Display.Interrupt($"Finished adding {total} relationship sets to entities in Dataverse.",
+            Display.Print($"Finished adding relationship sets to entities in Dataverse.",
                                 Display.MessageSeverity.Success);
         }
     }
