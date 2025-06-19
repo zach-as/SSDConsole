@@ -27,15 +27,15 @@ namespace SSDConsole.Dataverse.DVConnector.DVConnector
         public const int CONDITION_LIMIT = 500; // the limit for the number of conditions in a single query
 
         private const string CONNECTION = $@"
-        AuthType = {AUTH_TYPE};
+        AuthTsype = {AUTH_TYPE};
         Url = {RESOURCE};
         AppId = {ID_CLIENT};
         RedirectUri = {URI_REDIRECT};
         LoginPrompt = Auto;
         RequireNewInstance = True;";
 
-        private static IOrganizationService? service;
-        private static IOrganizationService Service()
+        internal static IOrganizationService? service;
+        internal static IOrganizationService Service()
         {
             if (service is null)
             {
