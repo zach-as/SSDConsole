@@ -81,9 +81,9 @@ namespace LibCMS.Data.Associable
             return Associations().OfType<CClinic>();
         }
 
-        public IEnumerable<COrganization> Organizations()
+        public IEnumerable<CMedicalGroup> Organizations()
         {
-            return Associations().OfType<COrganization>();
+            return Associations().OfType<CMedicalGroup>();
         }
 
         

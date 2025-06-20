@@ -15,52 +15,21 @@ namespace LibDV.DVAttribute
     {
         #region getattribute
         // this exists so that we don't have to keep using reflection whenever we want to access GetAttributes()
-        private static Dictionary<EEntityType, EAttribute[]>? attributes;
+        private static List<EAttribute> attributes;
 
-        internal static EAttribute[] GetAttributes(EEntityType entityType)
-        {
-            if (attributes is not null) return attributes[entityType];
-            attributes = new Dictionary<EEntityType, EAttribute[]>();
-            var allAttributes = GetAttributes();
-            foreach (EAttribute a in allAttributes)
-            {
-                foreach (EEntityType et in a.EntityTypes())
-                {
-                    if (!attributes.ContainsKey(et))
-                    {
-                        attributes[et] = new EAttribute[] { a };
-                    }
-                    else
-                    {
-                        var existingAttributes = attributes[et].ToList();
-                        existingAttributes.Add(a);
-                        attributes[et] = existingAttributes.ToArray();
-                    }
-                }
-            }
-            return attributes[entityType];
-        }
-        internal static EAttribute[] GetAttributes()
+        internal static List<EAttribute> GetAttributes()
         {
             // if attributes is not initialized, initialize with reflection
-            if (attributes is null)
-            {
-                attributes = new Dictionary<EEntityType, EAttribute[]>();
-                var entityTypes = SEntityType.EntityTypes();
-                var allAttributes = Enum.GetValues<EAttribute>();
-                foreach (var t in entityTypes)
-                {
-                    attributes[t] = allAttributes.Where(a => a.EntityTypes().Contains(t)).ToArray();
-                }
-
-            }
-
-            return attributes.Values.SelectMany(_ => _).ToArray();
+            if (attributes is null) attributes = Enum.GetValues<EAttribute>().ToList();
+            return attributes;
         }
+
+        internal static List<EAttribute> GetAttributes(EEntityType entityType)
+            => GetAttributes().Where(a => a.EntityTypes().Contains(entityType)).ToList();
         internal static List<EAttribute> GetAttributes(CAssociable a)
-            => GetAttributes(a.EntityType()).ToList();
+            => GetAttributes(a.EntityType());
         internal static List<EAttribute> GetAttributes(Entity e)
-            => GetAttributes(e.EntityType()).ToList();
+            => GetAttributes(e.EntityType());
 
         internal static EAttribute GetAttribute(string attrName)
         {
@@ -75,21 +44,21 @@ namespace LibDV.DVAttribute
         }
         #endregion getattribute
 
-        #region getattributevalue
+        #region attributevalue
 
-        internal static object? GetAttributeValue(LibCMS.Data.Associable.CAssociable a, EAttribute attribute)
+        internal static object? AttributeValue(CAssociable a, EAttribute attribute)
         {
-            if (a is CClinic clinic) return GetAttributeValue(clinic, attribute);
-            if (a is CClinician clinician) return GetAttributeValue(clinician, attribute);
-            if (a is COrganization organization) return GetAttributeValue(organization, attribute);
+            if (a is CClinic clinic) return AttributeValue(clinic, attribute);
+            if (a is CClinician clinician) return AttributeValue(clinician, attribute);
+            if (a is CMedicalGroup organization) return AttributeValue(organization, attribute);
             throw new NotImplementedException($"No attribute retrieval defined for {a.GetType().Name}");
         }
-        internal static object? GetAttributeValue(LibCMS.Data.Associable.CAssociable a, string attrName)
-            => GetAttributeValue(a, GetAttribute(attrName));
+        internal static object? AttributeValue(CAssociable a, string attrName)
+            => AttributeValue(a, GetAttribute(attrName));
 
-        private static object? GetAttributeValue(CClinic c, EAttribute a)
+        private static object? AttributeValue(CClinic c, EAttribute a)
         {
-            if (!a.EntityTypes().Contains(c.EntityType())) throw new Exception($"GetAttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
+            if (!a.EntityTypes().Contains(c.EntityType())) throw new Exception($"AttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
             return a switch
             {
                 EAttribute.AddressID => c.location.addressID,
@@ -107,9 +76,9 @@ namespace LibDV.DVAttribute
             };
         }
 
-        private static object? GetAttributeValue(CClinician c, EAttribute a)
+        private static object? AttributeValue(CClinician c, EAttribute a)
         {
-            if (!a.EntityTypes().Contains(c.EntityType())) throw new Exception($"GetAttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
+            if (!a.EntityTypes().Contains(c.EntityType())) throw new Exception($"AttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
             return a switch
             {
                 EAttribute.Pac => c.PacID,
@@ -131,13 +100,13 @@ namespace LibDV.DVAttribute
             };
         }
 
-        private static object? GetAttributeValue(COrganization o, EAttribute a)
+        private static object? AttributeValue(CMedicalGroup o, EAttribute a)
         {
-            if (!a.EntityTypes().Contains(o.EntityType())) throw new Exception($"GetAttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
+            if (!a.EntityTypes().Contains(o.EntityType())) throw new Exception($"AttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
             return a switch
             {
                 EAttribute.Pac => o.pac,
-                EAttribute.PartitionId => o.pac,
+                EAttribute.Name => o.pac,
                 EAttribute.PrimarySpecialties => o.PrimarySpecialtyCodes(),
                 EAttribute.SecondarySpecialties => o.SecondarySpecialtyCodes(),
                 EAttribute.FullMedicare => o.acceptsFullMedicare,
@@ -145,16 +114,23 @@ namespace LibDV.DVAttribute
                 _ => null
             };
         }
-        #endregion getattributevalue
+        #endregion attributevalue
 
         #region hasattribute
-        internal static bool HasAttribute(LibCMS.Data.Associable.CAssociable a, string attrName)
+        internal static bool HasAttribute(this CAssociable a, string attrName)
             => HasAttribute(a, GetAttribute(attrName));
-        internal static bool HasAttribute(LibCMS.Data.Associable.CAssociable a, EAttribute attr)
+        internal static bool HasAttribute(this CAssociable a, EAttribute attr)
         {
-            if (attr.EntityTypes().Contains(a.EntityType())) return GetAttributeValue(a, attr) != null;
+            if (attr.EntityTypes().Contains(a.EntityType())) return AttributeValue(a, attr) != null;
             return false;
         }
+        internal static bool HasAttribute(this Entity e, EAttribute attr)
+            => e.HasAttribute(attr.Attribute());
+
+        internal static bool HasAttribute(this Entity e, string attrName)
+            => e.Attributes.ContainsKey(attrName);
+        internal static object? AttributeValue(this Entity e, string attrName)
+            => e.Attributes.TryGetValue(attrName, out var value) ? value : null;
         #endregion hasattribute
 
         #region idattribute
@@ -164,8 +140,8 @@ namespace LibDV.DVAttribute
             => IdAttribute(e.EntityType());
         internal static EAttribute IdAttribute(this CAssociable a)
             => IdAttribute(a.EntityType());
-        internal static EAttribute IdAttribute(EEntityType entityType)
-            => entityType.IdAttribute();
+        internal static EAttribute IdAttribute(this EEntityType entityType)
+            => GetAttribute(entityType.LogicalName() + "id");
         #endregion idattribute
     }
 }

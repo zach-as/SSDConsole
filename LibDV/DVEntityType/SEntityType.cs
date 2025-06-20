@@ -42,7 +42,7 @@ namespace LibDV.DVEntityType
             if (a is null) throw new ArgumentNullException(nameof(a), "Cannot determine EEntityType from null CAssociable");
             if (a is CClinician) return EEntityType.Clinician;
             if (a is CClinic) return EEntityType.Clinic;
-            if (a is COrganization) return EEntityType.MedicalGroup;
+            if (a is CMedicalGroup) return EEntityType.MedicalGroup;
             throw new ArgumentException("Unknown CAssociable type", nameof(a));
         }
         #endregion extension

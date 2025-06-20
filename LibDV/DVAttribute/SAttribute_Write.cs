@@ -9,7 +9,7 @@ using System.Reflection.Metadata.Ecma335;
 namespace LibDV.DVAttribute
 {
     // This class contains static functions relevant to EAttribute that are used in the context of writing attributes to entities in Dataverse.
-    public static partial class SAttribute
+    internal static partial class SAttribute
     {
 
         #region applyattribute
@@ -20,7 +20,7 @@ namespace LibDV.DVAttribute
             foreach (var attribute in attributes)
             {
                 if (attribute.HasDVWrite())
-                    WriteAttribute(attribute, e, GetAttributeValue(a, attribute));
+                    WriteAttribute(attribute, e, AttributeValue(a, attribute));
             }
         }
 
@@ -29,19 +29,6 @@ namespace LibDV.DVAttribute
         {
             if (!CanWriteAttribute(a, e)) throw new Exception($"Unable to write to EAttribute {a} for entity of type {e.LogicalName}.");
             e[a.Attribute()] = value; // Write the value to the entity's attribute
-            TryWriteDuplicate(a, e, value); // Attempt to write duplicate if applicable
-        }
-
-        // Attempts to write duplicate values if relevant (safe, will not except)
-        private static void TryWriteDuplicate(EAttribute a, Entity e, object? value)
-        {
-            if (!a.HasDVWriteDuplicate()) return; // only write duplicate if duplicate System.Attribute is present on the EAttribute
-
-            var dup = a.DVWriteDuplicate(); // access the internal System.Attribute (I know, overloaded term...)
-            if (!dup.AppliesTo(e.EntityType())) return; // only write duplicate if the EAttribute should be duplicated for an entity of this type
-            
-            // Write the value to the duplicate attribute target
-            WriteAttribute(dup.Target(), e, value);
         }
 
         // Returns true if the EAttribute can be written to the entity

@@ -70,10 +70,10 @@ namespace LibCMS.Record
         }
 
         // A list of all organizations, extracted from CRecordResponse
-        private List<COrganization>? organizations { get; set; }
-        internal List<COrganization> Organizations()
+        private List<CMedicalGroup>? organizations { get; set; }
+        internal List<CMedicalGroup> Organizations()
         {
-            if (organizations is null) organizations = new List<COrganization>();
+            if (organizations is null) organizations = new List<CMedicalGroup>();
             return organizations;
         }
 
@@ -95,7 +95,7 @@ namespace LibCMS.Record
         {
             CClinician? clinician = null;
             CClinic? clinic = null;
-            COrganization? organization = null;
+            CMedicalGroup? organization = null;
 
             // Attempt to retrieve the clinician with the PAC ID in the current item from clinicians
             // This will return a default Clinician object if there is no Clinician with the existing Pac ID in clinicians
@@ -117,7 +117,7 @@ namespace LibCMS.Record
 
                 if (organization == null)
                 {
-                    organization = new COrganization(item);
+                    organization = new CMedicalGroup(item);
                     Organizations().Add(organization);
                 }
 

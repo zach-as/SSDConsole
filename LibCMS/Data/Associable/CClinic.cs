@@ -31,9 +31,9 @@ namespace LibCMS.Data.Associable
             return Associations().OfType<CClinician>();
         }
 
-        public IEnumerable<COrganization> Organizations()
+        public IEnumerable<CMedicalGroup> Organizations()
         {
-            return Associations().OfType<COrganization>();
+            return Associations().OfType<CMedicalGroup>();
         }
 
         public override int GetHashCode()

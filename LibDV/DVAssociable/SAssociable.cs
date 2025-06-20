@@ -40,7 +40,7 @@ namespace LibDV.DVAssociable
             => SAttribute.WriteAttributes(a, e);
 
         public static object? AttributeValue(this CAssociable a, string attrName)
-            => SAttribute.GetAttributeValue(a, attrName);
+            => SAttribute.AttributeValue(a, attrName);
 
         public static bool HasAttribute(this CAssociable a, string attrName)
             => SAttribute.HasAttribute(a, attrName);

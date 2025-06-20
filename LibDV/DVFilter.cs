@@ -62,9 +62,9 @@ namespace LibDV
                 var clinician = (CClinician)a;
                 filter.AddCondition(Attribute.Pac, ConditionOperator.Equal, clinician.PacID);
             }
-            else if (a is COrganization)
+            else if (a is CMedicalGroup)
             {
-                var organization = (COrganization)a;
+                var organization = (CMedicalGroup)a;
                 filter.AddCondition(Attribute.Pac, ConditionOperator.Equal, organization.pac);
             }
             else throw new Exception($"Unexpected associable type in EqualExpression(): {a.GetType()}");

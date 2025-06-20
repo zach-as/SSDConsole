@@ -1,5 +1,5 @@
 ﻿using LibDV.DVEntityType;
-using LibUtil.UtilGlobal;
+using static LibUtil.UtilGlobal.CGlobal;
 using LibUtil.UtilAttribute;
 using Microsoft.Xrm.Sdk;
 
@@ -7,100 +7,108 @@ namespace LibDV.DVAttribute
 {
     public enum EAttribute
     {
-        [AAttribute("name", EEntityType.MedicalGroup, EEntityType.ClinicAtMedicalGroup, EEntityType.ClinicianAtMedicalGroup, EEntityType.ClinicianAtClinic)]
-        Unused_Name, // name attribute that is (mostly) not directly used in read/write operations, but rather acts as a meaningless primary key
-
         // These are the attributes used in comparison operations
-        [AAttribute("addressid", EEntityType.Clinic)]
+        [AAttribute(Attribute_AddressId, EEntityType.Clinic)]
         [ADVRead(), ADVWrite()]
         AddressID,
-        [AAttribute("addressline1", EEntityType.Clinic)]
+        [AAttribute(Attribute_AddressLine1, EEntityType.Clinic)]
         [ADVRead(), ADVWrite()]
         AddressLine1,
-        [AAttribute("addressline2", EEntityType.Clinic)]
+        [AAttribute(Attribute_AddressLine2, EEntityType.Clinic)]
         [ADVRead(), ADVWrite()]
         AddressLine2,
-        [AAttribute("addressline2suppressed", EEntityType.Clinic)]
+        [AAttribute(Attribute_Line2Suppressed, EEntityType.Clinic)]
         [ADVRead(), ADVWrite()]
         Line2Suppressed,
-        [AAttribute("name", EEntityType.Clinic)]
+        [AAttribute(Attribute_Name, EEntityType.Clinic, EEntityType.MedicalGroup)]
         [ADVRead(), ADVWrite()]
         Name,
-        [AAttribute("pac", EEntityType.Clinician, EEntityType.MedicalGroup)]
+        [AAttribute(Attribute_Pac, EEntityType.Clinician, EEntityType.MedicalGroup)]
         [ADVRead(), ADVWrite()]
-        [ADVWriteDuplicate(Unused_Name, EEntityType.MedicalGroup)]
         Pac,
 
         // These attributes are not set within this program, but rather are generated in dataverse
-        [AAttribute("clinicianid", EEntityType.Clinician)]
-        ClinicianID,
-        [AAttribute("medicalgroupid", EEntityType.MedicalGroup)]
-        MedicalGroupID,
-        [AAttribute("clinicid", EEntityType.Clinic)]
-        ClinicID,
+        [AAttribute(Attribute_ClinicianId, EEntityType.Clinician)]
+        [ADVRead()]
+        ClinicianId,
+        [AAttribute(Attribute_MedicalGroupId, EEntityType.MedicalGroup)]
+        [ADVRead()]
+        MedicalGroupId,
+        [AAttribute(Attribute_ClinicId, EEntityType.Clinic)]
+        [ADVRead()]
+        ClinicId,
+        [AAttribute(Attribute_ClinicianAtClinicId, EEntityType.ClinicianAtClinic)]
+        [ADVRead()]
+        ClinicianAtClinicId,
+        [AAttribute(Attribute_ClinicianAtMedicalGroupId, EEntityType.ClinicianAtMedicalGroup)]
+        [ADVRead()]
+        ClinicianAtMedicalGroupId,
+        [AAttribute(Attribute_ClinicAtMedicalGroupId, EEntityType.ClinicAtMedicalGroup)]
+        [ADVRead()]
+        ClinicAtMedicalGroupId,
 
         // These are the remaining attributes that are not used in comparison operations
-        [AAttribute("phonenumber", EEntityType.Clinic)]
+        [AAttribute(Attribute_PhoneNumber, EEntityType.Clinic)]
         [ADVWrite()]
         PhoneNumber,
-        [AAttribute("city", EEntityType.Clinic)]
+        [AAttribute(Attribute_City, EEntityType.Clinic)]
         [ADVWrite()]
         City,
-        [AAttribute("zip", EEntityType.Clinic)]
+        [AAttribute(Attribute_Zip, EEntityType.Clinic)]
         [ADVWrite()]
         Zip,
-        [AAttribute("npi", EEntityType.Clinician)]
+        [AAttribute(Attribute_Npi, EEntityType.Clinician)]
         [ADVWrite()]
         Npi,
-        [AAttribute("enrl", EEntityType.Clinician)]
+        [AAttribute(Attribute_Enrl, EEntityType.Clinician)]
         [ADVWrite()]
         Enrl,
-        [AAttribute("firstname", EEntityType.Clinician)]
+        [AAttribute(Attribute_FirstName, EEntityType.Clinician)]
         [ADVWrite()]
         FirstName,
-        [AAttribute("middlename", EEntityType.Clinician)]
+        [AAttribute(Attribute_MiddleName, EEntityType.Clinician)]
         [ADVWrite()]
         MiddleName,
-        [AAttribute("lastname", EEntityType.Clinician)]
+        [AAttribute(Attribute_LastName, EEntityType.Clinician)]
         [ADVWrite()]
         LastName,
-        [AAttribute("primaryspecialty", EEntityType.Clinician)]
+        [AAttribute(Attribute_PrimarySpecialty, EEntityType.Clinician)]
         [ADVWrite()]
         PrimarySpecialty,
-        [AAttribute("suffix", EEntityType.Clinician)]
+        [AAttribute(Attribute_Suffix, EEntityType.Clinician)]
         [ADVWrite()]
         Suffix,
-        [AAttribute("sex", EEntityType.Clinician)]
+        [AAttribute(Attribute_Sex, EEntityType.Clinician)]
         [ADVWrite()]
         Sex,
-        [AAttribute("credentials", EEntityType.Clinician)]
+        [AAttribute(Attribute_Credentials, EEntityType.Clinician)]
         [ADVWrite()]
         Credentials,
-        [AAttribute("medicalschool", EEntityType.Clinician)]
+        [AAttribute(Attribute_MedicalSchool, EEntityType.Clinician)]
         [ADVWrite()]
         MedicalSchool,
-        [AAttribute("graduationyear", EEntityType.Clinician)]
+        [AAttribute(Attribute_GraduationYear, EEntityType.Clinician)]
         [ADVWrite()]
         GraduationYear,
-        [AAttribute("telehealth", EEntityType.Clinician)]
+        [AAttribute(Attribute_Telehealth, EEntityType.Clinician)]
         [ADVWrite()]
         Telehealth,
-        [AAttribute("fullmedicare", EEntityType.Clinician, EEntityType.MedicalGroup)]
+        [AAttribute(Attribute_FullMedicare, EEntityType.Clinician, EEntityType.MedicalGroup)]
         [ADVWrite()]
         FullMedicare,
-        [AAttribute("primaryspecialties", EEntityType.Clinic, EEntityType.MedicalGroup)]
+        [AAttribute(Attribute_PrimarySpecialties, EEntityType.Clinic, EEntityType.MedicalGroup)]
         [ADVWrite()]
         PrimarySpecialties,
-        [AAttribute("secondaryspecialties", EEntityType.Clinic, EEntityType.Clinician, EEntityType.MedicalGroup)]
+        [AAttribute(Attribute_SecondarySpecialties, EEntityType.Clinic, EEntityType.Clinician, EEntityType.MedicalGroup)]
         [ADVWrite()]
         SecondarySpecialties,
-        [AAttribute("cliniciancount", EEntityType.Clinic, EEntityType.MedicalGroup)]
+        [AAttribute(Attribute_ClinicianCount, EEntityType.Clinic, EEntityType.MedicalGroup)]
         [ADVWrite()]
         ClinicianCount,
     }
 
     // This class provides extension methods for EAttribute, allowing easy access to its attributes and properties.
-    public static partial class SAttribute
+    internal static partial class SAttribute
     {
         internal static AAttributeAttribute InternalAttribute(this EAttribute a)
             => CUtilAttribute.InternalAttribute<AAttributeAttribute>(a);
@@ -110,11 +118,6 @@ namespace LibDV.DVAttribute
 
         internal static bool HasDVWrite(this EAttribute a)
             => CUtilAttribute.HasInternalAttribute<ADVWriteAttribute>(a);
-        internal static bool HasDVWriteDuplicate(this EAttribute a)
-            => CUtilAttribute.HasInternalAttribute<ADVWriteDuplicate>(a);
-
-        internal static ADVWriteDuplicate DVWriteDuplicate(this EAttribute a)
-            => CUtilAttribute.InternalAttribute<ADVWriteDuplicate>(a);
 
         public static EEntityType[] EntityTypes(this EAttribute a)
             => a.InternalAttribute().EntityTypes();

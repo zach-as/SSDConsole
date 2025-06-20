@@ -2,7 +2,7 @@
 
 namespace LibCMS.Data.Associable
 {
-    public class COrganization : CAssociable
+    public class CMedicalGroup : CAssociable
     {
         // This is the unique ID that is associated with this organization in PECOS
         public string pac { get; set; }
@@ -13,7 +13,7 @@ namespace LibCMS.Data.Associable
         // This indicates if this organization accepts medicare payments in full or in part
         public bool acceptsFullMedicare { get; set; }
 
-        internal COrganization (CRecordItem record)
+        internal CMedicalGroup (CRecordItem record)
         {
             pac = record.IDPacOrg;
             acceptsFullMedicare = record.MedicareFullOrg == "Y" ? true : false;

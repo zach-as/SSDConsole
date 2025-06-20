@@ -8,7 +8,7 @@ using LibCMS.Data.Associable;
 namespace LibCMS
 {
 
-    public static class SCmsConnector
+    public static class SCmsAccess
     {
 
         // The threshold for how much time must pass before records are forcefully updated
@@ -132,7 +132,7 @@ namespace LibCMS
             => (await Records()).Clinicians();
         public static async Task<IEnumerable<CClinic>> GetClinics()
             => (await Records()).Clinics();
-        public static async Task<IEnumerable<COrganization>> GetOrganizations()
+        public static async Task<IEnumerable<CMedicalGroup>> GetOrganizations()
             => (await Records()).Organizations();
 
         public static async Task<IEnumerable<CAssociable>> GetAssociables()

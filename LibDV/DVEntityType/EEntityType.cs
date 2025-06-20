@@ -111,8 +111,6 @@ namespace LibDV.DVEntityType
                          }}
             };
 
-        public static EAttribute IdAttribute(this EEntityType e)
-            => SAttribute.GetAttribute(e.LogicalName() + "id");
     }
     #endregion entitytype_extension
 }

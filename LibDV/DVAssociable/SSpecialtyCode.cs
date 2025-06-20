@@ -12,14 +12,14 @@ namespace LibDV.DVAssociable
             => GetSpecialtyCode(c.PrimarySpecialty());
         internal static OptionSetValueCollection PrimarySpecialtyCodes(this CClinic c)
             => GetSpecialtyCodes(c.PrimarySpecialties());
-        internal static OptionSetValueCollection PrimarySpecialtyCodes(this COrganization o)
+        internal static OptionSetValueCollection PrimarySpecialtyCodes(this CMedicalGroup o)
             => GetSpecialtyCodes(o.PrimarySpecialties());
 
         internal static OptionSetValueCollection SecondarySpecialtyCodes(this CClinician c)
             => GetSpecialtyCodes(c.SecondarySpecialties());
         internal static OptionSetValueCollection SecondarySpecialtyCodes(this CClinic c)
             => GetSpecialtyCodes(c.SecondarySpecialties());
-        internal static OptionSetValueCollection SecondarySpecialtyCodes(this COrganization o)
+        internal static OptionSetValueCollection SecondarySpecialtyCodes(this CMedicalGroup o)
             => GetSpecialtyCodes(o.SecondarySpecialties());
 
         public static OptionSetValue GetSpecialtyCode(string specialty)

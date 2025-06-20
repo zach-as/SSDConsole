@@ -21,10 +21,6 @@ namespace LibDV.DVEntity
             };
         }
 
-        internal static object? AttributeValue(this Entity e, string attrName)
-            => e.Attributes.TryGetValue(attrName, out var value) ? value : null;
-        internal static bool HasAttribute(this Entity e, string attrName)
-            => e.Attributes.ContainsKey(attrName);
         
         internal static bool Matches(this Entity e1, Entity? e2)
         {

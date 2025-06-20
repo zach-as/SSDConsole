@@ -16,18 +16,18 @@ namespace LibCMS.Function
             => c.PrimarySpecialty;
         public static string[] PrimarySpecialties(this CClinic c)
             => Specialties(c.Clinicians(), SpecialtyType.Primary);
-        public static string[] PrimarySpecialties(this COrganization o)
+        public static string[] PrimarySpecialties(this CMedicalGroup o)
             => Specialties(o.Clinicians(), SpecialtyType.Primary);
 
         public static string[] SecondarySpecialties(this CClinician c)
             => c.SecondarySpecialties;
         public static string[] SecondarySpecialties(this CClinic c)
             => Specialties(c.Clinicians(), SpecialtyType.Secondary);
-        public static string[] SecondarySpecialties(this COrganization o)
+        public static string[] SecondarySpecialties(this CMedicalGroup o)
             => Specialties(o.Clinicians(), SpecialtyType.Secondary);
 
         public static async Task<string[]> Specialties(SpecialtyType type = SpecialtyType.All)
-            => Specialties(await SCmsConnector.GetClinicians(), type);
+            => Specialties(await SCmsAccess.GetClinicians(), type);
 
         private static string[] Specialties(IEnumerable<CClinician> clinicians, SpecialtyType type = SpecialtyType.All)
             => clinicians.SelectMany(c => c.Specialties(type)).Distinct().ToArray();
