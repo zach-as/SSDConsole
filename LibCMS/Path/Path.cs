@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LibCMS.Path
 {
-    internal enum PathMisc
+    internal enum EPathMisc
     {
         // The base URI for CMS
         [Description("https://data.cms.gov/provider-data")]
@@ -22,7 +22,7 @@ namespace LibCMS.Path
         End,
     }
 
-    internal enum PathStore
+    internal enum EPathStore
     {
         // References the storage of data in CMS
         [Description("datastore")]
@@ -32,30 +32,30 @@ namespace LibCMS.Path
         [Description("metastore")]
         Metastore,
     }
-    internal enum PathAction
+    internal enum EPathAction
     {
         // Represents the basic query action to be used in CMS
         [Description("query")]
         Query,
     }
 
-    internal enum PathDatabase
+    internal enum EPathDatabase
     {
         // References the primary database of providers in CMS
         [Description("mj5m-pzi6")]
         NationalProviderDatabase,
     }
 
-    internal static class Path_Extensions
+    internal static class SPath
     {
-        internal static Uri BuildUri(PathStore store = PathStore.Datastore,
-                                      PathAction action = PathAction.Query,
-                                      PathDatabase database = PathDatabase.NationalProviderDatabase)
+        internal static Uri BuildUri(EPathStore store = EPathStore.Datastore,
+                                      EPathAction action = EPathAction.Query,
+                                      EPathDatabase database = EPathDatabase.NationalProviderDatabase)
         {
             var sb = new StringBuilder();
-            sb.Append(PathMisc.Base.Description());
+            sb.Append(EPathMisc.Base.Description());
             sb.Append("/");
-            sb.Append(PathMisc.Api.Description());
+            sb.Append(EPathMisc.Api.Description());
             sb.Append("/");
             sb.Append(store.Description());
             sb.Append("/");
@@ -63,7 +63,7 @@ namespace LibCMS.Path
             sb.Append("/");
             sb.Append(database.Description());
             sb.Append("/");
-            sb.Append(PathMisc.End.Description());
+            sb.Append(EPathMisc.End.Description());
             return new Uri(sb.ToString());
         }
 

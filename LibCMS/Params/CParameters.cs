@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace LibCMS.Params
 {
-    public class ParametersBase
+    public class CParameters
     {
         [Description("The conditions to filter the query by.")]
         [JsonInclude]
@@ -26,12 +26,15 @@ namespace LibCMS.Params
         [JsonInclude]
         public bool Schema { get; set; } = false;
 
-        public ParametersBase()
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+        public CParameters()
         {
-            AddCondition(new Condition("state", ConditionOperator.Equals, "AZ"));
+            AddCondition(new CCondition("state", ConditionOperator.Equals, "AZ"));
             if (Limit > 2000) throw new Exception("Limit cannot be greater than 2000.");
             if (Limit == 0) Limit = null; // Indicate that limit should be limitless
         }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
 
         /// <summary>
         /// This function adds the given condition to the list of conditions if it is not alread present.

@@ -11,11 +11,11 @@ using LibCMS.Data;
 namespace LibCMS.Record
 {
     // This class is constructed directly from the response from the CMS API using Json serialization.
-    internal class RecordResponse
+    internal class CRecordResponse
     {
         [JsonInclude]
         [JsonPropertyName("results")]
-        internal IEnumerable<RecordItem>? records { get; set; }
+        internal IEnumerable<CRecordItem>? records { get; set; }
 
         [JsonInclude]
         [JsonPropertyName("count")]
@@ -23,14 +23,14 @@ namespace LibCMS.Record
         // Note that this count will likely be different from Records().Count()
         internal int RecordCountDB { get; set; }
 
-        internal static async Task<RecordResponse?> BuildFromHttpResponse(HttpResponseMessage message)
+        internal static async Task<CRecordResponse?> BuildFromHttpResponse(HttpResponseMessage message)
         {
-            return JsonSerializer.Deserialize<RecordResponse>(await message.Content.ReadAsStringAsync());
+            return JsonSerializer.Deserialize<CRecordResponse>(await message.Content.ReadAsStringAsync());
         }
 
-        internal IEnumerable<RecordItem> Records()
+        internal IEnumerable<CRecordItem> Records()
         {
-            if (records is null) records = new List<RecordItem>();
+            if (records is null) records = new List<CRecordItem>();
             return records;
         }
 
@@ -43,7 +43,7 @@ namespace LibCMS.Record
     }
 
     // This class processes and stores the information returned from the CMS API into a more usable form.
-    internal class RecordOutput
+    internal class CRecordOutput
     {
         // The most recent time in which this record output was updated
         private DateTime? timeLastUpdated;
@@ -53,27 +53,27 @@ namespace LibCMS.Record
             return (DateTime)timeLastUpdated;
         }
 
-        // A list of all clinicians, extracted from RecordResponse
-        private List<Clinician>? clinicians {  get; set; }
-        internal List<Clinician> Clinicians()
+        // A list of all clinicians, extracted from CRecordResponse
+        private List<CClinician>? clinicians {  get; set; }
+        internal List<CClinician> Clinicians()
         {
-            if (clinicians is null) clinicians = new List<Clinician>();
+            if (clinicians is null) clinicians = new List<CClinician>();
             return clinicians;
         }
 
-        // A list of all clinics, extracted from RecordResponse
-        private List<Clinic>? clinics { get; set; }
-        internal List<Clinic> Clinics()
+        // A list of all clinics, extracted from CRecordResponse
+        private List<CClinic>? clinics { get; set; }
+        internal List<CClinic> Clinics()
         {
-            if (clinics is null) clinics = new List<Clinic>();
+            if (clinics is null) clinics = new List<CClinic>();
             return clinics;
         }
 
-        // A list of all organizations, extracted from RecordResponse
-        private List<Organization>? organizations { get; set; }
-        internal List<Organization> Organizations()
+        // A list of all organizations, extracted from CRecordResponse
+        private List<COrganization>? organizations { get; set; }
+        internal List<COrganization> Organizations()
         {
-            if (organizations is null) organizations = new List<Organization>();
+            if (organizations is null) organizations = new List<COrganization>();
             return organizations;
         }
 
@@ -81,21 +81,21 @@ namespace LibCMS.Record
         /// This function extracts the information from a item response and uses that to expand the fields of this class as the item output.
         /// </summary>
         /// <param name="response">The response to extract information from.</param>
-        internal void AddRecordInput(RecordResponse response)
+        internal void AddRecordInput(CRecordResponse response)
         {
             if (response is null || !response.HasRecords()) return;
             
-            foreach (RecordItem record in response.Records())
+            foreach (CRecordItem record in response.Records())
             {
                 AddItem(record);    
             }
         }
 
-        private void AddItem(RecordItem item)
+        private void AddItem(CRecordItem item)
         {
-            Clinician? clinician = null;
-            Clinic? clinic = null;
-            Organization? organization = null;
+            CClinician? clinician = null;
+            CClinic? clinic = null;
+            COrganization? organization = null;
 
             // Attempt to retrieve the clinician with the PAC ID in the current item from clinicians
             // This will return a default Clinician object if there is no Clinician with the existing Pac ID in clinicians
@@ -104,7 +104,7 @@ namespace LibCMS.Record
             if (clinician == null)
             {
                 // CreateEntities a new clinician and add it to clinicians
-                clinician = new Clinician(item);
+                clinician = new CClinician(item);
                 Clinicians().Add(clinician);
             }
 
@@ -113,11 +113,11 @@ namespace LibCMS.Record
             {
                 // This repeats the same process for clinicians, only applied to organizations
                 // After this line, currentOrganization will == the relevant Organization or the default value
-                organization = Organizations().FirstOrDefault(o => o.PacID == item.IDPacOrg);
+                organization = Organizations().FirstOrDefault(o => o.pac == item.IDPacOrg);
 
                 if (organization == null)
                 {
-                    organization = new Organization(item);
+                    organization = new COrganization(item);
                     Organizations().Add(organization);
                 }
 
@@ -127,7 +127,7 @@ namespace LibCMS.Record
             //------------------------------------------------------------------------------------------------------------------------
 
             // Create a temp clinic for comparison purposes
-            Clinic compareClinic = new Clinic(item);
+            CClinic compareClinic = new CClinic(item);
             clinic = Clinics().FirstOrDefault(c => c.Equals(compareClinic)); // use the custom comparison operators
 
             if (clinic is null)
@@ -143,9 +143,9 @@ namespace LibCMS.Record
 
                 // If the clinic for this record already exists but in a supressed form, and the new item is not in this supressed form,
                 // move over the new data
-                if (clinic.location.Line2Suppressed && item.Line2Supressed != "Y")
+                if (clinic.location.line2Suppressed && item.Line2Supressed != "Y")
                 {
-                    clinic.location = new Address(item); // update the location to reflect the new record
+                    clinic.location = new CAddress(item); // update the location to reflect the new record
                 }
                 if (clinic.telephoneNumber == string.Empty && item.PhoneNumber != string.Empty)
                 {
@@ -161,7 +161,7 @@ namespace LibCMS.Record
         }
     }
 
-    internal class RecordItem
+    internal class CRecordItem
     {
 
         [JsonInclude]

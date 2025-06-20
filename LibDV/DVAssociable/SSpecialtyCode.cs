@@ -6,20 +6,20 @@ using Microsoft.Xrm.Sdk;
 
 namespace LibDV.DVAssociable
 {
-    public static class SpecialtyCode
+    public static class SSpecialtyCode
     {
-        internal static OptionSetValue PrimarySpecialtyCode(this Clinician c)
+        internal static OptionSetValue PrimarySpecialtyCode(this CClinician c)
             => GetSpecialtyCode(c.PrimarySpecialty());
-        internal static OptionSetValueCollection PrimarySpecialtyCodes(this Clinic c)
+        internal static OptionSetValueCollection PrimarySpecialtyCodes(this CClinic c)
             => GetSpecialtyCodes(c.PrimarySpecialties());
-        internal static OptionSetValueCollection PrimarySpecialtyCodes(this Organization o)
+        internal static OptionSetValueCollection PrimarySpecialtyCodes(this COrganization o)
             => GetSpecialtyCodes(o.PrimarySpecialties());
 
-        internal static OptionSetValueCollection SecondarySpecialtyCodes(this Clinician c)
+        internal static OptionSetValueCollection SecondarySpecialtyCodes(this CClinician c)
             => GetSpecialtyCodes(c.SecondarySpecialties());
-        internal static OptionSetValueCollection SecondarySpecialtyCodes(this Clinic c)
+        internal static OptionSetValueCollection SecondarySpecialtyCodes(this CClinic c)
             => GetSpecialtyCodes(c.SecondarySpecialties());
-        internal static OptionSetValueCollection SecondarySpecialtyCodes(this Organization o)
+        internal static OptionSetValueCollection SecondarySpecialtyCodes(this COrganization o)
             => GetSpecialtyCodes(o.SecondarySpecialties());
 
         public static OptionSetValue GetSpecialtyCode(string specialty)

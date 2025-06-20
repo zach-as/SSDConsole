@@ -11,16 +11,16 @@ namespace LibDV.DVEntityType
     {
         [AEntity("Clinician")]
         Clinician,
-        [AEntity("Clinic")]
+        [AEntity("CClinic")]
         Clinic,
         [AEntity("Medical Group")]
         MedicalGroup, // aka Organization
 
-        [AEntity("Clinician at Clinic")]
+        [AEntity("Clinician at CClinic")]
         ClinicianAtClinic,
         [AEntity("Clinician at Medical Group")]
         ClinicianAtMedicalGroup,
-        [AEntity("Clinic at Medical Group")]
+        [AEntity("CClinic at Medical Group")]
         ClinicAtMedicalGroup,
     }
     #endregion entitytype
@@ -43,27 +43,17 @@ namespace LibDV.DVEntityType
         internal ColumnSet ColumnSet()
         {
             // Retrieve all attributes that are relevant to this entity
-            var attrs = DVAttribute.GetAttributes(EEntityType(logicalname));
+            var attrs = SAttribute.GetAttributes(SEntityType.EntityType(logicalname));
             // Returns a ColumnSet that contains all the attributes that are relevant to this entity.
-            return new ColumnSet(attrs.Where(a => a.UseInColumnSet()).Select(a => a.Attribute()).ToArray());
+            return new ColumnSet(attrs.Where(a => a.HasDVRead()).Select(a => a.Attribute()).ToArray());
         }
     }
     #endregion entityattribute
 
     #region entitytype_extension
-    public static class CEntityType
+    // this partial class contains extension methods for EEntityType
+    public static partial class SEntityType
     {
-
-        private static EEntityType[] entityTypes = [];
-        public static EEntityType[] EntityTypes()
-        {
-            if (entityTypes.Length == 0)
-            {
-                entityTypes = Enum.GetValues<EEntityType>();
-            }
-            return entityTypes;
-        }
-
         private enum NameType
         {
             Friendly,
@@ -122,7 +112,7 @@ namespace LibDV.DVEntityType
             };
 
         public static EAttribute IdAttribute(this EEntityType e)
-            => DVAttribute.AttributeFromString(e.LogicalName()+"id");
+            => SAttribute.GetAttribute(e.LogicalName() + "id");
     }
     #endregion entitytype_extension
 }

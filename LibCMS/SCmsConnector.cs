@@ -8,7 +8,7 @@ using LibCMS.Data.Associable;
 namespace LibCMS
 {
 
-    public static class CMSConnector
+    public static class SCmsConnector
     {
 
         // The threshold for how much time must pass before records are forcefully updated
@@ -34,8 +34,8 @@ namespace LibCMS
         #endregion Client
 
         #region Records
-        private static RecordOutput? records;
-        private static async Task<RecordOutput> Records()
+        private static CRecordOutput? records;
+        private static async Task<CRecordOutput> Records()
         {
             await UpdateRecords();
             if (records is not null) return records;
@@ -48,23 +48,23 @@ namespace LibCMS
 
             CDisplay.Print("Pulling records from CMS. This may take a few minutes.");
 
-            ParametersBase parameters = new ParametersBase();
+            CParameters parameters = new CParameters();
             //parameters.Limit = 60;
             int? recordTotal = null;// 60;
             int recordsRecorded = 0;
 
             do
             {
-                var message = await Send(new HttpRequest(parameters)); // query CMS
+                var message = await Send(new CHttpRequest(parameters)); // query CMS
 
-                var response = await RecordResponse.BuildFromHttpResponse(message); // convert text to usable data
+                var response = await CRecordResponse.BuildFromHttpResponse(message); // convert text to usable data
 
                 if (response is null) throw new Exception("Failed to build record response from text.");
                 if (recordTotal is null || recordTotal == 0) recordTotal = response.RecordCountDB; // note the total # of records
 
                 if (!CDisplay.InProgress()) CDisplay.StartProgressBar("CMS records pulled and formatted:", recordTotal);
                 
-                if(records is null) records = new RecordOutput();
+                if(records is null) records = new CRecordOutput();
                 records.AddRecordInput(response); // Convert the response to most usable form (clinicians, clinics, orgs, etc)
 
                 int recordsPulled = response.Records().Count();
@@ -108,7 +108,7 @@ namespace LibCMS
         #endregion Headers
 
         #region HttpMessaging
-        private static async Task<HttpResponseMessage> Send(HttpRequest request)
+        private static async Task<HttpResponseMessage> Send(CHttpRequest request)
         {
             HttpResponseMessage response = await Client().SendAsync(request);
 
@@ -128,17 +128,17 @@ namespace LibCMS
         #endregion HttpMessaging
 
         #region PublicMethods
-        public static async Task<IEnumerable<Clinician>> GetClinicians()
+        public static async Task<IEnumerable<CClinician>> GetClinicians()
             => (await Records()).Clinicians();
-        public static async Task<IEnumerable<Clinic>> GetClinics()
+        public static async Task<IEnumerable<CClinic>> GetClinics()
             => (await Records()).Clinics();
-        public static async Task<IEnumerable<Organization>> GetOrganizations()
+        public static async Task<IEnumerable<COrganization>> GetOrganizations()
             => (await Records()).Organizations();
 
-        public static async Task<IEnumerable<Associable>> GetAssociables()
+        public static async Task<IEnumerable<CAssociable>> GetAssociables()
         {
-            // Group the data into a list of Associable objects for processing
-            List<Associable> associables = new List<Associable>();
+            // Group the data into a list of CAssociable objects for processing
+            List<CAssociable> associables = new List<CAssociable>();
             associables.AddRange(await GetClinicians());
             associables.AddRange(await GetClinics());
             associables.AddRange(await GetOrganizations());

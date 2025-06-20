@@ -10,7 +10,7 @@ namespace LibCMS.Json
     /// <summary>
     /// This is a custom JSON naming policy used to force property names to be in camel case, regardless of the presence of quotes.
     /// </summary>
-    internal class UpperCamelNamingPolicy : JsonNamingPolicy
+    internal class CUpperCamelNamingPolicy : JsonNamingPolicy
     {
 
         public override string ConvertName(string name)

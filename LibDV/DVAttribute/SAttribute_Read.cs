@@ -1,38 +1,18 @@
-﻿using Microsoft.Xrm.Sdk;
-using LibCMS.Data.Associable;
-using LibUtil.UtilGlobal;
+﻿using LibCMS.Data.Associable;
 using LibDV.DVAssociable;
-using LibDV.DVEntity;
 using LibDV.DVEntityType;
+using Microsoft.Xrm.Sdk;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LibDV.DVAttribute
 {
-    public static partial class CAttribute
+    // Partial class of SAttribute, contains all functions related to accessing attributes
+    internal static partial class SAttribute
     {
-
-        #region applyattribute
-        internal static void ApplyAttributes(Associable a, Entity e)
-        {
-            var attributes = GetAttributes(a);
-            foreach (var attribute in attributes)
-            {
-                if (attribute.DVRead()) ApplyAttribute(attribute, e, a);
-            }
-        }
-        private static void ApplyAttribute(EAttribute attr, Entity e, Associable a)
-            => ApplyAttribute(attr, e, GetAttributeValue(a, attr));
-
-        private static void ApplyAttribute(EAttribute a, Entity e, object? value)
-        {
-            e[a.Attribute()] = value;
-
-            // jank-ass logic to make the ssd_name field in MedicalGroup = Pac
-            if (e.EntityType() == EEntityType.MedicalGroup)
-                if (a == EAttribute.Pac)
-                    e[$"{CGlobal.Prefix()}name"] = value;
-        }
-        #endregion applyattribute
-
         #region getattribute
         // this exists so that we don't have to keep using reflection whenever we want to access GetAttributes()
         private static Dictionary<EEntityType, EAttribute[]>? attributes;
@@ -66,7 +46,7 @@ namespace LibDV.DVAttribute
             if (attributes is null)
             {
                 attributes = new Dictionary<EEntityType, EAttribute[]>();
-                var entityTypes = CEntityType.EntityTypes();
+                var entityTypes = SEntityType.EntityTypes();
                 var allAttributes = Enum.GetValues<EAttribute>();
                 foreach (var t in entityTypes)
                 {
@@ -74,59 +54,50 @@ namespace LibDV.DVAttribute
                 }
 
             }
-            
+
             return attributes.Values.SelectMany(_ => _).ToArray();
         }
-        internal static List<EAttribute> GetAttributes(Associable a)
-            => GetAttributes(a.EntityType());
+        internal static List<EAttribute> GetAttributes(CAssociable a)
+            => GetAttributes(a.EntityType()).ToList();
         internal static List<EAttribute> GetAttributes(Entity e)
-            => GetAttributes(e.EntityType());
+            => GetAttributes(e.EntityType()).ToList();
 
         internal static EAttribute GetAttribute(string attrName)
         {
             try
             {
                 return GetAttributes().First(a => a.Attribute().Equals(attrName));
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new ArgumentException($"EAttribute with name '{attrName}' not found.", nameof(attrName));
             }
-        }
-
-        internal static EAttribute GetAttributeFromString(string s)
-        {
-            var attributes = GetAttributes();
-            foreach (var a in attributes)
-            {
-                if (a.Attribute().Equals(s)) return a;
-            }
-            throw new Exception($"Unable to identify attribute from string: {s}");
         }
         #endregion getattribute
 
         #region getattributevalue
 
-        internal static object? GetAttributeValue(Associable a, EAttribute attribute)
+        internal static object? GetAttributeValue(LibCMS.Data.Associable.CAssociable a, EAttribute attribute)
         {
-            if (a is Clinic clinic) return GetAttributeValue(clinic, attribute);
-            if (a is Clinician clinician) return GetAttributeValue(clinician, attribute);
-            if (a is Organization organization) return GetAttributeValue(organization, attribute);
+            if (a is CClinic clinic) return GetAttributeValue(clinic, attribute);
+            if (a is CClinician clinician) return GetAttributeValue(clinician, attribute);
+            if (a is COrganization organization) return GetAttributeValue(organization, attribute);
             throw new NotImplementedException($"No attribute retrieval defined for {a.GetType().Name}");
         }
-        internal static object? GetAttributeValue(Associable a, string attrName)
+        internal static object? GetAttributeValue(LibCMS.Data.Associable.CAssociable a, string attrName)
             => GetAttributeValue(a, GetAttribute(attrName));
 
-        private static object? GetAttributeValue(Clinic c, EAttribute a)
+        private static object? GetAttributeValue(CClinic c, EAttribute a)
         {
-            if (!a.EntityTypes().Contains(c.EntityType())) throw new Exception($"GetAttributeValue(): EAttribute {a} does not apply to Clinic entity type.");
+            if (!a.EntityTypes().Contains(c.EntityType())) throw new Exception($"GetAttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
             return a switch
             {
-                EAttribute.AddressID => c.location.AddressID,
-                EAttribute.AddressLine1 => c.location.AddressLine1,
-                EAttribute.AddressLine2 => c.location.AddressLine2,
-                EAttribute.Line2Suppressed => c.location.Line2Suppressed,
-                EAttribute.City => c.location.City,
-                EAttribute.Zip => c.location.ZIP,
+                EAttribute.AddressID => c.location.addressID,
+                EAttribute.AddressLine1 => c.location.addressLine1,
+                EAttribute.AddressLine2 => c.location.addressLine2,
+                EAttribute.Line2Suppressed => c.location.line2Suppressed,
+                EAttribute.City => c.location.city,
+                EAttribute.Zip => c.location.zip,
                 EAttribute.PhoneNumber => c.telephoneNumber,
                 EAttribute.Name => c.name,
                 EAttribute.ClinicianCount => c.numClinicians,
@@ -136,11 +107,11 @@ namespace LibDV.DVAttribute
             };
         }
 
-        private static object? GetAttributeValue(Clinician c, EAttribute a)
+        private static object? GetAttributeValue(CClinician c, EAttribute a)
         {
-            if (!a.EntityTypes().Contains(c.EntityType())) throw new Exception($"GetAttributeValue(): EAttribute {a} does not apply to Clinic entity type.");
+            if (!a.EntityTypes().Contains(c.EntityType())) throw new Exception($"GetAttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
             return a switch
-            { 
+            {
                 EAttribute.Pac => c.PacID,
                 EAttribute.Npi => c.NPI,
                 EAttribute.Enrl => c.EnrlID,
@@ -160,25 +131,26 @@ namespace LibDV.DVAttribute
             };
         }
 
-        private static object? GetAttributeValue(Organization o, EAttribute a)
+        private static object? GetAttributeValue(COrganization o, EAttribute a)
         {
-            if (!a.EntityTypes().Contains(o.EntityType())) throw new Exception($"GetAttributeValue(): EAttribute {a} does not apply to Clinic entity type.");
-            return a switch {
-                EAttribute.Pac => o.PacID,
-                EAttribute.PartitionId => o.PacID,
+            if (!a.EntityTypes().Contains(o.EntityType())) throw new Exception($"GetAttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
+            return a switch
+            {
+                EAttribute.Pac => o.pac,
+                EAttribute.PartitionId => o.pac,
                 EAttribute.PrimarySpecialties => o.PrimarySpecialtyCodes(),
                 EAttribute.SecondarySpecialties => o.SecondarySpecialtyCodes(),
-                EAttribute.FullMedicare => o.AcceptsFullMedicare,
-                EAttribute.ClinicianCount => o.NumberClinicians,
+                EAttribute.FullMedicare => o.acceptsFullMedicare,
+                EAttribute.ClinicianCount => o.numClinicians,
                 _ => null
             };
         }
         #endregion getattributevalue
 
         #region hasattribute
-        internal static bool HasAttribute(Associable a, string attrName)
+        internal static bool HasAttribute(LibCMS.Data.Associable.CAssociable a, string attrName)
             => HasAttribute(a, GetAttribute(attrName));
-        internal static bool HasAttribute(Associable a, EAttribute attr)
+        internal static bool HasAttribute(LibCMS.Data.Associable.CAssociable a, EAttribute attr)
         {
             if (attr.EntityTypes().Contains(a.EntityType())) return GetAttributeValue(a, attr) != null;
             return false;
@@ -190,11 +162,10 @@ namespace LibDV.DVAttribute
             => IdAttribute(er.EntityType());
         internal static EAttribute IdAttribute(this Entity e)
             => IdAttribute(e.EntityType());
-        internal static EAttribute IdAttribute(this Associable a)
+        internal static EAttribute IdAttribute(this CAssociable a)
             => IdAttribute(a.EntityType());
         internal static EAttribute IdAttribute(EEntityType entityType)
             => entityType.IdAttribute();
         #endregion idattribute
-
     }
 }

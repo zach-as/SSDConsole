@@ -67,7 +67,7 @@ namespace LibDV.DVRelationship
             if (attributes is null) throw new Exception("DVRelationshipType.EAttribute(): No attribute found!");
             return attributes[0];
         }
-        // Retrieve the friendly name of the relationship type table (e.g. Clinician At Clinic)
+        // Retrieve the friendly name of the relationship type table (e.g. Clinician At CClinic)
         internal static string FriendlyName(this DVRelationshipType t)
             => t.Attribute().FriendlyName();
         // Retrieve the schema name of the relationship type table (e.g. ssd_ClinicianatClinic)
@@ -109,7 +109,7 @@ namespace LibDV.DVRelationship
             }
             throw new Exception($"RelationshipType({a}, {b}): Unable to find matching relationship type."); // this should never be reached
         }
-        internal static DVRelationshipType RelationshipType(Associable a, Associable b)
+        internal static DVRelationshipType RelationshipType(LibCMS.Data.Associable.CAssociable a, LibCMS.Data.Associable.CAssociable b)
             => RelationshipType(a.EntityType(), b.EntityType());
         internal static DVRelationshipType RelationshipType(Entity a, Entity b)
             => RelationshipType(a.EntityType(), b.EntityType());

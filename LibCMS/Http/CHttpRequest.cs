@@ -8,18 +8,18 @@ using LibCMS.Json;
 namespace LibCMS.Http
 {
 
-    internal class HttpRequest : HttpRequestMessage
+    internal class CHttpRequest : HttpRequestMessage
     {
         private const string CONTENT_TYPE = "application/json";
 
-        public HttpRequest(ParametersBase parameters)
+        public CHttpRequest(CParameters parameters)
         {
          
             JsonSerializerOptions options = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                DictionaryKeyPolicy = new UpperCamelNamingPolicy(),
-                PropertyNamingPolicy = new UpperCamelNamingPolicy(),
+                DictionaryKeyPolicy = new CUpperCamelNamingPolicy(),
+                PropertyNamingPolicy = new CUpperCamelNamingPolicy(),
                 DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
@@ -35,7 +35,7 @@ namespace LibCMS.Http
             Content.Headers.ContentType = new MediaTypeHeaderValue(CONTENT_TYPE);
 
             Method = HttpMethod.Post;
-            RequestUri = Path_Extensions.BuildUri();
+            RequestUri = SPath.BuildUri();
 
         }
     }

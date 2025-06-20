@@ -2,7 +2,7 @@
 
 namespace LibCMS.Function
 {
-    public static class Specialty
+    public static class SSpecialty
     {
 
         public enum SpecialtyType
@@ -12,27 +12,27 @@ namespace LibCMS.Function
             All
         }
 
-        public static string PrimarySpecialty(this Clinician c)
+        public static string PrimarySpecialty(this CClinician c)
             => c.PrimarySpecialty;
-        public static string[] PrimarySpecialties(this Clinic c)
+        public static string[] PrimarySpecialties(this CClinic c)
             => Specialties(c.Clinicians(), SpecialtyType.Primary);
-        public static string[] PrimarySpecialties(this Organization o)
+        public static string[] PrimarySpecialties(this COrganization o)
             => Specialties(o.Clinicians(), SpecialtyType.Primary);
 
-        public static string[] SecondarySpecialties(this Clinician c)
+        public static string[] SecondarySpecialties(this CClinician c)
             => c.SecondarySpecialties;
-        public static string[] SecondarySpecialties(this Clinic c)
+        public static string[] SecondarySpecialties(this CClinic c)
             => Specialties(c.Clinicians(), SpecialtyType.Secondary);
-        public static string[] SecondarySpecialties(this Organization o)
+        public static string[] SecondarySpecialties(this COrganization o)
             => Specialties(o.Clinicians(), SpecialtyType.Secondary);
 
         public static async Task<string[]> Specialties(SpecialtyType type = SpecialtyType.All)
-            => Specialties(await CMSConnector.GetClinicians(), type);
+            => Specialties(await SCmsConnector.GetClinicians(), type);
 
-        private static string[] Specialties(IEnumerable<Clinician> clinicians, SpecialtyType type = SpecialtyType.All)
+        private static string[] Specialties(IEnumerable<CClinician> clinicians, SpecialtyType type = SpecialtyType.All)
             => clinicians.SelectMany(c => c.Specialties(type)).Distinct().ToArray();
 
-        private static string[] Specialties(this Clinician c, SpecialtyType type = SpecialtyType.All)
+        private static string[] Specialties(this CClinician c, SpecialtyType type = SpecialtyType.All)
         {
             string[] primarySpecialty = [c.PrimarySpecialty()];
             string[] secondarySpecialties = c.SecondarySpecialties();

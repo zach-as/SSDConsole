@@ -3,18 +3,18 @@
 
 namespace LibCMS.Data.Associable
 {
-    public class Associable
+    public class CAssociable
     {
         #region association
 
         [JsonIgnore]
-        private List<Associable>? associations;
-        internal List<Associable> Associations()
+        private List<CAssociable>? associations;
+        public List<CAssociable> Associations()
         {
-            if (associations is null) associations = new List<Associable>();
+            if (associations is null) associations = new List<CAssociable>();
             return associations;
         }
-        internal bool Associate(Associable associable)
+        internal bool Associate(CAssociable associable)
         {
             if (associable == null) return false;
             if (associable.GetType() == GetType()) return false; // do not associate with associables of the same type
@@ -23,7 +23,7 @@ namespace LibCMS.Data.Associable
             associable.Associate(this);
             return true;
         }
-        internal bool Disassociate(Associable associable)
+        internal bool Disassociate(CAssociable associable)
         {
             if (associable == null) return false;
             if (!HasAssociation(associable)) return false;
@@ -31,7 +31,7 @@ namespace LibCMS.Data.Associable
             associable.Disassociate(this);
             return true;
         }
-        internal bool HasAssociation(Associable associable)
+        internal bool HasAssociation(CAssociable associable)
         {
             if (associable == null) return false;
             return Associations().Contains(associable);
@@ -39,9 +39,9 @@ namespace LibCMS.Data.Associable
         #endregion association
 
         // Sorts the provided associables by type.
-        internal static Dictionary<Type, List<Associable>> SortAssociables(List<Associable> associables)
+        internal static Dictionary<Type, List<CAssociable>> SortAssociables(List<CAssociable> associables)
         {
-            var sorted = new Dictionary<Type, List<Associable>>();
+            var sorted = new Dictionary<Type, List<CAssociable>>();
 
             foreach (var associable in associables)
             {
@@ -49,7 +49,7 @@ namespace LibCMS.Data.Associable
 
                 if (!sorted.ContainsKey(type))
                 {
-                    sorted[type] = new List<Associable>();
+                    sorted[type] = new List<CAssociable>();
                 }
 
                 sorted[type].Add(associable);

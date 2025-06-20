@@ -9,15 +9,15 @@ using System.Web;
 namespace LibCMS.Params
 {
 
-    [JsonDerivedType(typeof(Condition))]
-    [JsonDerivedType(typeof(ConditionGroup))]
+    [JsonDerivedType(typeof(CCondition))]
+    [JsonDerivedType(typeof(CConditionGroup))]
     public interface ICondition{}
 
     // This model is used to represent an individual condition that
     // must be fulfilled for a particular record to be returned in a query.
-    public class Condition : ICondition
+    public class CCondition : ICondition
     {
-        public Condition(string _property, ConditionOperator _operator, string _value)
+        public CCondition(string _property, ConditionOperator _operator, string _value)
         {
             Property = _property;
             Operator = _operator.Description();
@@ -42,9 +42,9 @@ namespace LibCMS.Params
         public override bool Equals(object? obj)
         {
             if (obj == null) return false;
-            if (obj is not Condition) return false;
+            if (obj is not CCondition) return false;
 
-            Condition? c = obj as Condition;
+            CCondition? c = obj as CCondition;
 
             if (c?.Property == Property &&
                 c?.Operator == Operator &&
@@ -56,7 +56,7 @@ namespace LibCMS.Params
 
     // This model is used to represent a group of conditions that
     // must be fulfilled for a particular record to be returned in a query.
-    public class ConditionGroup : ICondition
+    public class CConditionGroup : ICondition
     {
         // The operator to determine if all or only some conditions must be met (and, or)
         [JsonInclude]
@@ -70,9 +70,9 @@ namespace LibCMS.Params
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
-            if (!(obj is ConditionGroup)) return false;
+            if (!(obj is CConditionGroup)) return false;
 
-            ConditionGroup c = (ConditionGroup)obj;
+            CConditionGroup c = (CConditionGroup)obj;
 
             if (GroupOperator != c.GroupOperator) return false;
 
@@ -132,7 +132,7 @@ namespace LibCMS.Params
         [Description("match")]
         Match = 14,
     }
-    public static class ConditionOperator_Extensions
+    public static class SConditionOperator
     {
         public static string Description(this ConditionOperator conditionOperator)
         {

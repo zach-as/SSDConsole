@@ -8,7 +8,7 @@ using LibCMS.Record;
 
 namespace LibCMS.Data.Associable
 {
-    public class Clinician : Associable
+    public class CClinician : CAssociable
     {
         // This is a unique code that represents this clinician in PPES.
         public string NPI { get; set; }
@@ -55,7 +55,7 @@ namespace LibCMS.Data.Associable
         // This indicates if this clinician accepts medicare payments in full or in part
         public bool AcceptsFullMedicare { get; set; }
 
-        public Clinician(RecordItem record)
+        internal CClinician(CRecordItem record)
         {
             if (record == null) throw new ArgumentNullException("Clinician created with null record");
             NPI = record.IDNpi;
@@ -76,14 +76,14 @@ namespace LibCMS.Data.Associable
             AcceptsFullMedicare = record.MedicareFullInd == "Y" ? true : false;
         }
 
-        public IEnumerable<Clinic> Clinics()
+        public IEnumerable<CClinic> Clinics()
         {
-            return Associations().OfType<Clinic>();
+            return Associations().OfType<CClinic>();
         }
 
-        public IEnumerable<Organization> Organizations()
+        public IEnumerable<COrganization> Organizations()
         {
-            return Associations().OfType<Organization>();
+            return Associations().OfType<COrganization>();
         }
 
         

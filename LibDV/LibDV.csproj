@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LibCMS\LibCMS.csproj" />
     <ProjectReference Include="..\LibUtil\LibUtil.csproj" />
   </ItemGroup>
 

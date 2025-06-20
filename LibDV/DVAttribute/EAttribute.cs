@@ -1,41 +1,14 @@
 ﻿using LibDV.DVEntityType;
 using LibUtil.UtilGlobal;
 using LibUtil.UtilAttribute;
+using Microsoft.Xrm.Sdk;
 
 namespace LibDV.DVAttribute
 {
-    [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
-    public class AAttributeAttribute : System.Attribute
-    {
-        private string attributeName; // the name of this attribute as used in dataverse
-        private EEntityType[] entityTypes; // the entity types that this attribute applies to
-
-        internal AAttributeAttribute(string attributeName, params EEntityType[] entityTypes)
-        {
-            this.attributeName = CGlobal.Prefix() + attributeName;
-            this.entityTypes = entityTypes;
-        }
-
-        public override string ToString()
-            => attributeName;
-
-        internal EEntityType[] EntityTypes()
-            => entityTypes;
-    }
-
-    // If this attribtue is present on an EAttribute, it indicates that the EAttribute should be included in the columnset when fetching from dataverse
-    [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
-    internal class ADVReadAttribute : System.Attribute { }
-
-    // If this attribute is present on an EAttribute, it indicates that the EAttribute should be written to dataverse when creating or updating the relevant entity.
-    internal class ADVWriteAttribute : System.Attribute { }
-
     public enum EAttribute
     {
-        // This represents the partition attribute, used in elastic tables
-        [AAttribute("partitionid", EEntityType.Clinic, EEntityType.Clinician, EEntityType.MedicalGroup)]
-        [ADVWrite()]
-        PartitionId,
+        [AAttribute("name", EEntityType.MedicalGroup, EEntityType.ClinicAtMedicalGroup, EEntityType.ClinicianAtMedicalGroup, EEntityType.ClinicianAtClinic)]
+        Unused_Name, // name attribute that is (mostly) not directly used in read/write operations, but rather acts as a meaningless primary key
 
         // These are the attributes used in comparison operations
         [AAttribute("addressid", EEntityType.Clinic)]
@@ -55,6 +28,7 @@ namespace LibDV.DVAttribute
         Name,
         [AAttribute("pac", EEntityType.Clinician, EEntityType.MedicalGroup)]
         [ADVRead(), ADVWrite()]
+        [ADVWriteDuplicate(Unused_Name, EEntityType.MedicalGroup)]
         Pac,
 
         // These attributes are not set within this program, but rather are generated in dataverse
@@ -64,7 +38,6 @@ namespace LibDV.DVAttribute
         MedicalGroupID,
         [AAttribute("clinicid", EEntityType.Clinic)]
         ClinicID,
-
 
         // These are the remaining attributes that are not used in comparison operations
         [AAttribute("phonenumber", EEntityType.Clinic)]
@@ -126,21 +99,28 @@ namespace LibDV.DVAttribute
         ClinicianCount,
     }
 
-    public static partial class CAttribute
+    // This class provides extension methods for EAttribute, allowing easy access to its attributes and properties.
+    public static partial class SAttribute
     {
-        public static AAttributeAttribute InternalAttribute(this EAttribute a)
+        internal static AAttributeAttribute InternalAttribute(this EAttribute a)
             => CUtilAttribute.InternalAttribute<AAttributeAttribute>(a);
 
-        public static bool DVRead(this EAttribute a)
+        internal static bool HasDVRead(this EAttribute a)
             => CUtilAttribute.HasInternalAttribute<ADVReadAttribute>(a);
 
-        public static bool DVWrite(this EAttribute a)
+        internal static bool HasDVWrite(this EAttribute a)
             => CUtilAttribute.HasInternalAttribute<ADVWriteAttribute>(a);
+        internal static bool HasDVWriteDuplicate(this EAttribute a)
+            => CUtilAttribute.HasInternalAttribute<ADVWriteDuplicate>(a);
+
+        internal static ADVWriteDuplicate DVWriteDuplicate(this EAttribute a)
+            => CUtilAttribute.InternalAttribute<ADVWriteDuplicate>(a);
 
         public static EEntityType[] EntityTypes(this EAttribute a)
             => a.InternalAttribute().EntityTypes();
 
         public static string Attribute(this EAttribute a)
             => a.InternalAttribute().ToString();
+
     }
 }

@@ -8,21 +8,8 @@ using LibDV.DVEntityType;
 
 namespace LibDV.DVEntity
 {
-    internal static class DVEntity
+    internal static class SEntity
     {
-        
-
-        // Returns a ColumnSet that contains all the attributes that are relevant to this object.
-        internal static ColumnSet ColumnSet(Associable a)
-        {
-            if (a is null) return new ColumnSet();
-            return a.EntityType().ColumnSet();
-        }
-
-        internal static string LogicalName(Associable a)
-        {
-            return a.EntityType().LogicalName();
-        }
 
         internal static EntityCollection EntityCollection(this List<Entity>? entities)
         {
@@ -32,23 +19,6 @@ namespace LibDV.DVEntity
             {
                 EntityName = entities.ElementAt(0).LogicalName
             };
-        }
-
-        internal static DVEntityType EntityType(this Entity e)
-            => EntityType(e.LogicalName);
-        internal static DVEntityType EntityType(this EntityReference er)
-            => EntityType(er.LogicalName);
-        internal static DVEntityType EntityType(string logicalname)
-        {
-            if (string.IsNullOrEmpty(logicalname)) throw new ArgumentNullException(nameof(logicalname), "EEntityType cannot be determined from null or empty logical name");
-            var entityTypes = EntityType_Extensions.EntityTypes();
-            
-            foreach (DVEntityType t in entityTypes)
-            {
-                if (t.LogicalName().Equals(logicalname)) return t;
-            }
-
-            throw new Exception($"Unrecognized logicalname: {logicalname}");
         }
 
         internal static object? AttributeValue(this Entity e, string attrName)

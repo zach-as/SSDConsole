@@ -21,15 +21,15 @@ namespace LibDV
         }
 
         #region filtergeneration
-        internal static FilterExpression EqualExpression(Associable a)
+        internal static FilterExpression EqualExpression(CAssociable a)
         {
             var filter = new FilterExpression(LogicalOperator.And);
 
             if (a is null) return filter;
 
-            if (a is Clinic)
+            if (a is CClinic)
             {
-                var clinic = (Clinic)a;
+                var clinic = (CClinic)a;
 
                 // Name && (ID || (Ln1 && (Ln2 || Sprs)))
 
@@ -57,15 +57,15 @@ namespace LibDV
                 filter.AddFilter(filter_name);
                 filter.AddFilter(filter_addr);
             }
-            else if (a is Clinician)
+            else if (a is CClinician)
             {
-                var clinician = (Clinician)a;
+                var clinician = (CClinician)a;
                 filter.AddCondition(Attribute.Pac, ConditionOperator.Equal, clinician.PacID);
             }
-            else if (a is Organization)
+            else if (a is COrganization)
             {
-                var organization = (Organization)a;
-                filter.AddCondition(Attribute.Pac, ConditionOperator.Equal, organization.PacID);
+                var organization = (COrganization)a;
+                filter.AddCondition(Attribute.Pac, ConditionOperator.Equal, organization.pac);
             }
             else throw new Exception($"Unexpected associable type in EqualExpression(): {a.GetType()}");
 
@@ -186,14 +186,14 @@ namespace LibDV
 
         #region conditionalmatching
         // Returns true if the entity's relevant attributes match the provided associable's EqualExpression().
-        internal static bool Matches(Associable a, Entity e)
+        internal static bool Matches(CAssociable a, Entity e)
         {
             if (e == null || a == null) return a == null && e == null;
             if (e.LogicalName != a.LogicalName()) return false;
             return Matches(e, a.EqualExpression()); // Returns true if all conditions of EqualExpression() are met
         }
         // Returns true if the associables are functionally equivelant
-        internal static bool Matches(Associable a1, Associable a2)
+        internal static bool Matches(CAssociable a1, CAssociable a2)
         {
             if (a1 == null || a2 == null) return a1 == null && a2 == null;
             if (a1.LogicalName() != a2.LogicalName()) return false;
@@ -250,7 +250,7 @@ namespace LibDV
                                     : found; // NotNull means the attribute is present
                     
                     // We have this because of the niche occurence wherein empty strings are assigned the Null conditionoperator instead of equals ""
-                    if (compareTarget is Associable && condition.Operator == ConditionOperator.Null)
+                    if (compareTarget is CAssociable && condition.Operator == ConditionOperator.Null)
                     {
                         if (found)
                         {
@@ -328,14 +328,14 @@ namespace LibDV
         {
             if (o is null) throw new Exception("DVFilter(): Unable to access attribute: {attrName} from null object!");
             if (o is Entity e) return e.HasAttribute(attrName);
-            if (o is Associable a) return a.HasAttribute(attrName);
+            if (o is CAssociable a) return a.HasAttribute(attrName);
             return false;
         }
         private static object? AttributeValue(object o, string attrName)
         {
             if (o is null) throw new Exception("DVFilter(): Unable to access attribute: {attrName} from null object!");
             if (o is Entity e) return e.AttributeValue(attrName);
-            if (o is Associable a) return a.AttributeValue(attrName);
+            if (o is CAssociable a) return a.AttributeValue(attrName);
             throw new Exception($"DVFilter(): Attempting to access EAttribute value for object: {o.GetType()} with attrName: {attrName}, but object is invalid type.");
         }
 

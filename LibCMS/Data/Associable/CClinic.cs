@@ -1,10 +1,10 @@
 ﻿using LibCMS.Data;
 using LibCMS.Record;
-using static LibCMS.Function.Specialty;
+using static LibCMS.Function.SSpecialty;
 
 namespace LibCMS.Data.Associable
 {
-    public class Clinic : Associable
+    public class CClinic : CAssociable
     {
         // This is the name of this clinic
         public string name { get; set; }
@@ -16,36 +16,36 @@ namespace LibCMS.Data.Associable
         public int numClinicians { get; set; }
         
         // This is the address of this clinic
-        public Address location { get; set; }
+        public CAddress location { get; set; }
 
-        public Clinic (RecordItem record)
+        internal CClinic (CRecordItem record)
         {
             name = record.FacilityName;
             telephoneNumber = record.PhoneNumber;
-            location = new Address(record);
+            location = new CAddress(record);
             numClinicians = 1; // Always start at 1 clinician, this number will be incremented as more clinicians are discovered 
         }
 
-        public IEnumerable<Clinician> Clinicians()
+        public IEnumerable<CClinician> Clinicians()
         {
-            return Associations().OfType<Clinician>();
+            return Associations().OfType<CClinician>();
         }
 
-        public IEnumerable<Organization> Organizations()
+        public IEnumerable<COrganization> Organizations()
         {
-            return Associations().OfType<Organization>();
+            return Associations().OfType<COrganization>();
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(location.AddressID,
+            return HashCode.Combine(location.addressID,
                                     name,
-                                    location.AddressLine1,
-                                    location.AddressLine2,
-                                    location.Line2Suppressed,
-                                    location.City,
-                                    location.State,
-                                    location.ZIP);
+                                    location.addressLine1,
+                                    location.addressLine2,
+                                    location.line2Suppressed,
+                                    location.city,
+                                    location.state,
+                                    location.zip);
         }
     }
 }
