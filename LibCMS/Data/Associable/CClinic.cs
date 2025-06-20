@@ -1,21 +1,26 @@
 ﻿using LibCMS.Data;
 using LibCMS.Record;
 using static LibCMS.Function.SSpecialty;
+using static LibUtil.UtilGlobal.CGlobal;
 
 namespace LibCMS.Data.Associable
 {
     public class CClinic : CAssociable
     {
         // This is the name of this clinic
+        [ADVIndicator(Attribute_Name)]
         public string name { get; set; }
 
         // This indicates the telephone number associated with this clinic
+        [ADVIndicator(Attribute_PhoneNumber)]
         public string telephoneNumber { get; set; }
 
         // This is the number of clinicians that operate at this clinic
+        [ADVIndicator(Attribute_ClinicianCount)]
         public int numClinicians { get; set; }
-        
+
         // This is the address of this clinic
+        [ADVIndicatorNested]
         public CAddress location { get; set; }
 
         internal CClinic (CRecordItem record)

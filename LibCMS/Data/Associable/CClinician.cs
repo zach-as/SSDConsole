@@ -1,79 +1,89 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
-using System.Web;
-using LibCMS.Function;
-using LibCMS.Record;
+﻿using LibCMS.Record;
+using static LibUtil.UtilGlobal.CGlobal;
 
 namespace LibCMS.Data.Associable
 {
     public class CClinician : CAssociable
     {
         // This is a unique code that represents this clinician in PPES.
-        public string NPI { get; set; }
+        [ADVIndicator(Attribute_Npi)]
+        public string npi { get; set; }
 
         // This is a unique code that represents this clinician in PECOS.
-        public string PacID { get; set; }
+        [ADVIndicator(Attribute_Pac)]
+        public string pacId { get; set; }
 
         // This is a unique code that denotes the clinician's enrollment ID in CMS.
-        public string EnrlID { get; set; }
+        [ADVIndicator(Attribute_Enrl)]
+        public string enrlId { get; set; }
 
         // This is the clinician's first name.
-        public string FirstName { get; set; }
+        [ADVIndicator(Attribute_FirstName)]
+        public string firstName { get; set; }
 
         // This is the clinician's middle name or initial.
-        public string MiddleName { get; set; }
+        [ADVIndicator(Attribute_MiddleName)]
+        public string middleName { get; set; }
 
         // This is the clinician's last name.
-        public string LastName { get; set; }
+        [ADVIndicator(Attribute_LastName)]
+        public string lastName { get; set; }
 
         // This is the clinician's primary specialty.
-        public string PrimarySpecialty { get; set; }
+        [ADVIndicator(Attribute_PrimarySpecialty)]
+        public string primarySpecialty { get; set; }
 
         // This is an array of the clinician's listed secondary specialties
-        public string[] SecondarySpecialties { get; set; }
+        [ADVIndicator(Attribute_SecondarySpecialties)]
+        public string[] secondarySpecialties { get; set; }
 
         // This is the suffix of the clinician (Jr., Sr., etc)
-        public string Suffix { get; set; }
+        [ADVIndicator(Attribute_Suffix)]
+        public string suffix { get; set; }
 
         // This is the categorized sex of the clinician (M, F)
+        [ADVIndicator(Attribute_Sex)]
         public string sex { get; set; }
 
         // This represents the medical credentials of the clinician (PA, CNA, NP, MD, etc)
-        public string Credentials { get; set; }
+        [ADVIndicator(Attribute_Credentials)]
+        public string credentials { get; set; }
 
         // This represents the medical institution where the clinician received their primary clinical education.
-        public string MedicalSchool { get; set; }
+        [ADVIndicator(Attribute_MedicalSchool)]
+        public string medicalSchool { get; set; }
 
         // This represents the year in which the clinician graduated from their medical school.
-        public string GraduationYear { get; set; }
+        [ADVIndicator(Attribute_GraduationYear)]
+        public string graduationYear { get; set; }
 
         // This represents if the clinician accepts telehealth
-        public bool Telehealth { get; set; }
+        [ADVIndicator(Attribute_Telehealth)]
+        public bool telehealth { get; set; }
 
         // This indicates if this clinician accepts medicare payments in full or in part
-        public bool AcceptsFullMedicare { get; set; }
+        [ADVIndicator(Attribute_FullMedicare)]
+        public bool acceptsFullMedicare { get; set; }
 
         internal CClinician(CRecordItem record)
         {
             if (record == null) throw new ArgumentNullException("Clinician created with null record");
-            NPI = record.IDNpi;
-            PacID = record.IDPacInd;
-            EnrlID = record.IDEnrollment;
-            FirstName = record.ProviderNameFirst;
-            MiddleName = record.ProviderNameMiddle; // This might be the full middle name, an empty string, or a middle initial
-            LastName = record.ProviderNameLast;
-            PrimarySpecialty = record.SpecialtyPrimary;
-            SecondarySpecialties = record.SpecialtySecondaryAll
+            npi = record.IDNpi;
+            pacId = record.IDPacInd;
+            enrlId = record.IDEnrollment;
+            firstName = record.ProviderNameFirst;
+            middleName = record.ProviderNameMiddle; // This might be the full middle name, an empty string, or a middle initial
+            lastName = record.ProviderNameLast;
+            primarySpecialty = record.SpecialtyPrimary;
+            secondarySpecialties = record.SpecialtySecondaryAll
                                         .Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
-            Suffix = record.Suffix;
+            suffix = record.Suffix;
             sex = record.Sex; // This should always == "M" or "F" according to the schema
-            Credentials = record.Credentials;
-            MedicalSchool = record.SchoolName;
-            GraduationYear = record.SchoolGradYear;
-            Telehealth = record.AcceptsTelehealth == "Y" ? true : false;
-            AcceptsFullMedicare = record.MedicareFullInd == "Y" ? true : false;
+            credentials = record.Credentials;
+            medicalSchool = record.SchoolName;
+            graduationYear = record.SchoolGradYear;
+            telehealth = record.AcceptsTelehealth == "Y" ? true : false;
+            acceptsFullMedicare = record.MedicareFullInd == "Y" ? true : false;
         }
 
         public IEnumerable<CClinic> Clinics()
@@ -86,11 +96,9 @@ namespace LibCMS.Data.Associable
             return Associations().OfType<CMedicalGroup>();
         }
 
-        
-
         public override int GetHashCode()
         {
-            return HashCode.Combine(PacID, NPI, EnrlID, FirstName, MiddleName, LastName);
+            return HashCode.Combine(pacId, npi, enrlId, firstName, middleName, lastName);
         }
     }
 }

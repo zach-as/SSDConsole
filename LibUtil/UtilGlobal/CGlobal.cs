@@ -33,6 +33,7 @@ namespace LibUtil.UtilGlobal
         public const string Attribute_ClinicianAtMedicalGroupId = "clinicianatmedicalgroupid";
         public const string Attribute_ClinicAtMedicalGroupId = "clinicatmedicalgroupid";
         public const string Attribute_PhoneNumber = "phonenumber";
+        public const string Attribute_State = "state";
         public const string Attribute_City = "city";
         public const string Attribute_Zip = "zip";
         public const string Attribute_Npi = "npi";

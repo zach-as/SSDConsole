@@ -54,6 +54,9 @@ namespace LibDV.DVAttribute
         [AAttribute(Attribute_City, EEntityType.Clinic)]
         [ADVWrite()]
         City,
+        [AAttribute(Attribute_State, EEntityType.Clinic)]
+        [ADVWrite()]
+        State,
         [AAttribute(Attribute_Zip, EEntityType.Clinic)]
         [ADVWrite()]
         Zip,

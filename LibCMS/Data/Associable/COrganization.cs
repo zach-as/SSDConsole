@@ -1,16 +1,20 @@
 ﻿using LibCMS.Record;
+using static LibUtil.UtilGlobal.CGlobal;
 
 namespace LibCMS.Data.Associable
 {
     public class CMedicalGroup : CAssociable
     {
         // This is the unique ID that is associated with this organization in PECOS
+        [ADVIndicator(Attribute_Pac)]
         public string pac { get; set; }
 
         // This is the number of clinicians affiliated with this organization
+        [ADVIndicator(Attribute_ClinicianCount)]
         public int numClinicians { get; set; }
 
         // This indicates if this organization accepts medicare payments in full or in part
+        [ADVIndicator(Attribute_FullMedicare)]
         public bool acceptsFullMedicare { get; set; }
 
         internal CMedicalGroup (CRecordItem record)
