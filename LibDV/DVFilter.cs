@@ -60,7 +60,7 @@ namespace LibDV
             else if (a is CClinician)
             {
                 var clinician = (CClinician)a;
-                filter.AddCondition(Attribute.Pac, ConditionOperator.Equal, clinician.PacID);
+                filter.AddCondition(Attribute.Pac, ConditionOperator.Equal, clinician.pacId);
             }
             else if (a is CMedicalGroup)
             {

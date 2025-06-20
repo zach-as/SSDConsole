@@ -99,7 +99,7 @@ namespace LibCMS.Record
 
             // Attempt to retrieve the clinician with the PAC ID in the current item from clinicians
             // This will return a default Clinician object if there is no Clinician with the existing Pac ID in clinicians
-            clinician = Clinicians().FirstOrDefault(c => c.PacID == item.IDPacInd);
+            clinician = Clinicians().FirstOrDefault(c => c.pacId == item.IDPacInd);
 
             if (clinician == null)
             {
@@ -129,7 +129,7 @@ namespace LibCMS.Record
             // Create a temp clinic for comparison purposes
             CClinic compareClinic = new CClinic(item);
             clinic = Clinics().FirstOrDefault(c => c.Equals(compareClinic)); // use the custom comparison operators
-            throw new NotImplementedException(); // REMEMBER c.Equals() no longer works because I got rid of the override
+            throw new NotImplementedException(); // TODO: c.Equals() no longer works because I got rid of the override. fix this shit
             if (clinic is null)
             {
                 // Save the temp clinic as a permanent clinic

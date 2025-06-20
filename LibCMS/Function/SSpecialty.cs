@@ -13,14 +13,14 @@ namespace LibCMS.Function
         }
 
         public static string PrimarySpecialty(this CClinician c)
-            => c.PrimarySpecialty;
+            => c.primarySpecialty;
         public static string[] PrimarySpecialties(this CClinic c)
             => Specialties(c.Clinicians(), SpecialtyType.Primary);
         public static string[] PrimarySpecialties(this CMedicalGroup o)
             => Specialties(o.Clinicians(), SpecialtyType.Primary);
 
         public static string[] SecondarySpecialties(this CClinician c)
-            => c.SecondarySpecialties;
+            => c.secondarySpecialties;
         public static string[] SecondarySpecialties(this CClinic c)
             => Specialties(c.Clinicians(), SpecialtyType.Secondary);
         public static string[] SecondarySpecialties(this CMedicalGroup o)

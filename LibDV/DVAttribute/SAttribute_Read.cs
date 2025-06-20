@@ -15,7 +15,7 @@ namespace LibDV.DVAttribute
     {
         #region getattribute
         // this exists so that we don't have to keep using reflection whenever we want to access GetAttributes()
-        private static List<EAttribute> attributes;
+        private static List<EAttribute>? attributes;
 
         internal static List<EAttribute> GetAttributes()
         {
@@ -81,21 +81,21 @@ namespace LibDV.DVAttribute
             if (!a.EntityTypes().Contains(c.EntityType())) throw new Exception($"AttributeValue(): EAttribute {a} does not apply to CClinic entity type.");
             return a switch
             {
-                EAttribute.Pac => c.PacID,
-                EAttribute.Npi => c.NPI,
-                EAttribute.Enrl => c.EnrlID,
-                EAttribute.FirstName => c.FirstName,
-                EAttribute.MiddleName => c.MiddleName,
-                EAttribute.LastName => c.LastName,
+                EAttribute.Pac => c.pacId,
+                EAttribute.Npi => c.npi,
+                EAttribute.Enrl => c.enrlId,
+                EAttribute.FirstName => c.firstName,
+                EAttribute.MiddleName => c.middleName,
+                EAttribute.LastName => c.lastName,
                 EAttribute.PrimarySpecialty => c.PrimarySpecialtyCode(),
                 EAttribute.SecondarySpecialties => c.SecondarySpecialtyCodes(),
-                EAttribute.Suffix => c.Suffix,
+                EAttribute.Suffix => c.suffix,
                 EAttribute.Sex => c.Sex(),
-                EAttribute.Credentials => c.Credentials,
-                EAttribute.MedicalSchool => c.MedicalSchool,
-                EAttribute.GraduationYear => c.GraduationYear,
-                EAttribute.Telehealth => c.Telehealth,
-                EAttribute.FullMedicare => c.AcceptsFullMedicare,
+                EAttribute.Credentials => c.credentials,
+                EAttribute.MedicalSchool => c.medicalSchool,
+                EAttribute.GraduationYear => c.graduationYear,
+                EAttribute.Telehealth => c.telehealth,
+                EAttribute.FullMedicare => c.acceptsFullMedicare,
                 _ => null
             };
         }
