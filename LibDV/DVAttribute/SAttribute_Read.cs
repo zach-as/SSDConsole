@@ -48,6 +48,16 @@ namespace LibDV.DVAttribute
 
         internal static object? AttributeValue(CAssociable a, EAttribute attribute)
         {
+            var attrName = attribute.Attribute();       // Access the logical name of the provided attribute
+            var attrPairs = a.GetAttributePairs();      // Access the pairs of logical names and associated values of all attributes within the provided CAssociable
+
+            if (!attrPairs.ContainsKey(attrName)) throw new Exception("Unable to access attribute {attrName} from associable of type {a.LogicalName()}. Unable to find attribute of that type with the associable.");
+            return attrPairs[attrName];
+        }
+
+        /*
+        internal static object? AttributeValue(CAssociable a, EAttribute attribute)
+        {
             if (a is CClinic clinic) return AttributeValue(clinic, attribute);
             if (a is CClinician clinician) return AttributeValue(clinician, attribute);
             if (a is CMedicalGroup organization) return AttributeValue(organization, attribute);
@@ -114,6 +124,7 @@ namespace LibDV.DVAttribute
                 _ => null
             };
         }
+        */
         #endregion attributevalue
 
         #region hasattribute
