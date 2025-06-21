@@ -29,7 +29,7 @@ namespace LibDV.DVEntityType
             var entityTypes = EntityTypes();
             var matchingType = entityTypes.Where(t => t.LogicalName().Equals(logicalname));
             if (matchingType.Any()) return matchingType.First();
-            throw new Exception($"Unrecognized logicalname: {logicalname}");
+            throw new Exception($"Unrecognized logicalName: {logicalname}");
         }
 
         #region extension
