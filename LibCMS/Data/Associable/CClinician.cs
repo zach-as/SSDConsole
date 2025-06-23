@@ -1,68 +1,69 @@
 ﻿using LibCMS.Record;
-using static LibUtil.UtilGlobal.CGlobal;
+using LibUtil.UtilAttribute;
+using static LibUtil.UtilAttribute.EAttributeName;
 
 namespace LibCMS.Data.Associable
 {
     public class CClinician : CAssociable
     {
         // This is a unique code that represents this clinician in PPES.
-        [ADVIndicator(Attribute_Npi)]
+        [AAttributeTag(Attribute_Npi)]
         public string npi { get; set; }
 
         // This is a unique code that represents this clinician in PECOS.
-        [ADVIndicator(Attribute_Pac)]
+        [AAttributeTag(Attribute_Pac)]
         public string pacId { get; set; }
 
         // This is a unique code that denotes the clinician's enrollment ID in CMS.
-        [ADVIndicator(Attribute_Enrl)]
+        [AAttributeTag(Attribute_Enrl)]
         public string enrlId { get; set; }
 
         // This is the clinician's first name.
-        [ADVIndicator(Attribute_FirstName)]
+        [AAttributeTag(Attribute_FirstName)]
         public string firstName { get; set; }
 
         // This is the clinician's middle name or initial.
-        [ADVIndicator(Attribute_MiddleName)]
+        [AAttributeTag(Attribute_MiddleName)]
         public string middleName { get; set; }
 
         // This is the clinician's last name.
-        [ADVIndicator(Attribute_LastName)]
+        [AAttributeTag(Attribute_LastName)]
         public string lastName { get; set; }
 
         // This is the clinician's primary specialty.
-        [ADVIndicator(Attribute_PrimarySpecialty)]
+        [AAttributeTag(Attribute_PrimarySpecialty)]
         public string primarySpecialty { get; set; }
 
         // This is an array of the clinician's listed secondary specialties
-        [ADVIndicator(Attribute_SecondarySpecialties)]
+        [AAttributeTag(Attribute_SecondarySpecialties)]
         public string[] secondarySpecialties { get; set; }
 
         // This is the suffix of the clinician (Jr., Sr., etc)
-        [ADVIndicator(Attribute_Suffix)]
+        [AAttributeTag(Attribute_Suffix)]
         public string suffix { get; set; }
 
         // This is the categorized sex of the clinician (M, F)
-        [ADVIndicator(Attribute_Sex)]
+        [AAttributeTag(Attribute_Sex)]
         public string sex { get; set; }
 
         // This represents the medical credentials of the clinician (PA, CNA, NP, MD, etc)
-        [ADVIndicator(Attribute_Credentials)]
+        [AAttributeTag(Attribute_Credentials)]
         public string credentials { get; set; }
 
         // This represents the medical institution where the clinician received their primary clinical education.
-        [ADVIndicator(Attribute_MedicalSchool)]
+        [AAttributeTag(Attribute_MedicalSchool)]
         public string medicalSchool { get; set; }
 
         // This represents the year in which the clinician graduated from their medical school.
-        [ADVIndicator(Attribute_GraduationYear)]
+        [AAttributeTag(Attribute_GraduationYear)]
         public string graduationYear { get; set; }
 
         // This represents if the clinician accepts telehealth
-        [ADVIndicator(Attribute_Telehealth)]
+        [AAttributeTag(Attribute_Telehealth)]
         public bool telehealth { get; set; }
 
         // This indicates if this clinician accepts medicare payments in full or in part
-        [ADVIndicator(Attribute_FullMedicare)]
+        [AAttributeTag(Attribute_FullMedicare)]
         public bool acceptsFullMedicare { get; set; }
 
         internal CClinician(CRecordItem record)

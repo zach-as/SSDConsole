@@ -42,22 +42,27 @@ namespace LibCMS.Data.Associable
 
         public Dictionary<string, object?> GetAttributePairs()
             => GetAttributePairs(this);
-        // Retrieves all values of fields marked with the ADVIndicateAttribute and returns pairs of the attributeName and value.
-        private static Dictionary<string, object?> GetAttributePairs(object o)
-        {
+        // Retrieves all values of fields marked with the AAttributeTag and returns pairs of the logicalName and value.
+        private static Dictionary<EAttributeName, object?> GetAttributePairs(object o)
+            => SAttributeUtil.AttributeTagMap(o)
+                .ToDictionary(
+                    mapping => ((AAttributeTagAttribute)mapping.Attribute()).AttributeName(),
+                    mapping => mapping.Value()
+                );
+        /*{
             var results = new Dictionary<string, object?>();
             var props = o.GetType().GetProperties();
             foreach(var prop in props)
             {
-                var hasDVIndicator = CUtilAttribute.HasInternalAttribute<ADVIndicatorAttribute>(o, prop.Name);
+                var hasDVIndicator = SUtilAttribute.HasInternalAttribute<ADVIndicatorAttribute>(o, prop.Name);
                 if (hasDVIndicator)
                 {
-                    var indicatorAttr = CUtilAttribute.InternalAttribute<ADVIndicatorAttribute>(o, prop.Name);
-                    results[indicatorAttr.AttributeName()] = prop.GetValue(o);
+                    var indicatorAttr = SUtilAttribute.InternalAttribute<ADVIndicatorAttribute>(o, prop.Name);
+                    results[indicatorAttr.Name()] = prop.GetValue(o);
                     continue;
                 }
 
-                var hasNestedIndicator = CUtilAttribute.HasInternalAttribute<ADVIndicatorNestedAttribute>(o, prop.Name);
+                var hasNestedIndicator = SUtilAttribute.HasInternalAttribute<ADVIndicatorNestedAttribute>(o, prop.Name);
                 if (hasNestedIndicator)
                 {
                     var val = prop.GetValue(o);
@@ -70,7 +75,7 @@ namespace LibCMS.Data.Associable
                 }
             }
             return results;
-        }
+        }*/
 
         // Sorts the provided associables by type.
         internal static Dictionary<Type, List<CAssociable>> SortAssociables(List<CAssociable> associables)
