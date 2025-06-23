@@ -1,6 +1,4 @@
-﻿using LibCMS.Data;
-using LibCMS.Record;
-using static LibCMS.Function.SSpecialty;
+﻿using LibCMS.Record;
 using static LibUtil.UtilAttribute.EAttributeName;
 using LibUtil.UtilAttribute;
 
