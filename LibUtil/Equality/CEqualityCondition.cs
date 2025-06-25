@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace LibUtil.Equality
 {
 
-    public class CEqualityCondition
+    internal class CEqualityCondition
     {
         private EEqualityComparator comparator;
         private EAttributeName attribute;

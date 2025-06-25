@@ -15,10 +15,30 @@ namespace LibUtil.Equality
             this.op = op;
         }
 
-        public void AddCondition(CEqualityCondition condition)
+        #region add_condition
+        internal void AddCondition(CEqualityCondition condition)
             => conditions.Add(condition);
         public void AddCondition(EAttributeName attr, EEqualityComparator comp, object? val)
             => AddCondition(SEqualityCondition.NewCondition(attr, comp, val));
+        public void AddCondition(EAttributeName attr, EEqualityComparator comp, IEqualityComparable owner, EAttributeName attr2)
+            => AddCondition(SEqualityCondition.NewCondition(attr, comp, owner, attr2));
+        public void AddCondition(EAttributeName attr, EEqualityComparator comp, Func<object?> valFunc)
+            => AddCondition(SEqualityCondition.NewCondition(attr, comp, valFunc));
+        public void AddEquals(EAttributeName attr, object? val)
+            => AddCondition(attr, EEqualityComparator.Equal, val);
+        public void AddEquals(EAttributeName attr, IEqualityComparable owner, EAttributeName attr2)
+            => AddCondition(attr, EEqualityComparator.Equal, owner, attr2);
+        public void AddEquals(EAttributeName attr, Func<object?> valFunc)
+            => AddCondition(attr, EEqualityComparator.Equal, valFunc);
+        public void AddNotEquals(EAttributeName attr, object? val)
+            => AddCondition(attr, EEqualityComparator.NotEqual, val);
+        public void AddNotEquals(EAttributeName attr, IEqualityComparable owner, EAttributeName attr2)
+            => AddCondition(attr, EEqualityComparator.NotEqual, owner, attr2);
+        public void AddNotEquals(EAttributeName attr, Func<object?> valFunc)
+            => AddCondition(attr, EEqualityComparator.NotEqual, valFunc);
+        public void AddNull(EAttributeName attr)
+            => AddCondition(attr, EEqualityComparator.Equal, null as object);
+        #endregion add_condition
 
         public void AddExpression(CEqualityExpression expression)
             => expressions.Add(expression);
