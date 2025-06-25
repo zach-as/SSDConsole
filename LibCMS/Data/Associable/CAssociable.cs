@@ -1,11 +1,12 @@
-﻿using LibUtil.UtilAttribute;
+﻿using LibUtil.Equality;
+using LibUtil.UtilAttribute;
 using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
 
 
 namespace LibCMS.Data.Associable
 {
-    public class CAssociable
+    public abstract class CAssociable : IEqualityComparable
     {
         #region association
 
@@ -49,33 +50,17 @@ namespace LibCMS.Data.Associable
                     mapping => mapping.Attribute().AttributeName(),
                     mapping => mapping.Value()
                 );
-        /*{
-            var results = new Dictionary<string, object?>();
-            var props = o.GetType().GetProperties();
-            foreach(var prop in props)
-            {
-                var hasDVIndicator = SUtilAttribute.HasInternalAttribute<ADVIndicatorAttribute>(o, prop.Name);
-                if (hasDVIndicator)
-                {
-                    var indicatorAttr = SUtilAttribute.InternalAttribute<ADVIndicatorAttribute>(o, prop.Name);
-                    results[indicatorAttr.Name()] = prop.GetValue(o);
-                    continue;
-                }
 
-                var hasNestedIndicator = SUtilAttribute.HasInternalAttribute<ADVIndicatorNestedAttribute>(o, prop.Name);
-                if (hasNestedIndicator)
-                {
-                    var val = prop.GetValue(o);
-                    if (val is null) continue; // dont try to examine nested attributes if the value is null
-                    var nestedResults = GetAttributePairs(val); // use recursion to get nested attributes
-                    foreach (var nestedResult in nestedResults)
-                    {
-                        results[nestedResult.Key] = nestedResult.Value; // add the nested results to the main results
-                    }
-                }
-            }
-            return results;
-        }*/
+
+        public abstract CEqualityExpression EqualityExpression();
+        public object? AttributeValue(EAttributeName attrName)
+        {
+            var attrPairs = GetAttributePairs();
+            if (!attrPairs.ContainsKey(attrName))
+                return null;
+            return attrPairs[attrName];
+        }
+
 
         // Sorts the provided associables by type.
         internal static Dictionary<Type, List<CAssociable>> SortAssociables(List<CAssociable> associables)
