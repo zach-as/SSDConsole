@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace LibUtil.UtilAttribute
 {
+
     public enum EAttributeName
     {
         [Description("addressid")]
@@ -76,13 +77,15 @@ namespace LibUtil.UtilAttribute
         Attribute_ClinicianCount,
 
         [Description("logicalname")]
-        LogicalName,
+        Entity_LogicalName,
+        [Description("id")]
+        Entity_Id,
     }
 
     public static class SAttributeName
     {
         private static List<EAttributeName>? attrNames;
-        private static List<EAttributeName> AttrNames()
+        public static List<EAttributeName> AttrNames()
         {
             if (attrNames is null)
                 attrNames = Enum.GetValues(typeof(EAttributeName)).Cast<EAttributeName>().ToList();
@@ -98,12 +101,18 @@ namespace LibUtil.UtilAttribute
         public static string LogicalName(this EAttributeName attrName)
             => CGlobal.Prefix() + attrName.Name();
 
-        public static EAttributeName EnumFromLogical(string attrNameLogical)
+        public static EAttributeName EnumFromLogical(string logicalName)
         {
             var dict = AttrNamesWithLogical();
-            if (dict.ContainsValue(attrNameLogical))
-                return dict.FirstOrDefault(kvp => kvp.Value.Equals(attrNameLogical)).Key;
-            throw new ArgumentException($"No EAttributeName found for logical name '{attrNameLogical}'.");
+            if (dict.ContainsValue(logicalName))
+                return dict.FirstOrDefault(kvp => kvp.Value.Equals(logicalName)).Key;
+            throw new ArgumentException($"No EAttributeName found for logical name '{logicalName}'.");
+        }
+
+        public static bool LogicalNameExists(string logicalName)
+        {
+            var dict = AttrNamesWithLogical();
+            return dict.ContainsValue(logicalName);
         }
     }
 }
