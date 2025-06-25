@@ -28,7 +28,7 @@ namespace LibDV.DVAttribute
         private static void WriteAttribute(EAttribute a, Entity e, object? value)
         {
             if (!CanWriteAttribute(a, e)) throw new Exception($"Unable to write to EAttribute {a} for entity of type {e.LogicalName}.");
-            e[a.Attribute()] = value; // Write the value to the entity's attribute
+            e[a.LogicalName()] = value; // Write the value to the entity's attribute
         }
 
         // Returns true if the EAttribute can be written to the entity

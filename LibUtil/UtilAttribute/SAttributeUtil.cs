@@ -76,6 +76,12 @@
         // this attribute indicates that the field has a relevant logical name which we use in EAttributeName and in DV
         public static List<CAttributeMapping<AAttributeTagAttribute>> AttributeTagMap(object o)
             => AttributeMap<AAttributeTagAttribute>(o);
+        
+        // retrieve a single field of the specified object which has an attribute tag matching the specified attribute name
+        public static CAttributeMapping<AAttributeTagAttribute> AttributeTagMapping(object o, EAttributeName attrName)
+            => AttributeTagMap(o)
+                .FirstOrDefault(mapping => mapping.Attribute().AttributeName() == attrName)
+                ?? throw new ArgumentException($"No attribute mapping found for {attrName} in {o.GetType().Name}.");
 
         #endregion attributemap
     }

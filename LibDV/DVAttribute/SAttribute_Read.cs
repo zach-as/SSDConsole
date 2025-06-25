@@ -1,6 +1,7 @@
 ﻿using LibCMS.Data.Associable;
 using LibDV.DVAssociable;
 using LibDV.DVEntityType;
+using LibUtil.UtilAttribute;
 using Microsoft.Xrm.Sdk;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace LibDV.DVAttribute
         {
             try
             {
-                return GetAttributes().First(a => a.Attribute().Equals(attrName));
+                return GetAttributes().First(a => a.LogicalName().Equals(attrName));
             }
             catch (Exception ex)
             {
@@ -48,10 +49,10 @@ namespace LibDV.DVAttribute
 
         internal static object? AttributeValue(CAssociable a, EAttribute attribute)
         {
-            var attrName = attribute.Attribute();       // Access the logical name of the provided attribute
+            var attrName = attribute.AttributeName();       // Access the logical name of the provided attribute
             var attrPairs = a.GetAttributePairs();      // Access the pairs of logical names and associated values of all attributes within the provided CAssociable
 
-            if (!attrPairs.ContainsKey(attrName)) throw new Exception("Unable to access attribute {attrName} from associable of type {a.LogicalName()}. Unable to find attribute of that type with the associable.");
+            if (!attrPairs.ContainsKey(attrName)) throw new Exception("Unable to access attribute {attrName} from associable of type {a.Name()}. Unable to find attribute of that type with the associable.");
             return attrPairs[attrName];
         }
 
@@ -136,7 +137,7 @@ namespace LibDV.DVAttribute
             return false;
         }
         internal static bool HasAttribute(this Entity e, EAttribute attr)
-            => e.HasAttribute(attr.Attribute());
+            => e.HasAttribute(attr.LogicalName());
 
         internal static bool HasAttribute(this Entity e, string attrName)
             => e.Attributes.ContainsKey(attrName);

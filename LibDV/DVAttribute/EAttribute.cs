@@ -1,5 +1,5 @@
 ﻿using LibDV.DVEntityType;
-using static LibUtil.UtilGlobal.CGlobal;
+using static LibUtil.UtilAttribute.EAttributeName;
 using LibUtil.UtilAttribute;
 using Microsoft.Xrm.Sdk;
 
@@ -114,19 +114,22 @@ namespace LibDV.DVAttribute
     internal static partial class SAttribute
     {
         internal static AAttributeAttribute InternalAttribute(this EAttribute a)
-            => CUtilAttribute.InternalAttribute<AAttributeAttribute>(a);
+            => LibUtil.UtilAttribute.SAttributeUtil.InternalAttribute<AAttributeAttribute>(a);
 
         internal static bool HasDVRead(this EAttribute a)
-            => CUtilAttribute.HasInternalAttribute<ADVReadAttribute>(a);
+            => LibUtil.UtilAttribute.SAttributeUtil.HasInternalAttribute<ADVReadAttribute>(a);
 
         internal static bool HasDVWrite(this EAttribute a)
-            => CUtilAttribute.HasInternalAttribute<ADVWriteAttribute>(a);
+            => LibUtil.UtilAttribute.SAttributeUtil.HasInternalAttribute<ADVWriteAttribute>(a);
 
         public static EEntityType[] EntityTypes(this EAttribute a)
             => a.InternalAttribute().EntityTypes();
 
-        public static string Attribute(this EAttribute a)
-            => a.InternalAttribute().ToString();
+        public static EAttributeName AttributeName(this EAttribute a)
+            => a.InternalAttribute().AttributeName();
+
+        public static string LogicalName(this EAttribute a)
+            => a.InternalAttribute().LogicalName();
 
     }
 }

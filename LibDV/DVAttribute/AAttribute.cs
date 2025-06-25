@@ -1,4 +1,5 @@
 ﻿using LibDV.DVEntityType;
+using LibUtil.UtilAttribute;
 using LibUtil.UtilGlobal;
 using Microsoft.Xrm.Sdk;
 using System;
@@ -12,20 +13,19 @@ namespace LibDV.DVAttribute
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
     public class AAttributeAttribute : Attribute
     {
-        private string attributeName; // the name of this attribute as used in dataverse
+        private EAttributeName attributeName; // the name of this attribute as used in dataverse
         private EEntityType[] entityTypes; // the entity types that this attribute applies to
 
-        internal AAttributeAttribute(string attributeName, params EEntityType[] entityTypes)
+        internal AAttributeAttribute(EAttributeName attributeName, params EEntityType[] entityTypes)
         {
-            this.attributeName = CGlobal.Prefix() + attributeName;
+            this.attributeName = attributeName;
             this.entityTypes = entityTypes;
         }
 
-        public override string ToString()
-            => attributeName;
-
-        internal EEntityType[] EntityTypes()
-            => entityTypes;
+        public string LogicalName() => attributeName.LogicalName();
+        public string Name() => attributeName.Name();
+        public EAttributeName AttributeName() => attributeName;
+        internal EEntityType[] EntityTypes() => entityTypes;
     }
 
     // If this attribtue is present on an EAttribute, it indicates that the EAttribute should be included in the columnset when fetching from dataverse

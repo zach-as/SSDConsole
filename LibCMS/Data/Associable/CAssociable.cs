@@ -40,13 +40,13 @@ namespace LibCMS.Data.Associable
         }
         #endregion association
 
-        public Dictionary<string, object?> GetAttributePairs()
+        public Dictionary<EAttributeName, object?> GetAttributePairs()
             => GetAttributePairs(this);
         // Retrieves all values of fields marked with the AAttributeTag and returns pairs of the logicalName and value.
         private static Dictionary<EAttributeName, object?> GetAttributePairs(object o)
             => SAttributeUtil.AttributeTagMap(o)
                 .ToDictionary(
-                    mapping => ((AAttributeTagAttribute)mapping.Attribute()).AttributeName(),
+                    mapping => mapping.Attribute().AttributeName(),
                     mapping => mapping.Value()
                 );
         /*{

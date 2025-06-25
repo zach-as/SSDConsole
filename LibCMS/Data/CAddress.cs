@@ -1,38 +1,39 @@
 ﻿using LibCMS.Data.Associable;
 using LibCMS.Record;
-using static LibUtil.UtilGlobal.CGlobal;
+using static LibUtil.UtilAttribute.EAttributeName;
+using LibUtil.UtilAttribute;
 
 namespace LibCMS.Data
 {
     public class CAddress
     {
         // This is the first line of the address
-        [ADVIndicator(Attribute_AddressLine1)]
+        [AAttributeTag(Attribute_AddressLine1)]
         public string addressLine1 { get; }
 
         // This is the second line of the address
-        [ADVIndicator(Attribute_AddressLine2)]
+        [AAttributeTag(Attribute_AddressLine2)]
         public string addressLine2 { get; }
 
         // This indicates if addressLine2 is supressed (may be incomplete)
-        [ADVIndicator(Attribute_Line2Suppressed)]
+        [AAttributeTag(Attribute_Line2Suppressed)]
         public bool line2Suppressed { get; }
 
         // This indicates the city of the address
-        [ADVIndicator(Attribute_City)]
+        [AAttributeTag(Attribute_City)]
         public string city { get; }
 
         // This indicates the state of the address
-        [ADVIndicator(Attribute_State)]
+        [AAttributeTag(Attribute_State)]
         public string state { get; }
 
         // This indicates the zip code of address
-        [ADVIndicator(Attribute_Zip)]
+        [AAttributeTag(Attribute_Zip)]
         public string zip { get; }
 
         /* This is a unique ID used to identify the specific street name,
         * suite, state, zip, and office floor of this address */
-        [ADVIndicator(Attribute_AddressId)]
+        [AAttributeTag(Attribute_AddressId)]
         public string addressID { get; }
 
         internal CAddress(CRecordItem record)
