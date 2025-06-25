@@ -1,6 +1,8 @@
-﻿using LibUtil.Equality;
+﻿using LibDV.DVEntityType;
+using LibUtil.Equality;
 using LibUtil.UtilAttribute;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 
 namespace LibDV.DVEntity
 {
@@ -21,40 +23,69 @@ namespace LibDV.DVEntity
         {
             var expression = new CEqualityExpression();
 
-            // Add the logical name condition
-            expression.AddCondition(EAttributeName.LogicalName, EEqualityComparator.Equal, entity.LogicalName);
+            // Add the logical name and ID conditions
+            expression.AddEquals(EAttributeName.Entity_LogicalName, entity.LogicalName);
+            expression.AddEquals(EAttributeName.Entity_Id, entity.Id);
+
+            var addedAttrNames = new List<EAttributeName>() 
+            { 
+                EAttributeName.Entity_LogicalName,
+                EAttributeName.Entity_Id,
+            };
+
+            // for each attribute in the entity, add an equality condition
+            foreach (var attr in entity.Attributes)
+            {
+                var logicalName = attr.Key;
+                // Use the logical name of the attribute
+                var attrNameExists = SAttributeName.LogicalNameExists(logicalName);
+                if (!attrNameExists)
+                {
+                    // If the logical name does not exist, skip this attribute
+                    continue;
+                }
+
+                // Convert the attribute key to an EAttributeName
+                var attrName = SAttributeName.EnumFromLogical(logicalName);
+                expression.AddEquals(attrName, attr.Value);
+                addedAttrNames.Add(attrName);
+            }
+
+            var missingAttrNames = SAttributeName.AttrNames()
+                .Where(attrName => !addedAttrNames.Contains(attrName))
+                .ToList();
+
+            // for each attribute NOT in the entity, add a null condition
+            missingAttrNames.ForEach(
+                attr => expression.AddNull(attr)
+            );
 
             return expression;
         }
         public object? AttributeValue(EAttributeName attrName)
         {
-            if (attrName == EAttributeName.LogicalName)
+            if (attrName == EAttributeName.Entity_LogicalName)
                 return entity.LogicalName;
-            throw new NotImplementedException();
+            if (attrName == EAttributeName.Entity_Id)
+                return entity.Id;
+
+            var logicalName = attrName.LogicalName();
+
+            // Try to retrieve the attribute value from the entity
+            if (entity.Attributes.TryGetValue(logicalName, out var value))
+            {
+                return value;
+            }
+
+            // Attribute not found on entity
+            return null;
         }
 
-        internal static bool Matches(this Entity e1, Entity? e2)
-        {
-            if (e1 == null || e2 == null) return false;
-            if (e1.LogicalName != e2.LogicalName) return false;
-            if (e1.Id != e2.Id) return false;
-            // Check if all attributes match
-            foreach (var attr in e1.Attributes)
-            {
-                if (!e2.Attributes.TryGetValue(attr.Key, out var value) || !object.Equals(attr.Value, value))
-                {
-                    return false;
-                }
-            }
-            // Check if e2 has any additional attributes that e1 does not have
-            foreach (var attr in e2.Attributes)
-            {
-                if (!e1.Attributes.ContainsKey(attr.Key))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+        internal string LogicalName() => entity.LogicalName;
+        internal EEntityType EntityType() => SEntityType.EntityType(LogicalName());
+        internal ColumnSet ColumnSet() => EntityType().ColumnSet();
+        internal QueryExpression QueryExpression() => EntityType().QueryExpression();
+        internal Guid Id() => entity.Id;
+        internal Entity Entity() => entity;
     }
 }
