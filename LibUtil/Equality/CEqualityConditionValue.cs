@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibUtil.UtilEquality
+namespace LibUtil.Equality
 {
     internal abstract class CEqualityConditionValue
     {
@@ -35,16 +35,16 @@ namespace LibUtil.UtilEquality
 
     internal class CEqualityConditionValueAttr : CEqualityConditionValue
     {
-        private object owner;
+        private IEqualityComparable owner;
         private EAttributeName attrName;
 
-        internal CEqualityConditionValueAttr(object owner, EAttributeName attrName)
+        internal CEqualityConditionValueAttr(IEqualityComparable owner, EAttributeName attrName)
         {
             this.owner = owner;
             this.attrName = attrName;
         }
 
         internal override object? Value()
-            => SAttributeUtil.AttributeTagMapping(owner, attrName).Value();
+            => owner.AttributeValue(attrName);
     }
 }

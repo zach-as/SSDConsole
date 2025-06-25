@@ -12,7 +12,7 @@ namespace LibDV.DVEntityType
     {
         [AEntity("Clinician")]
         Clinician,
-        [AEntity("CClinic")]
+        [AEntity("Clinic")]
         Clinic,
         [AEntity("Medical Group")]
         MedicalGroup,

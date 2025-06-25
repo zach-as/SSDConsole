@@ -74,6 +74,9 @@ namespace LibUtil.UtilAttribute
         Attribute_SecondarySpecialties,
         [Description("cliniciancount")]
         Attribute_ClinicianCount,
+
+        [Description("logicalname")]
+        LogicalName,
     }
 
     public static class SAttributeName

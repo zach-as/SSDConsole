@@ -33,7 +33,7 @@ namespace LibDV.DVEntityType
             // Retrieve all attributes that are relevant to this entity
             var attrs = SAttribute.GetAttributes(SEntityType.EntityType(logicalName));
             // Returns a ColumnSet that contains all the attributes that are relevant to this entity.
-            return new ColumnSet(attrs.Where(a => a.HasDVRead()).Select(a => a.Attribute()).ToArray());
+            return new ColumnSet(attrs.Where(a => a.HasDVRead()).Select(a => a.LogicalName()).ToArray());
         }
         internal  QueryExpression QueryExpression()
             => new QueryExpression

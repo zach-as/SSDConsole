@@ -1,9 +1,9 @@
-﻿using LibDV;
-using Microsoft.Xrm.Sdk;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using LibCMS.Data.Associable;
+using LibDV.DVFilter;
 
-namespace LibDV
+namespace LibDV.DVFilter
 {
     internal static class DVFilter
     {

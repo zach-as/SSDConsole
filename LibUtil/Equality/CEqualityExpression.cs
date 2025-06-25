@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LibUtil.UtilAttribute;
 
-namespace LibUtil.UtilEquality
+namespace LibUtil.Equality
 {
     public class CEqualityExpression
     {
@@ -12,7 +8,7 @@ namespace LibUtil.UtilEquality
         private List<CEqualityExpression> expressions;
         private EEqualityExpressionOperator op;
         
-        public CEqualityExpression(EEqualityExpressionOperator op)
+        public CEqualityExpression(EEqualityExpressionOperator op = EEqualityExpressionOperator.And)
         {
             conditions = new List<CEqualityCondition>();
             expressions = new List<CEqualityExpression>();
@@ -21,6 +17,9 @@ namespace LibUtil.UtilEquality
 
         public void AddCondition(CEqualityCondition condition)
             => conditions.Add(condition);
+        public void AddCondition(EAttributeName attr, EEqualityComparator comp, object? val)
+            => AddCondition(SEqualityCondition.NewCondition(attr, comp, val));
+
         public void AddExpression(CEqualityExpression expression)
             => expressions.Add(expression);
 
@@ -64,7 +63,7 @@ namespace LibUtil.UtilEquality
     // Extension methods for CEqualityExpression
     public static partial class SEqualityExpression
     {
-        internal static EEqualityResult Evaluate(this CEqualityExpression ex)
+        internal static EEqualityResult Evaluate(this CEqualityExpression ex, IEqualityComparable other)
         {
             if (ex == null)
                 return EEqualityResult.Invalid;
@@ -76,7 +75,7 @@ namespace LibUtil.UtilEquality
 
             foreach (var condition in ex.Conditions())
             {
-                var evaluation = condition.Evaluate();
+                var evaluation = condition.Evaluate(other);
                 if (evaluation == EEqualityResult.Invalid)
                     return EEqualityResult.Invalid;
 
@@ -91,7 +90,7 @@ namespace LibUtil.UtilEquality
 
             foreach (var expression in ex.Expressions())
             {
-                var evaluation = Evaluate(expression);
+                var evaluation = Evaluate(expression, other);
                 if (evaluation == EEqualityResult.Invalid)
                     return EEqualityResult.Invalid;
 
@@ -106,8 +105,5 @@ namespace LibUtil.UtilEquality
 
             return (runningOutcome ?? false) ? EEqualityResult.True : EEqualityResult.False;
         }
-
-        public static bool IsTrue(this CEqualityExpression ex)
-            => ex.Evaluate().IsTrue();
     }
 }
