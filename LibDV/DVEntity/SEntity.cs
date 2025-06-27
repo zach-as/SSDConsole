@@ -11,6 +11,11 @@ namespace LibDV.DVEntity
     internal static class SEntity
     {
 
+        internal static List<CEntity> ConvertEntities(this List<Entity> entities)
+            => entities.Select(e => new CEntity(e)).ToList();
+        internal static List<CEntity> ConvertEntities(this EntityCollection col)
+            => col.Entities.Select(e => new CEntity(e)).ToList();
+
         internal static EntityCollection EntityCollection(this List<Entity>? entities)
         {
             if (entities == null) return new EntityCollection();
