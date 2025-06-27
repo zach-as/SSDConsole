@@ -41,7 +41,7 @@ namespace LibUtil.UtilDisplay
                 do
                 {
                     // Handle all of the print logic
-                    Print();
+                    WriteToConsole();
 
                     // Avoid overloading the system by sleeping between updates
                     System.Threading.Thread.Sleep(TIME_BETWEEN_UPDATES);
@@ -59,8 +59,14 @@ namespace LibUtil.UtilDisplay
         // for public use, this will print a message to the console with low priority
         public static void Print(string message, MessageSeverity severity = MessageSeverity.Info)
             => messages.Add(new Message(message, MessageSource.Misc, severity));
-        
-        private static void Print()
+        public static void Success(string message)
+            => Print(message, MessageSeverity.Success);
+        public static void Warning(string message)
+            => Print(message, MessageSeverity.Warning);
+        public static void Error(string message)
+            => Print(message, MessageSeverity.Error);
+
+        private static void WriteToConsole()
         {
             // First print any interrupt messages if present
             if (interruptMessages.Count > 0)
