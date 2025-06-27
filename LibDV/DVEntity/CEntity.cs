@@ -4,19 +4,19 @@ using LibUtil.UtilAttribute;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace LibDV.Entity
+namespace LibDV.DVEntity
 {
     internal class CEntity : IEqualityComparable
     {
-        private Microsoft.Xrm.Sdk.Entity entity;
+        private Entity entity;
 
-        internal CEntity(Microsoft.Xrm.Sdk.Entity entity)
+        internal CEntity(Entity entity)
         {
             this.entity = entity;
         }
         internal CEntity()
         {
-            this.entity = new Microsoft.Xrm.Sdk.Entity();
+            this.entity = new Entity();
         }
 
         public CEqualityExpression EqualityExpression()
@@ -86,6 +86,6 @@ namespace LibDV.Entity
         internal ColumnSet ColumnSet() => EntityType().ColumnSet();
         internal QueryExpression QueryExpression() => EntityType().QueryExpression();
         internal Guid Id() => entity.Id;
-        internal Microsoft.Xrm.Sdk.Entity Entity() => entity;
+        internal Entity Entity() => entity;
     }
 }

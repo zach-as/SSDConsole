@@ -6,7 +6,7 @@ using LibDV.Attribute;
 using LibUtil.UtilGlobal;
 using LibDV.EntityType;
 
-namespace LibDV.Entity
+namespace LibDV.DVEntity
 {
     internal static class SEntity
     {
