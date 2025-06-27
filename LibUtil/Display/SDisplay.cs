@@ -21,7 +21,7 @@ namespace LibUtil.UtilDisplay
         Debug
     }
 
-    public static partial class CDisplay
+    public static partial class SDisplay
     {
         
         private const int TIME_BETWEEN_UPDATES = 10; // in milliseconds, aka 10 updates per second

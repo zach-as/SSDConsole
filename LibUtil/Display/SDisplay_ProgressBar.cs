@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LibUtil.UtilDisplay
 {
-    public static partial class CDisplay
+    public static partial class SDisplay
     {
         // Returns true if there is an active progress bar
         public static bool InProgress()

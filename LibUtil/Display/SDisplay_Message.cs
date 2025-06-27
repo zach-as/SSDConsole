@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LibUtil.UtilDisplay
 {
 
-    public static partial class CDisplay
+    public static partial class SDisplay
     {
         internal class Message
         {
