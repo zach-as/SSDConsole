@@ -57,8 +57,8 @@ namespace LibDV.DVAccess
                 }
             }
 
-            var cEntities = 
-            return entities.Select(e => new CEntity(e)).ToList();
+            // return entities as CEntity wrapper
+            return entities.ConvertEntities();
         }
     }
 }
