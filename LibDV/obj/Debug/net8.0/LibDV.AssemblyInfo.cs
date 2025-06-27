@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LibDV")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2910675e4f62441615e5b9867ce2cf3468fe0686")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e963c867d20ed021b8c1305a2616e10417aad58")]
 [assembly: System.Reflection.AssemblyProductAttribute("LibDV")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LibDV")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

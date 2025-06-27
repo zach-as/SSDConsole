@@ -1,6 +1,6 @@
 ﻿using LibCMS.Data.Associable;
-using LibDV.DVAssociable;
-using LibDV.DVEntityType;
+using LibDV.Associable;
+using LibDV.EntityType;
 using LibUtil.UtilAttribute;
 using Microsoft.Xrm.Sdk;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibDV.DVAttribute
+namespace LibDV.Attribute
 {
     // Partial class of SAttribute, contains all functions related to accessing attributes
     internal static partial class SAttribute
@@ -29,7 +29,7 @@ namespace LibDV.DVAttribute
             => GetAttributes().Where(a => a.EntityTypes().Contains(entityType)).ToList();
         internal static List<EAttribute> GetAttributes(CAssociable a)
             => GetAttributes(a.EntityType());
-        internal static List<EAttribute> GetAttributes(Entity e)
+        internal static List<EAttribute> GetAttributes(Microsoft.Xrm.Sdk.Entity e)
             => GetAttributes(e.EntityType());
 
         internal static EAttribute GetAttribute(string attrName)
@@ -136,19 +136,19 @@ namespace LibDV.DVAttribute
             if (attr.EntityTypes().Contains(a.EntityType())) return AttributeValue(a, attr) != null;
             return false;
         }
-        internal static bool HasAttribute(this Entity e, EAttribute attr)
+        internal static bool HasAttribute(this Microsoft.Xrm.Sdk.Entity e, EAttribute attr)
             => e.HasAttribute(attr.LogicalName());
 
-        internal static bool HasAttribute(this Entity e, string attrName)
+        internal static bool HasAttribute(this Microsoft.Xrm.Sdk.Entity e, string attrName)
             => e.Attributes.ContainsKey(attrName);
-        internal static object? AttributeValue(this Entity e, string attrName)
+        internal static object? AttributeValue(this Microsoft.Xrm.Sdk.Entity e, string attrName)
             => e.Attributes.TryGetValue(attrName, out var value) ? value : null;
         #endregion hasattribute
 
         #region idattribute
         internal static EAttribute IdAttribute(this EntityReference er)
             => IdAttribute(er.EntityType());
-        internal static EAttribute IdAttribute(this Entity e)
+        internal static EAttribute IdAttribute(this Microsoft.Xrm.Sdk.Entity e)
             => IdAttribute(e.EntityType());
         internal static EAttribute IdAttribute(this CAssociable a)
             => IdAttribute(a.EntityType());

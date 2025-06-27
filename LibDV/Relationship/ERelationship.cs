@@ -1,14 +1,14 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using LibCMS.Data.Associable;
-using LibDV.DVEntity;
+using LibDV.Entity;
 using LibUtil.UtilGlobal;
-using LibDV.DVRelationship;
-using LibDV.DVAssociable;
-using LibDV.DVEntityType;
+using LibDV.Relationship;
+using LibDV.Associable;
+using LibDV.EntityType;
 using LibUtil.UtilAttribute;
 
-namespace LibDV.DVRelationship
+namespace LibDV.Relationship
 {
     // The purpose of this enum is to act as an accessibility wrapper around EENtityTypes that use the AEntityRelationship attribute
     internal enum ERelationshipType
@@ -22,7 +22,7 @@ namespace LibDV.DVRelationship
     }
 
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
-    internal class ARelationshipAttribute : Attribute
+    internal class ARelationshipAttribute : System.Attribute
     {
         private EEntityType type;
         private AEntityRelationshipAttribute internalAttribute;

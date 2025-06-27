@@ -33,12 +33,12 @@ namespace LibDV.DVFilter
 
                 // Name && (ID || (Ln1 && (Ln2 || Sprs)))
 
-                var filter_name = FilterAll(Attribute.Name, clinic.Name);
-                var filter_id = FilterAll(Attribute.AddressID, clinic.Location.AddressID);
-                var filter_ln1 = FilterAll(Attribute.AddressLine1, clinic.Location.AddressLine1);
-                var filter_ln2 = FilterAll(Attribute.AddressLine2, clinic.Location.AddressLine2);
-                var filter_sprs = FilterAny(Attribute.Line2Suppressed, true);
-                if (clinic.Location.Line2Suppressed) filter_sprs.AddEquals(Attribute.Line2Suppressed, false); // if clinic ln 2 is supressed, remote ln 2 sprs does not matter
+                var filter_name = FilterAll(System.Attribute.Name, clinic.Name);
+                var filter_id = FilterAll(System.Attribute.AddressID, clinic.Location.AddressID);
+                var filter_ln1 = FilterAll(System.Attribute.AddressLine1, clinic.Location.AddressLine1);
+                var filter_ln2 = FilterAll(System.Attribute.AddressLine2, clinic.Location.AddressLine2);
+                var filter_sprs = FilterAny(System.Attribute.Line2Suppressed, true);
+                if (clinic.Location.Line2Suppressed) filter_sprs.AddEquals(System.Attribute.Line2Suppressed, false); // if clinic ln 2 is supressed, remote ln 2 sprs does not matter
                 
                 var filter_addr = new FilterExpression(LogicalOperator.Or);
                 var filter_lns_1 = new FilterExpression(LogicalOperator.And);
@@ -60,35 +60,35 @@ namespace LibDV.DVFilter
             else if (a is CClinician)
             {
                 var clinician = (CClinician)a;
-                filter.AddCondition(Attribute.Pac, ConditionOperator.Equal, clinician.pacId);
+                filter.AddCondition(System.Attribute.Pac, ConditionOperator.Equal, clinician.pacId);
             }
             else if (a is CMedicalGroup)
             {
                 var organization = (CMedicalGroup)a;
-                filter.AddCondition(Attribute.Pac, ConditionOperator.Equal, organization.pac);
+                filter.AddCondition(System.Attribute.Pac, ConditionOperator.Equal, organization.pac);
             }
             else throw new Exception($"Unexpected associable type in EqualExpression(): {a.GetType()}");
 
             return filter;
         }
 
-        internal static void AddEquals(this FilterExpression f, Attribute a, object value)
+        internal static void AddEquals(this FilterExpression f, System.Attribute a, object value)
             => f.AddCondition(a, ConditionOperator.Equal, value);
         internal static void AddEquals(this FilterExpression f, string a, object value)
             => f.AddCondition(a, ConditionOperator.Equal, value);
-        internal static void AddNotEquals(this FilterExpression f, Attribute a, object value)
+        internal static void AddNotEquals(this FilterExpression f, System.Attribute a, object value)
             => f.AddCondition(a, ConditionOperator.NotEqual, value);
         internal static void AddNotEquals(this FilterExpression f, string a, object value)
             => f.AddCondition(a, ConditionOperator.NotEqual, value);
-        internal static void AddNull(this FilterExpression f, Attribute a)
+        internal static void AddNull(this FilterExpression f, System.Attribute a)
             => f.AddCondition(a, ConditionOperator.Null);
         internal static void AddNull(this FilterExpression f, string a)
             => f.AddCondition(a, ConditionOperator.Null);
-        internal static void AddNotNull(this FilterExpression f, Attribute a)
+        internal static void AddNotNull(this FilterExpression f, System.Attribute a)
             => f.AddCondition(a, ConditionOperator.NotNull);
         internal static void AddNotNull(this FilterExpression f, string a)
             => f.AddCondition(a, ConditionOperator.NotNull);
-        internal static void AddCondition(this FilterExpression f, Attribute a, ConditionOperator op, object? value = null)
+        internal static void AddCondition(this FilterExpression f, System.Attribute a, ConditionOperator op, object? value = null)
             => AddCondition(f, a.Attribute(), op, value);
         internal static void AddCondition(this FilterExpression f, string a, ConditionOperator op, object? value = null)
         {
@@ -120,32 +120,32 @@ namespace LibDV.DVFilter
         }
 
 
-        internal static FilterExpression FilterAny<T>(Attribute a, T value)
+        internal static FilterExpression FilterAny<T>(System.Attribute a, T value)
             => FilterAny(a.Attribute(), new List<T> { value });
         internal static FilterExpression FilterAny<T>(string attrName, T value)
             => FilterAny(attrName, new List<T> { value });
-        internal static FilterExpression FilterAny<T>(Attribute a, params T[] values)
+        internal static FilterExpression FilterAny<T>(System.Attribute a, params T[] values)
             => FilterAny(a.Attribute(), values.ToList());
         internal static FilterExpression FilterAny<T>(string attrName, params T[] values)
             => FilterAny(attrName, values.ToList());
-        internal static FilterExpression FilterAny<T>(Attribute a, List<T> values)
+        internal static FilterExpression FilterAny<T>(System.Attribute a, List<T> values)
             => FilterMatch(a, LogicalOperator.Or, values, true);
         internal static FilterExpression FilterAny<T>(string attrName, List<T> values)
             => FilterMatch(attrName, LogicalOperator.Or, values, true);
 
-        internal static FilterExpression FilterAll<T>(Attribute a, List<T> values)
+        internal static FilterExpression FilterAll<T>(System.Attribute a, List<T> values)
             => FilterMatch(a, LogicalOperator.And, values, true);
-        internal static FilterExpression FilterAll<T>(Attribute a, T value)
+        internal static FilterExpression FilterAll<T>(System.Attribute a, T value)
             => FilterAll(a, new List<T> { value });
-        internal static FilterExpression FilterAll<T>(Attribute a, params T[] values)
+        internal static FilterExpression FilterAll<T>(System.Attribute a, params T[] values)
             => FilterAll(a, values.ToList());
-        internal static FilterExpression FilterNone<T>(Attribute a, List<T> values)
+        internal static FilterExpression FilterNone<T>(System.Attribute a, List<T> values)
             => FilterMatch(a, LogicalOperator.And, values, false);
-        internal static FilterExpression FilterNone<T>(Attribute a, T value)
+        internal static FilterExpression FilterNone<T>(System.Attribute a, T value)
             => FilterNone(a, new List<T> { value });
-        internal static FilterExpression FilterNone<T>(Attribute a, params T[] values)
+        internal static FilterExpression FilterNone<T>(System.Attribute a, params T[] values)
             => FilterNone(a, values.ToList());
-        private static FilterExpression FilterMatch<T>(Attribute a, LogicalOperator op, List<T> values, bool equals)
+        private static FilterExpression FilterMatch<T>(System.Attribute a, LogicalOperator op, List<T> values, bool equals)
             => FilterMatch(a.Attribute(), op, values, equals);
         private static FilterExpression FilterMatch<T>(string a, LogicalOperator op, List<T> values, bool equals)
         {
@@ -186,7 +186,7 @@ namespace LibDV.DVFilter
 
         #region conditionalmatching
         // Returns true if the entity's relevant attributes match the provided associable's EqualExpression().
-        internal static bool Matches(CAssociable a, Entity e)
+        internal static bool Matches(CAssociable a, Microsoft.Xrm.Sdk.Entity e)
         {
             if (e == null || a == null) return a == null && e == null;
             if (e.LogicalName != a.LogicalName()) return false;
@@ -327,14 +327,14 @@ namespace LibDV.DVFilter
         private static bool HasAttribute(object o, string attrName)
         {
             if (o is null) throw new Exception("DVFilter(): Unable to access attribute: {attrName} from null object!");
-            if (o is Entity e) return e.HasAttribute(attrName);
+            if (o is Microsoft.Xrm.Sdk.Entity e) return e.HasAttribute(attrName);
             if (o is CAssociable a) return a.HasAttribute(attrName);
             return false;
         }
         private static object? AttributeValue(object o, string attrName)
         {
             if (o is null) throw new Exception("DVFilter(): Unable to access attribute: {attrName} from null object!");
-            if (o is Entity e) return e.AttributeValue(attrName);
+            if (o is Microsoft.Xrm.Sdk.Entity e) return e.AttributeValue(attrName);
             if (o is CAssociable a) return a.AttributeValue(attrName);
             throw new Exception($"DVFilter(): Attempting to access EAttribute value for object: {o.GetType()} with attrName: {attrName}, but object is invalid type.");
         }

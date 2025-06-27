@@ -1,8 +1,8 @@
 ﻿using LibCMS.Data.Associable;
-using LibDV.DVEntityType;
+using LibDV.EntityType;
 using Microsoft.Xrm.Sdk;
 
-namespace LibDV.DVRelationship
+namespace LibDV.Relationship
 {
     internal static partial class SRelationship
     {
@@ -29,19 +29,19 @@ namespace LibDV.DVRelationship
         }
         internal static ERelationshipType RelationshipType(CAssociable a, CAssociable b)
             => RelationshipType(a.EntityType(), b.EntityType());
-        internal static ERelationshipType RelationshipType(Entity a, Entity b)
+        internal static ERelationshipType RelationshipType(Microsoft.Xrm.Sdk.Entity a, Microsoft.Xrm.Sdk.Entity b)
             => RelationshipType(a.EntityType(), b.EntityType());
-        internal static ERelationshipType RelationshipType(Entity relationshipEntity)
+        internal static ERelationshipType RelationshipType(Microsoft.Xrm.Sdk.Entity relationshipEntity)
             => RelationshipTypes()
             .First(relType => relType.LogicalName() == relationshipEntity.LogicalName);
 
         #endregion getrelationshiptype
 
         // Creates a new Entity for the purpose of recording a relationship in DV
-        internal static Entity NewRelationship(Entity a, Entity b)
+        internal static Microsoft.Xrm.Sdk.Entity NewRelationship(Microsoft.Xrm.Sdk.Entity a, Microsoft.Xrm.Sdk.Entity b)
         {
             var relType = RelationshipType(a.EntityType(), b.EntityType());
-            var entity = new Entity(relType.LogicalName());
+            var entity = new Microsoft.Xrm.Sdk.Entity(relType.LogicalName());
 
             // assign the reference value of A's col to A's id
             entity[a.LogicalName] = a.ToEntityReference();
@@ -56,7 +56,7 @@ namespace LibDV.DVRelationship
         // a = the first entity to check
         // b = the second entity to check
         // this function returns true if the relationship entity is of the appropriate relType and if its stored relationship info matches the given  types
-        internal static bool RelationshipMatch(Entity relationship, Entity a, Entity b)
+        internal static bool RelationshipMatch(Microsoft.Xrm.Sdk.Entity relationship, Microsoft.Xrm.Sdk.Entity a, Microsoft.Xrm.Sdk.Entity b)
         {
             var relType = RelationshipType(a.EntityType(), b.EntityType());
             if (relationship.LogicalName != relType.LogicalName()) return false;

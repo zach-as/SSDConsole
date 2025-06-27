@@ -1,10 +1,10 @@
 ﻿using LibCMS.Data.Associable;
 using LibCMS.Function;
-using LibDV.DVAssociable;
+using LibDV.Associable;
 using LibUtil.UtilGlobal;
 using Microsoft.Xrm.Sdk;
 
-namespace LibDV.DVAssociable
+namespace LibDV.Associable
 {
     public static class SSpecialtyCode
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibDV.DVOptionSet
+namespace LibDV.OptionSet
 {
     internal static class SOptionSet
     {

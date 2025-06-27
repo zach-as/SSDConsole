@@ -1,22 +1,22 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using LibCMS.Data.Associable;
-using LibDV.DVAssociable;
-using LibDV.DVAttribute;
+using LibDV.Associable;
+using LibDV.Attribute;
 using LibUtil.UtilGlobal;
-using LibDV.DVEntityType;
+using LibDV.EntityType;
 
-namespace LibDV.DVEntity
+namespace LibDV.Entity
 {
     internal static class SEntity
     {
 
-        internal static List<CEntity> ConvertEntities(this List<Entity> entities)
+        internal static List<CEntity> ConvertEntities(this List<Microsoft.Xrm.Sdk.Entity> entities)
             => entities.Select(e => new CEntity(e)).ToList();
         internal static List<CEntity> ConvertEntities(this EntityCollection col)
             => col.Entities.Select(e => new CEntity(e)).ToList();
 
-        internal static EntityCollection EntityCollection(this List<Entity>? entities)
+        internal static EntityCollection EntityCollection(this List<Microsoft.Xrm.Sdk.Entity>? entities)
         {
             if (entities == null) return new EntityCollection();
             if (entities.Count == 0) return new EntityCollection();
@@ -27,7 +27,7 @@ namespace LibDV.DVEntity
         }
 
         
-        internal static bool Matches(this Entity e1, Entity? e2)
+        internal static bool Matches(this Microsoft.Xrm.Sdk.Entity e1, Microsoft.Xrm.Sdk.Entity? e2)
         {
             if (e1 == null || e2 == null) return false;
             if (e1.LogicalName != e2.LogicalName) return false;

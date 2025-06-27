@@ -1,5 +1,5 @@
 ﻿using LibCMS.Data.Associable;
-using LibDV.DVAttribute;
+using LibDV.Attribute;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibDV.DVEntityType
+namespace LibDV.EntityType
 {
     public static partial class SEntityType
     {
@@ -33,7 +33,7 @@ namespace LibDV.DVEntityType
         }
 
         #region extension
-        public static EEntityType EntityType(this Entity e)
+        public static EEntityType EntityType(this Microsoft.Xrm.Sdk.Entity e)
             => EntityType(e.LogicalName);
         public static EEntityType EntityType(this EntityReference er)
             => EntityType(er.LogicalName);

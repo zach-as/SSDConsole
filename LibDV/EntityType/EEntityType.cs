@@ -1,10 +1,10 @@
-﻿using LibDV.DVRelationship;
+﻿using LibDV.Relationship;
 using LibUtil.UtilGlobal;
 using Microsoft.Xrm.Sdk.Query;
-using LibDV.DVAttribute;
+using LibDV.Attribute;
 using LibUtil.UtilAttribute;
 
-namespace LibDV.DVEntityType
+namespace LibDV.EntityType
 {
 
     #region entitytype

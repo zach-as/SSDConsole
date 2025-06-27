@@ -1,7 +1,7 @@
 ﻿using LibUtil.UtilDisplay;
 using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Xrm.Sdk;
-using LibDV.DVEntity;
+using LibDV.Entity;
 
 namespace LibDV.Connector
 {
@@ -9,7 +9,7 @@ namespace LibDV.Connector
     {
         internal static List<CEntity> FetchEntities(QueryExpression query, bool skipDisplay = false)
         {
-            var entities = new List<Entity>();
+            var entities = new List<Microsoft.Xrm.Sdk.Entity>();
             var logicalName = query.EntityName;
 
             query.PageInfo.PageNumber = 1;

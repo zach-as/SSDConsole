@@ -1,9 +1,9 @@
-﻿using LibDV.DVEntityType;
+﻿using LibDV.EntityType;
 using static LibUtil.UtilAttribute.EAttributeName;
 using LibUtil.UtilAttribute;
 using Microsoft.Xrm.Sdk;
 
-namespace LibDV.DVAttribute
+namespace LibDV.Attribute
 {
     public enum EAttribute
     {

@@ -1,4 +1,4 @@
-﻿using LibDV.DVAttribute;
+﻿using LibDV.Attribute;
 using LibUtil.UtilGlobal;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibDV.DVEntityType
+namespace LibDV.EntityType
 {
     [AttributeUsage(AttributeTargets.All, Inherited = true, AllowMultiple = false)]
     internal class AEntityAttribute : System.Attribute

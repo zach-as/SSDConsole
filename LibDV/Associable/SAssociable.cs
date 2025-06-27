@@ -7,11 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using LibCMS.Data.Associable;
 using Microsoft.Xrm.Sdk.Query;
-using LibDV.DVEntity;
-using LibDV.DVEntityType;
-using LibDV.DVAttribute;
+using LibDV.Entity;
+using LibDV.EntityType;
+using LibDV.Attribute;
 
-namespace LibDV.DVAssociable
+namespace LibDV.Associable
 {
     public static class SAssociable
     {
@@ -24,7 +24,7 @@ namespace LibDV.DVAssociable
             => DVFilter.EqualExpression(a);
 
         // Returns true if the entity's relevant attributes match this object.
-        public static bool Matches(this CAssociable a, Entity e)
+        public static bool Matches(this CAssociable a, Microsoft.Xrm.Sdk.Entity e)
             => DVFilter.Matches(a, e);
 
         // Retrieves the logical name of this associable as used in Dataverse.
@@ -36,7 +36,7 @@ namespace LibDV.DVAssociable
             => a.EntityType().ColumnSet();
 
         // Adds this object's properties to the provided Entity.
-        public static void ApplyAttributes(this CAssociable a, Entity e)
+        public static void ApplyAttributes(this CAssociable a, Microsoft.Xrm.Sdk.Entity e)
             => SAttribute.WriteAttributes(a, e);
 
         public static object? AttributeValue(this CAssociable a, string attrName)
