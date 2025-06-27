@@ -51,7 +51,6 @@ namespace LibCMS.Data.Associable
                     mapping => mapping.Value()
                 );
 
-
         public abstract CEqualityExpression EqualityExpression();
         public object? AttributeValue(EAttributeName attrName)
         {
@@ -61,27 +60,12 @@ namespace LibCMS.Data.Associable
             return attrPairs[attrName];
         }
 
-
-        // Sorts the provided associables by type.
-        internal static Dictionary<Type, List<CAssociable>> SortAssociables(List<CAssociable> associables)
+        public override bool Equals(object? obj)
         {
-            var sorted = new Dictionary<Type, List<CAssociable>>();
-
-            foreach (var associable in associables)
-            {
-                var type = associable.GetType();
-
-                if (!sorted.ContainsKey(type))
-                {
-                    sorted[type] = new List<CAssociable>();
-                }
-
-                sorted[type].Add(associable);
-            }
-
-            return sorted;
+            var other = obj as IEqualityComparable;
+            if (other is null) return false;
+            return this.Matches(other);
         }
-        
     }
 
 }
