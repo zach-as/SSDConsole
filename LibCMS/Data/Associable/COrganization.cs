@@ -1,6 +1,7 @@
 ﻿using LibCMS.Record;
 using static LibUtil.UtilAttribute.EAttributeName;
 using LibUtil.UtilAttribute;
+using LibUtil.Equality;
 
 namespace LibCMS.Data.Associable
 {
@@ -40,5 +41,13 @@ namespace LibCMS.Data.Associable
         {
             return HashCode.Combine(pac);
         }
+
+        public override CEqualityExpression EqualityExpression()
+        {
+            var expression = SEqualityExpression.NewAndExpression();
+            expression.AddEquals(Attribute_Pac, pac);
+            return expression;
+        }
+
     }
 }

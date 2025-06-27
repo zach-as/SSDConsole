@@ -1,4 +1,5 @@
 ﻿using LibCMS.Record;
+using LibUtil.Equality;
 using LibUtil.UtilAttribute;
 using static LibUtil.UtilAttribute.EAttributeName;
 
@@ -100,6 +101,13 @@ namespace LibCMS.Data.Associable
         public override int GetHashCode()
         {
             return HashCode.Combine(pacId, npi, enrlId, firstName, middleName, lastName);
+        }
+
+        public override CEqualityExpression EqualityExpression()
+        {
+            var expression = SEqualityExpression.NewAndExpression();
+            expression.AddEquals(Attribute_Pac, pacId);
+            return expression;
         }
     }
 }

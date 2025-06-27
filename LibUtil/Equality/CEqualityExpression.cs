@@ -125,5 +125,10 @@ namespace LibUtil.Equality
 
             return (runningOutcome ?? false) ? EEqualityResult.True : EEqualityResult.False;
         }
+
+        public static CEqualityExpression NewAndExpression()
+            => new CEqualityExpression(EEqualityExpressionOperator.And);
+        public static CEqualityExpression NewOrExpression()
+            => new CEqualityExpression(EEqualityExpressionOperator.Or);
     }
 }

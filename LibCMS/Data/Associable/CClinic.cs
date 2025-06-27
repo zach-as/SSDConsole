@@ -1,6 +1,7 @@
 ﻿using LibCMS.Record;
 using static LibUtil.UtilAttribute.EAttributeName;
 using LibUtil.UtilAttribute;
+using LibUtil.Equality;
 
 namespace LibCMS.Data.Associable
 {
@@ -49,6 +50,51 @@ namespace LibCMS.Data.Associable
                                     location.city,
                                     location.state,
                                     location.zip);
+        }
+
+        public override CEqualityExpression EqualityExpression()
+        {
+            // Name && (ID || (Ln1 && (Ln2 || Sprs)))
+
+            var expression = new CEqualityExpression();
+
+            // An expression representing equality to the clinic's name
+            var ex_name = SEqualityExpression.NewAndExpression();
+            ex_name.AddEquals(Attribute_Name, name);
+
+            // An expression representing equality to the clinic's address ID
+            var ex_id = SEqualityExpression.NewAndExpression();
+            ex_id.AddEquals(Attribute_AddressId, location.addressID);
+
+            // An expression representing equality to the clinic's address line 2
+            var ex_ln2 = SEqualityExpression.NewAndExpression();
+            ex_ln2.AddEquals(Attribute_AddressLine2, location.addressLine2);
+
+            // An expression representing equality to the clinic's address line 2 suppressed
+            var ex_sprs = SEqualityExpression.NewAndExpression();
+            ex_sprs.AddEquals(Attribute_Line2Suppressed, location.line2Suppressed);
+
+            var ex_addr = SEqualityExpression.NewOrExpression();
+            var ex_addr_1 = SEqualityExpression.NewAndExpression();
+            var ex_addr_2 = SEqualityExpression.NewOrExpression();
+
+            // Ln2 || Sprs
+            ex_addr_2.AddExpression(ex_ln2);
+            ex_addr_2.AddExpression(ex_sprs);
+
+            // Ln1 && (Ln2 || Sprs)
+            ex_addr_1.AddEquals(Attribute_AddressLine1, location.addressLine1);
+            ex_addr_1.AddExpression(ex_addr_2);
+
+            // ID || (Ln1 && (Ln2 || Sprs))
+            ex_addr.AddExpression(ex_id);
+            ex_addr.AddExpression(ex_addr_1);
+
+            // Name && (ID || (Ln1 && (Ln2 || Sprs)))
+            expression.AddEquals(Attribute_Name, ex_name);
+            expression.AddExpression(ex_addr);
+
+            return expression;
         }
     }
 }
