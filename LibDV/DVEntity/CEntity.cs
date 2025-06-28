@@ -64,6 +64,16 @@ namespace LibDV.DVEntity
             => entities.Count() == 0 ? new EntityCollection()
                  : new EntityCollection(entities.Select(e => e.Entity()).ToList())
                     { EntityName = LogicalName()};
+        internal int Count()
+            => entities.Count();
+        internal bool AllExist()
+            => entities.All(e => e.Exists());
+        internal bool AnyExists()
+            => entities.Any(e => e.Exists());
+        internal CEntitySet Subset(int start, int size)
+            => new CEntitySet(entities.Skip(start).Take(size).ToList());
+        internal void Add(CEntitySet newSet)
+            => entities.AddRange(newSet.Entities());
     }
 
     public class CEntity : IEqualityComparable
