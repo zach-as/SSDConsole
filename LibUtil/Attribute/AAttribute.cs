@@ -1,9 +1,5 @@
-﻿using LibUtil.UtilGlobal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LibUtil.Reflection;
+using LibUtil.UtilGlobal;
 
 namespace LibUtil.UtilAttribute
 {
@@ -28,32 +24,30 @@ namespace LibUtil.UtilAttribute
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
     public class AOverrideValueAttribute : System.Attribute
     {
-        private object? value;
-        private Type? cType; // class type
-        private string fName = string.Empty; // func name
+        private object? value; // a direct value override
+        private EFuncName? funcName; // a function to call to get the value, if the value is not directly set
 
         public AOverrideValueAttribute(object? value)
         {
             this.value = value;
         }
-        // This constructor is used to specify a static method in a class that returns the value.
-        public AOverrideValueAttribute(ENamespace ns, EClassname cn, string fName)
+        public AOverrideValueAttribute(EFuncName funcName)
         {
-            this.cType = cType;
-            this.fName = fName;
+            this.funcName = funcName;
         }
 
-        public object? Value(params object?[] inputs)
+        public object? Value(object? owner, params object[] inputs)
         {
-            if (cType != null)
-            {
-                var func = cType.GetMethod(fName);
-                if (func == null)
-                    throw new ArgumentException($"Method '{fName}' not found in type '{cType.FullName}'.");
-                return func?.Invoke(null, inputs);
-            }
-            return value;
+            // If no func name is provided, return either null or the direct value
+            if (funcName is null)
+                return value;
+
+            // If a function name is provided, call the function with the inputs
+            else
+                return funcName?.GetMethod().Invoke(owner, inputs);
         }
+        public object? Value(params object[] inputs)
+            => Value(null, inputs);
     }
 
     public static class SAttributeTagOverrideValue
