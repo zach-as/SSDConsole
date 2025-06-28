@@ -1,4 +1,5 @@
-﻿using LibDV.EntityType;
+﻿using LibCMS.Data.Associable;
+using LibDV.EntityType;
 using LibUtil.Equality;
 using LibUtil.UtilAttribute;
 using Microsoft.Xrm.Sdk;
@@ -6,17 +7,80 @@ using Microsoft.Xrm.Sdk.Query;
 
 namespace LibDV.DVEntity
 {
-    internal class CEntity : IEqualityComparable
+    public class CEntitySet
+    {
+        private string logicalName = string.Empty;
+        private List<CEntity> entities;
+
+        internal CEntitySet(List<Entity> entities)
+        {
+            this.entities = new List<CEntity>();
+            entities.ForEach(e => this.entities.Add(new CEntity(e)));
+            SetLogicalName();
+        }
+        internal CEntitySet(List<CEntity> entities)
+        {
+            this.entities = entities;
+            SetLogicalName();
+        }
+        internal CEntitySet(List<CAssociable> associables)
+        {
+            entities = new List<CEntity>();
+            associables.ForEach(a => entities.Add(new CEntity(a)));
+            SetLogicalName();
+        }
+        internal CEntitySet(EntityCollection entityCol)
+        {
+            entities = new List<CEntity>();
+            entityCol.Entities.ToList().ForEach(
+                e => entities.Add(new CEntity(e)));
+            SetLogicalName();
+        }
+        internal CEntitySet()
+        {
+            entities = new List<CEntity>();
+            SetLogicalName();
+        }
+
+        private void SetLogicalName()
+        {
+            if (entities.Count() > 0)
+                logicalName = entities.First().LogicalName();
+            else
+                logicalName = string.Empty;
+        }
+
+        internal string LogicalName()
+            => logicalName;
+        internal List<CEntity> Entities()
+            => entities;
+        internal EEntityType EntityType()
+            => SEntityType.EntityType(LogicalName());
+        internal ColumnSet ColumnSet()
+            => EntityType().ColumnSet();
+        internal QueryExpression QueryExpression()
+            => EntityType().QueryExpression();
+        internal EntityCollection Collection()
+            => entities.Count() == 0 ? new EntityCollection()
+                 : new EntityCollection(entities.Select(e => e.Entity()).ToList())
+                    { EntityName = LogicalName()};
+    }
+
+    public class CEntity : IEqualityComparable
     {
         private Entity entity;
 
+        internal CEntity(CAssociable associable)
+        {
+            entity = SEntity.EntityFromAssociable(associable);
+        }
         internal CEntity(Entity entity)
         {
             this.entity = entity;
         }
         internal CEntity()
         {
-            this.entity = new Entity();
+            entity = new Entity();
         }
 
         public CEqualityExpression EqualityExpression()
@@ -87,5 +151,7 @@ namespace LibDV.DVEntity
         internal QueryExpression QueryExpression() => EntityType().QueryExpression();
         internal Guid Id() => entity.Id;
         internal Entity Entity() => entity;
+        // Returns true if this entity exists in DV
+        internal bool Exists() => Id() != Guid.Empty;
     }
 }

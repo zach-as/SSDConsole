@@ -27,22 +27,7 @@ namespace LibDV.Associable
         #endregion clinician
 
         #region entity
-        // Creates a new Entity from a CAssociables and wraps it in a CEntity object.
-        public static CEntity NewEntityFromAssociable(CAssociable a)
-        {
-            var newEntity = new Entity(a.EntityType().LogicalName());
-            var attributeMap = SAttributeMap.AttributeTagMap(a);
-            foreach (var mapping in attributeMap.Mappings())
-            {
-                var attr = mapping.Attribute();
-                var value = mapping.Value();
-                if (value != null) // null values should just be left empty in the entity
-                {
-                    newEntity[attr.LogicalName()] = value;
-                }
-            }
-            return new CEntity(newEntity);
-        }
+        
         #endregion entity
     }
 }
