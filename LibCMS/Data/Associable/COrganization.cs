@@ -27,14 +27,14 @@ namespace LibCMS.Data.Associable
             int.TryParse(record.NumClinicians, out numClinicians);
             this.numClinicians = numClinicians;
         }
-        public IEnumerable<CClinician> Clinicians()
+        public List<CClinician> Clinicians()
         {
-            return Associations().OfType<CClinician>();
+            return Associations().OfType<CClinician>().ToList();
         }
 
-        public IEnumerable<CClinic> Clinics()
+        public List<CClinic> Clinics()
         {
-            return Associations().OfType<CClinic>();
+            return Associations().OfType<CClinic>().ToList();
         }
 
         public override int GetHashCode()

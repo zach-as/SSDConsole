@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace LibCMS.Data.Associable
 {
-    internal static class SAssociable
+    public static class SAssociable
     {
         // Sorts the provided associables by type.
-        internal static Dictionary<Type, List<CAssociable>> SortAssociables(List<CAssociable> associables)
+        public static Dictionary<Type, List<CAssociable>> SortAssociables(this List<CAssociable> associables)
         {
             var sorted = new Dictionary<Type, List<CAssociable>>();
 

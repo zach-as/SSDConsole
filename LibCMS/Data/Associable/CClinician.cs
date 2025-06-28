@@ -1,5 +1,6 @@
 ﻿using LibCMS.Record;
 using LibUtil.Equality;
+using LibUtil.Reflection;
 using LibUtil.UtilAttribute;
 using static LibUtil.UtilAttribute.EAttributeName;
 
@@ -45,6 +46,7 @@ namespace LibCMS.Data.Associable
 
         // This is the categorized sex of the clinician (M, F)
         [AAttributeTag(Attribute_Sex)]
+        [AOverrideValue(EFuncName.LibDV_SAssociable_Sex)]
         public string sex { get; set; }
 
         // This represents the medical credentials of the clinician (PA, CNA, NP, MD, etc)

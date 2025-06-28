@@ -30,14 +30,14 @@ namespace LibCMS.Data.Associable
             numClinicians = 1; // Always start at 1 clinician, this number will be incremented as more clinicians are discovered 
         }
 
-        public IEnumerable<CClinician> Clinicians()
+        public List<CClinician> Clinicians()
         {
-            return Associations().OfType<CClinician>();
+            return Associations().OfType<CClinician>().ToList();
         }
 
-        public IEnumerable<CMedicalGroup> Organizations()
+        public List<CMedicalGroup> Organizations()
         {
-            return Associations().OfType<CMedicalGroup>();
+            return Associations().OfType<CMedicalGroup>().ToList();
         }
 
         public override int GetHashCode()

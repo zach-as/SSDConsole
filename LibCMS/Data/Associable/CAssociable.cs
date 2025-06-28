@@ -41,23 +41,13 @@ namespace LibCMS.Data.Associable
         }
         #endregion association
 
-        public Dictionary<EAttributeName, object?> GetAttributePairs()
-            => GetAttributePairs(this);
-        // Retrieves all values of fields marked with the AAttributeTag and returns pairs of the logicalName and value.
-        private static Dictionary<EAttributeName, object?> GetAttributePairs(object o)
-            => SAttributeUtil.AttributeTagMap(o)
-                .ToDictionary(
-                    mapping => mapping.Attribute().AttributeName(),
-                    mapping => mapping.Value()
-                );
-
         public abstract CEqualityExpression EqualityExpression();
         public object? AttributeValue(EAttributeName attrName)
         {
-            var attrPairs = GetAttributePairs();
-            if (!attrPairs.ContainsKey(attrName))
+            var attrMap = SAttributeMap.AttributeTagMap(this);
+            if (!attrMap.HasMapping(attrName))
                 return null;
-            return attrPairs[attrName];
+            return attrMap.Mapping(attrName);
         }
 
         public override bool Equals(object? obj)
