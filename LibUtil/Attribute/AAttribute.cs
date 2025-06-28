@@ -25,6 +25,7 @@ namespace LibUtil.UtilAttribute
 
     // An attribute for overridiing the value of an attribute in a class.
     // This is most useful if the existing value in the relevant field should not be directly used.
+    [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
     public class AOverrideValueAttribute : System.Attribute
     {
         private object? value;
@@ -36,7 +37,7 @@ namespace LibUtil.UtilAttribute
             this.value = value;
         }
         // This constructor is used to specify a static method in a class that returns the value.
-        public AOverrideValueAttribute(Type cType, string fName)
+        public AOverrideValueAttribute(ENamespace ns, EClassname cn, string fName)
         {
             this.cType = cType;
             this.fName = fName;
