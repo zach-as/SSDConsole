@@ -1,5 +1,6 @@
 ﻿using LibCMS.Data.Associable;
 using LibDV.Attribute;
+using LibDV.DVEntity;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
@@ -33,7 +34,7 @@ namespace LibDV.EntityType
         }
 
         #region extension
-        public static EEntityType EntityType(this Microsoft.Xrm.Sdk.Entity e)
+        public static EEntityType EntityType(this Entity e)
             => EntityType(e.LogicalName);
         public static EEntityType EntityType(this EntityReference er)
             => EntityType(er.LogicalName);
