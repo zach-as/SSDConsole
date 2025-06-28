@@ -22,4 +22,46 @@ namespace LibUtil.UtilAttribute
         public override string ToString() => logicalName;
         public string LogicalName() => logicalName;
     }
+
+    // An attribute for overridiing the value of an attribute in a class.
+    // This is most useful if the existing value in the relevant field should not be directly used.
+    public class AOverrideValueAttribute : System.Attribute
+    {
+        private object? value;
+        private Type? cType; // class type
+        private string fName = string.Empty; // func name
+
+        public AOverrideValueAttribute(object? value)
+        {
+            this.value = value;
+        }
+        // This constructor is used to specify a static method in a class that returns the value.
+        public AOverrideValueAttribute(Type cType, string fName)
+        {
+            this.cType = cType;
+            this.fName = fName;
+        }
+
+        public object? Value(params object?[] inputs)
+        {
+            if (cType != null)
+            {
+                var func = cType.GetMethod(fName);
+                if (func == null)
+                    throw new ArgumentException($"Method '{fName}' not found in type '{cType.FullName}'.");
+                return func?.Invoke(null, inputs);
+            }
+            return value;
+        }
+    }
+
+    public static class SAttributeTagOverrideValue
+    {
+        public static object? Value(this AOverrideValueAttribute attr, params object[] inputs)
+        {
+            if (attr == null)
+                return null;
+            return attr.Value(inputs);
+        }
+    }
 }
