@@ -2,7 +2,7 @@
 
 namespace LibDV.OptionSet
 {
-    internal class COptionSetEntry
+    public class COptionSetEntry
     {
         private string label;
         private int value;
@@ -17,8 +17,8 @@ namespace LibDV.OptionSet
         internal int Value() => value;
     }
 
-    
-    internal class COptionSet
+
+    public class COptionSet
     {
         private List<COptionSetEntry> entries;
 
@@ -46,5 +46,13 @@ namespace LibDV.OptionSet
             => labels.
                 Where(l => !HasLabel(l))
                 .ToList();
+
+        internal int ValueFromLabel(string label)
+        {
+            var entry = Entries().FirstOrDefault(e => e.Label().Equals(label));
+            if (entry is null)
+                throw new ArgumentException($"No option set entry found for label '{label}'.");
+            return entry.Value();
+        }
     }
 }
