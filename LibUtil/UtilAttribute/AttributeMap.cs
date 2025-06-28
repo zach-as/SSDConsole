@@ -106,5 +106,15 @@ namespace LibUtil.UtilAttribute
         // this attribute indicates that the field has a relevant logical name which we use in EAttributeName and in DV
         public static CAttributeMap<AAttributeTagAttribute> AttributeTagMap(object o)
             => AttributeMap<AAttributeTagAttribute>(o);
+        
+        public static bool HasMapping(this CAttributeMap<AAttributeTagAttribute> map, EAttributeName attr)
+            => map.Mappings().Any(m => m.Attribute().AttributeName() == attr);
+        public static CAttributeMapping<AAttributeTagAttribute> Mapping(this CAttributeMap<AAttributeTagAttribute> map, EAttributeName attr)
+        {
+            var mapping =  map.Mappings().FirstOrDefault(m => m.Attribute().AttributeName() == attr);
+            if (mapping is null)
+                throw new ArgumentException($"No mapping found for attribute {attr.LogicalName()}");
+            return mapping;
+        }
     }
 }
