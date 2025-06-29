@@ -9,8 +9,26 @@ namespace LibDV.Connector
 {
     public static partial class SConnectorDV
     {
-        // Fetch existing entities from DV
-        public static CEntitySet FetchEntities(QueryExpression query, bool skipDisplay = false)
+
+        #region fetch
+        // public func to fetch existing entities from DV
+        public static CEntitySet FetchEntities(string logicalName, int pageSize = PAGE_SIZE)
+        {
+            var query = new QueryExpression(logicalName)
+            {
+                ColumnSet = new ColumnSet(true), // Fetch all columns
+                PageInfo = new PagingInfo
+                {
+                    Count = pageSize,
+                    PageNumber = 1,
+                    ReturnTotalRecordCount = true
+                }
+            };
+            return FetchEntities(query);
+        }
+
+        // internal func to fetch existing entities from DV
+        internal static CEntitySet FetchEntities(QueryExpression query, bool skipDisplay = false)
         {
             var entities = new List<Entity>();
             var logicalName = query.EntityName;
@@ -63,6 +81,9 @@ namespace LibDV.Connector
             // return entities as CEntity wrapper
             return new CEntitySet(entities);
         }
+        #endregion fetch
+
+        #region push_update
 
         // Push entity updates to DV (entities must already exist in DV)
         public static void PushEntityUpdate(CEntitySet set, int batchSize = PAGE_SIZE, int index = 0)
@@ -103,6 +124,9 @@ namespace LibDV.Connector
             };
             Service().Execute(request);
         }
+        #endregion push_update
+
+        #region push_create
 
         // Push newly created entities to DV
         public static CEntitySet PushEntityCreate(CEntitySet set, int batchSize = PAGE_SIZE, int index = 0)
@@ -159,5 +183,7 @@ namespace LibDV.Connector
             return FetchEntities(query, true);
 
         }
+
+        #endregion push_create
     }
 }

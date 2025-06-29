@@ -7,6 +7,41 @@ using Microsoft.Xrm.Sdk.Query;
 
 namespace LibDV.DVEntity
 {
+    // A set of entity sets, sorted by entity types
+    public class CEntitySuperSet
+    {
+        private Dictionary<EEntityType, CEntitySet> sets;
+        internal CEntitySuperSet(Dictionary<EEntityType, CEntitySet> sets)
+        {
+            this.sets = sets;
+        }
+        internal CEntitySuperSet()
+        {
+            this.sets = new Dictionary<EEntityType, CEntitySet>();
+        }
+
+        internal Dictionary<EEntityType, CEntitySet> Sets()
+            => sets;
+        internal CEntitySet Set(EEntityType type)
+            => sets.ContainsKey(type) ? sets[type] : new CEntitySet();
+        internal void AddSet(EEntityType type, CEntitySet set)
+        {
+            if (sets.ContainsKey(type))
+                // If the set already exists, merge the new set into the existing one
+                sets[type].Add(set);
+            else
+                // Otherwise, add the new set
+                sets[type] = set;
+        }
+        internal void AddSet(CEntitySet set)
+            => AddSet(set.EntityType(), set);
+        internal int CountAll()
+            => sets.Values.Select(set => set.Count()).Sum();
+        internal int Count(EEntityType type)
+            => sets.ContainsKey(type) ? sets[type].Count() : 0;
+    }
+
+    // A set of entities
     public class CEntitySet
     {
         private string logicalName = string.Empty;
@@ -63,7 +98,7 @@ namespace LibDV.DVEntity
         internal EntityCollection Collection()
             => entities.Count() == 0 ? new EntityCollection()
                  : new EntityCollection(entities.Select(e => e.Entity()).ToList())
-                    { EntityName = LogicalName()};
+                 { EntityName = LogicalName() };
         internal int Count()
             => entities.Count();
         internal bool AllExist()
@@ -73,9 +108,11 @@ namespace LibDV.DVEntity
         internal CEntitySet Subset(int start, int size)
             => new CEntitySet(entities.Skip(start).Take(size).ToList());
         internal void Add(CEntitySet newSet)
+            // Note that this does not check for duplicate entries, but it shouldn't be a problem... right?
             => entities.AddRange(newSet.Entities());
     }
 
+    // An entity wrapper
     public class CEntity : IEqualityComparable
     {
         private Entity entity;
