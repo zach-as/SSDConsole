@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibUtil", "LibUtil\LibUtil.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSDConsole", "SSDConsole\SSDConsole.csproj", "{131F0365-F4F4-6052-2EF0-7EC05815D9A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console", "Console\Console.csproj", "{59AA8134-F2E8-4C62-BB79-36ACC5440EA2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{131F0365-F4F4-6052-2EF0-7EC05815D9A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{131F0365-F4F4-6052-2EF0-7EC05815D9A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{131F0365-F4F4-6052-2EF0-7EC05815D9A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59AA8134-F2E8-4C62-BB79-36ACC5440EA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59AA8134-F2E8-4C62-BB79-36ACC5440EA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59AA8134-F2E8-4C62-BB79-36ACC5440EA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59AA8134-F2E8-4C62-BB79-36ACC5440EA2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

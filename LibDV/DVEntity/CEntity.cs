@@ -15,16 +15,16 @@ namespace LibDV.DVEntity
         {
             this.sets = sets;
         }
-        internal CEntitySuperSet()
+        public CEntitySuperSet()
         {
             this.sets = new Dictionary<EEntityType, CEntitySet>();
         }
 
-        internal Dictionary<EEntityType, CEntitySet> Sets()
+        public Dictionary<EEntityType, CEntitySet> Sets()
             => sets;
-        internal CEntitySet Set(EEntityType type)
+        public CEntitySet Set(EEntityType type)
             => sets.ContainsKey(type) ? sets[type] : new CEntitySet();
-        internal void AddSet(EEntityType type, CEntitySet set)
+        public void AddSet(EEntityType type, CEntitySet set)
         {
             if (sets.ContainsKey(type))
                 // If the set already exists, merge the new set into the existing one
@@ -33,11 +33,11 @@ namespace LibDV.DVEntity
                 // Otherwise, add the new set
                 sets[type] = set;
         }
-        internal void AddSet(CEntitySet set)
+        public void AddSet(CEntitySet set)
             => AddSet(set.EntityType(), set);
-        internal int CountAll()
+        public int CountAll()
             => sets.Values.Select(set => set.Count()).Sum();
-        internal int Count(EEntityType type)
+        public int Count(EEntityType type)
             => sets.ContainsKey(type) ? sets[type].Count() : 0;
     }
 
@@ -46,6 +46,13 @@ namespace LibDV.DVEntity
     {
         private string logicalName = string.Empty;
         private List<CEntity> entities;
+
+        public CEntitySet(List<CAssociable> associables)
+        {
+            entities = new List<CEntity>();
+            associables.ForEach(a => entities.Add(new CEntity(a)));
+            SetLogicalName();
+        }
 
         internal CEntitySet(List<Entity> entities)
         {
@@ -56,12 +63,6 @@ namespace LibDV.DVEntity
         internal CEntitySet(List<CEntity> entities)
         {
             this.entities = entities;
-            SetLogicalName();
-        }
-        internal CEntitySet(List<CAssociable> associables)
-        {
-            entities = new List<CEntity>();
-            associables.ForEach(a => entities.Add(new CEntity(a)));
             SetLogicalName();
         }
         internal CEntitySet(EntityCollection entityCol)
@@ -117,7 +118,7 @@ namespace LibDV.DVEntity
     {
         private Entity entity;
 
-        internal CEntity(CAssociable associable)
+        public CEntity(CAssociable associable)
         {
             entity = SEntity.EntityFromAssociable(associable);
         }

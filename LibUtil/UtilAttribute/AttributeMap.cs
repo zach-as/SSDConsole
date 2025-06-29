@@ -78,8 +78,8 @@ namespace LibUtil.UtilAttribute
                     // There is an override value attribute, so we use it to get the value
                     finalVal = otherAttrs
                         .OfType<AOverrideValueAttribute>()
-                        .FirstOrDefault()
-                        ?.Value(o, initVal);
+                        .First()
+                        .Value(o, initVal);
 
                 if (targetAttrs is not null)
                 {

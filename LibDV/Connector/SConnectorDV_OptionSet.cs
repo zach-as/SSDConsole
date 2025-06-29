@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace LibDV.Connector
 {
-    internal static partial class SConnector
+    public static partial class SConnectorDV
     {
         internal static COptionSet GetOptionSetData(string logicalName)
             => new COptionSet(GetOptionSetMeta(logicalName));
 
         // This adds the provided labels to the option set with the provided logical name
-        internal static void AddOptionSetData(string logicalName, List<string> labels)
+        public static void AddOptionSetData(string logicalName, List<string> labels)
         {
             var existingOptionSet = GetOptionSetData(logicalName);
             var labelsToAdd = existingOptionSet.MissingLabels(labels);

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace LibUtil.Equality
 {
 
-    internal class CEqualityCondition
+    public class CEqualityCondition
     {
         private EEqualityComparator comparator;
         private EAttributeName attribute;
@@ -23,11 +23,11 @@ namespace LibUtil.Equality
             this.conditionVal = conditionVal;
         }
 
-        internal EEqualityComparator Comparator() => comparator;
-        internal EAttributeName AttributeName() => attribute;
-        internal object? Value() => conditionVal.Value();
+        public EEqualityComparator Comparator() => comparator;
+        public EAttributeName AttributeName() => attribute;
+        public object? Value() => conditionVal.Value();
         public override string ToString()
-            => $"Attribute {AttributeName()} {comparator.Description()} {Value()}";
+            => $"UtilAttribute {AttributeName()} {comparator.Description()} {Value()}";
     }
 
     internal static partial class SEqualityCondition

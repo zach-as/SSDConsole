@@ -1,6 +1,7 @@
 ﻿using LibCMS.Data.Associable;
-using LibCMS.Function;
+using LibCMS.Specialty;
 using LibDV.Associable;
+using LibDV.Connector;
 using LibUtil.UtilGlobal;
 using Microsoft.Xrm.Sdk;
 
@@ -24,39 +25,22 @@ namespace LibDV.Associable
 
         public static OptionSetValue GetSpecialtyCode(string specialty)
         {
-            Dictionary<string, int> specialtyData = DVConnector.GetOptionSetData(CGlobal.OptionSet_ClinicianSpecialtyChoice());
-
-            ValidateSpecialty(specialty, specialtyData);
-
-            return new OptionSetValue(specialtyData[specialty]);
+            var specialtyData = SConnectorDV.GetOptionSetData(CGlobal.OptionSet_ClinicianSpecialtyChoice());
+            return new OptionSetValue(specialtyData.ValueFromLabel(specialty));
         }
 
         public static OptionSetValueCollection GetSpecialtyCodes(IEnumerable<string> specialties)
         {
-            var specialtyData = DVConnector.GetOptionSetData(CGlobal.OptionSet_ClinicianSpecialtyChoice());
+            var specialtyData = SConnectorDV.GetOptionSetData(CGlobal.OptionSet_ClinicianSpecialtyChoice());
             var specialtyCodes = new OptionSetValueCollection();
 
 
             foreach (var specialty in specialties)
             {
-                ValidateSpecialty(specialty, specialtyData);
-                specialtyCodes.Add(new OptionSetValue(specialtyData[specialty]));
+                specialtyCodes.Add(new OptionSetValue(specialtyData.ValueFromLabel(specialty)));
             }
 
             return specialtyCodes;
-        }
-
-        private static void ValidateSpecialty(string specialty, Dictionary<string, int> specialtyData)
-        {
-            if (!specialtyData.ContainsKey(specialty))
-            {
-                throw new Exception($"ValidateSpecialty({specialty}) did not find any matching specialties in {CGlobal.OptionSet_ClinicianSpecialtyChoice()}.");
-            }
-
-            if (specialtyData[specialty] == -1)
-            {
-                throw new Exception("ValidateSpecialty{specialty} returned an invalid specialty code of -1.");
-            }
         }
     }
 }

@@ -12,19 +12,9 @@ namespace LibDV.Connector
 
         #region fetch
         // public func to fetch existing entities from DV
-        public static CEntitySet FetchEntities(string logicalName, int pageSize = PAGE_SIZE)
+        public static CEntitySet FetchEntities(string logicalName)
         {
-            var query = new QueryExpression(logicalName)
-            {
-                ColumnSet = new ColumnSet(true), // Fetch all columns
-                PageInfo = new PagingInfo
-                {
-                    Count = pageSize,
-                    PageNumber = 1,
-                    ReturnTotalRecordCount = true
-                }
-            };
-            return FetchEntities(query);
+            throw new NotImplementedException();
         }
 
         // internal func to fetch existing entities from DV

@@ -5,10 +5,10 @@ using LibCMS.Record;
 using LibCMS.Http;
 using LibCMS.Data.Associable;
 
-namespace LibCMS
+namespace LibCMS.Connector
 {
 
-    public static class SCmsAccess
+    public static class SConnectorCMS
     {
 
         // The threshold for how much time must pass before records are forcefully updated
@@ -46,7 +46,7 @@ namespace LibCMS
         {
             if (!ShouldUpdateRecords()) return;
 
-            CDisplay.Print("Pulling records from CMS. This may take a few minutes.");
+            SDisplay.Print("Pulling records from CMS. This may take a few minutes.");
 
             CParameters parameters = new CParameters();
             //parameters.Limit = 60;
@@ -62,14 +62,14 @@ namespace LibCMS
                 if (response is null) throw new Exception("Failed to build record response from text.");
                 if (recordTotal is null || recordTotal == 0) recordTotal = response.RecordCountDB; // note the total # of records
 
-                if (!CDisplay.InProgress()) CDisplay.StartProgressBar("CMS records pulled and formatted:", recordTotal);
+                if (!SDisplay.InProgress()) SDisplay.StartProgressBar("CMS records pulled and formatted:", recordTotal);
                 
                 if(records is null) records = new CRecordOutput();
                 records.AddRecordInput(response); // Convert the response to most usable form (clinicians, clinics, orgs, etc)
 
                 int recordsPulled = response.Records().Count();
                 
-                CDisplay.UpdateProgressBar(recordsPulled);
+                SDisplay.UpdateProgressBar(recordsPulled);
                 
                 // Increment the offset so that the query will return the next set of records (default 2000 at a time)
                 parameters.Offset += recordsPulled;
@@ -81,8 +81,8 @@ namespace LibCMS
             } while (recordTotal is not null
                     && recordsRecorded < recordTotal);
 
-            CDisplay.StopProgressBar();
-            CDisplay.Print("Records from CMS pulled and updated.");
+            SDisplay.StopProgressBar();
+            SDisplay.Print("Records from CMS pulled and updated.");
 
         }
         private static bool ShouldUpdateRecords()
@@ -128,20 +128,20 @@ namespace LibCMS
         #endregion HttpMessaging
 
         #region PublicMethods
-        public static async Task<IEnumerable<CClinician>> GetClinicians()
+        public static async Task<List<CClinician>> GetClinicians()
             => (await Records()).Clinicians();
-        public static async Task<IEnumerable<CClinic>> GetClinics()
+        public static async Task<List<CClinic>> GetClinics()
             => (await Records()).Clinics();
-        public static async Task<IEnumerable<CMedicalGroup>> GetOrganizations()
+        public static async Task<List<CMedicalGroup>> GetMedicalGroups()
             => (await Records()).Organizations();
 
-        public static async Task<IEnumerable<CAssociable>> GetAssociables()
+        public static async Task<List<CAssociable>> GetAssociables()
         {
             // Group the data into a list of CAssociable objects for processing
             List<CAssociable> associables = new List<CAssociable>();
             associables.AddRange(await GetClinicians());
             associables.AddRange(await GetClinics());
-            associables.AddRange(await GetOrganizations());
+            associables.AddRange(await GetMedicalGroups());
             return associables;
         }
 

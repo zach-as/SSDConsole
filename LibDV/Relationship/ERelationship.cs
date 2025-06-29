@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using LibCMS.Data.Associable;
-using LibDV.Entity;
+using LibDV.DVEntity;
 using LibUtil.UtilGlobal;
 using LibDV.Relationship;
 using LibDV.Associable;

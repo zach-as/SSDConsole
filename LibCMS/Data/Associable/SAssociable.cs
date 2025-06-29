@@ -27,5 +27,12 @@ namespace LibCMS.Data.Associable
 
             return sorted;
         }
+
+        public static List<CAssociable> AsParent (this List<CClinician> clinicians)
+            => clinicians.Cast<CAssociable>().ToList();
+        public static List<CAssociable> AsParent(this List<CClinic> clinics)
+            => clinics.Cast<CAssociable>().ToList();
+        public static List<CAssociable> AsParent(this List<CMedicalGroup> medicalGroups)
+            => medicalGroups.Cast<CAssociable>().ToList();
     }
 }

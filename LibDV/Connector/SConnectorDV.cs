@@ -10,7 +10,7 @@ using Newtonsoft.Json.Bson;
 namespace LibDV.Connector
 {
 
-    internal static partial class SConnector
+    public static partial class SConnectorDV
     {
         internal const string SOLUTION = "Sandbox";
         internal const string ENV = "sturtzsolutionsdev";

@@ -32,6 +32,7 @@ namespace LibUtil.Reflection
     {
         // This function accepts a string input representing clinician sex ("M" or "F")
         // and returns an OptionSetValue representing a specific option set in DV.
+        // This function accepts exactly one parameter, which is the string input.
         [AClassFunc("Sex", EClassName.LibDV_SAssociable)]
         LibDV_SAssociable_Sex,
 

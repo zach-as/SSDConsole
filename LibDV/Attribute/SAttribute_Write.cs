@@ -2,7 +2,7 @@
 using LibCMS.Data.Associable;
 using LibUtil.UtilGlobal;
 using LibDV.Associable;
-using LibDV.Entity;
+using LibDV.DVEntity;
 using LibDV.EntityType;
 using System.Reflection.Metadata.Ecma335;
 
@@ -14,7 +14,7 @@ namespace LibDV.Attribute
 
         #region applyattribute
         // Writes attributes to the provided Entity from the information within the provided CAssociable
-        internal static void WriteAttributes(CAssociable a, Microsoft.Xrm.Sdk.Entity e)
+        /*internal static void WriteAttributes(CAssociable a, Microsoft.Xrm.Sdk.Entity e)
         {
             var attributes = GetAttributes(a);
             foreach (var attribute in attributes)
@@ -33,7 +33,7 @@ namespace LibDV.Attribute
 
         // Returns true if the EAttribute can be written to the entity
         private static bool CanWriteAttribute(EAttribute a, Microsoft.Xrm.Sdk.Entity e)
-            => a.EntityTypes().Contains(e.EntityType());
+            => a.EntityTypes().Contains(e.EntityType());*/
 
         #endregion applyattribute
     }
