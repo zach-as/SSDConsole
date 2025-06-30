@@ -11,7 +11,7 @@ namespace LibUtil.Equality
         internal static bool IsNullOrEmpty(this object? o)
             => o is null || (o is string str && string.IsNullOrEmpty(str));
 
-        public static bool Matches(this IEqualityComparable comp1, IEqualityComparable comp2)
+        public static bool Matches(this IEqualityComparable comp1, IEqualityComparable? comp2)
         {
             if (comp1 is null || comp2 is null) return false;
             var eval = comp1.EqualityExpression().Evaluate(comp2);
