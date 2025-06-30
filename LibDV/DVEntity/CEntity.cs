@@ -124,7 +124,7 @@ namespace LibDV.DVEntity
             foreach (var ce in Entities())
             {
                 if (otherSet.HasEntity(ce))
-                    overlapping.Add(ce);
+                    overlapping.Add(new CEntity(ce, otherSet.Entities().Find(e => e.Equals(ce))!));
             }
 
             return new CEntitySet(overlapping);
@@ -156,6 +156,22 @@ namespace LibDV.DVEntity
         internal CEntity(Entity entity)
         {
             this.entity = entity;
+        }
+        // creates a new CEntity from two inputs, prioritizing a where conflict occurs
+        internal CEntity(CEntity a, CEntity b)
+        {
+            entity = new Entity(a.LogicalName());
+            var aAttr = a.Entity().Attributes;
+            var bAttr = b.Entity().Attributes;
+            foreach (var attr in bAttr)
+            {
+                if (aAttr.ContainsKey(attr.Key) && aAttr[attr.Key] != null) continue;
+                entity[attr.Key] = attr.Value;
+            }
+            foreach (var attr in aAttr)
+            {
+                entity[attr.Key] = attr.Value;
+            }
         }
         internal CEntity()
         {
