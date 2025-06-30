@@ -58,11 +58,37 @@ namespace LibUtil.UtilAttribute
 
     public static class SAttributeMap
     {
+        private static Dictionary<object, Dictionary<Type, CAttributeMap<Attribute>>> maps = new Dictionary<object, Dictionary<Type, CAttributeMap<Attribute>>>();
+
         // This function returns a mapping of all fields of the provided object that
         // have Attribute tags of the specified type along with the field names and values
         public static CAttributeMap<T> AttributeMap<T>(object o) where T : System.Attribute
         {
+            // Does the object have any existing mappings?
+            if (maps.TryGetValue(o, out var existingMaps))
+            {
+                // If the map already exists, return it
+                if (existingMaps.TryGetValue(typeof(T), out var targetMap))
+                {
+                    return (targetMap as CAttributeMap<T>)!;
+                }
+            }
+
+            // If the map could not be found, create a new map and add it to the dictionary
+            var newMap = AttributeMap_internal<T>(o);
+            if (!maps.ContainsKey(o))
+                maps[o] = new Dictionary<Type, CAttributeMap<Attribute>>();
+                
+            // Store the map in the dictionary for later reference
+            maps[o][typeof(T)] = (newMap as CAttributeMap<Attribute>)!;
+
+            return newMap;
+        }
+        private static CAttributeMap<T> AttributeMap_internal<T>(object o) where T : System.Attribute
+        {
             var map = new CAttributeMap<T>();
+            if (o is null)
+                return map; // return empty map if the object is null
             var fields = o.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             foreach (var field in fields)
@@ -89,10 +115,16 @@ namespace LibUtil.UtilAttribute
                 }
 
                 var fieldType = field.GetType();
-                if (fieldType.IsPrimitive) continue; // dont check for nested attrs in primitive types
-                if (initVal is null) continue; // dont check for nested attrs for null fields
+                // dont check for nested attrs for null fields
+                if (initVal is null) continue; 
+                // only check for nested attrs in complex types
+                if (fieldType.IsPrimitive ||
+                    fieldType == typeof(string) ||
+                    fieldType.IsEnum) continue;
+                // only check for nested attrs if the field has subfields
+                if (!fieldType.GetFields(BindingFlags.Public | BindingFlags.Instance).Any()) continue;
 
-                // if the property is a complex type, recursively check for attributes in it
+                // if the field is a complex type with subfields, recursively check for attributes in it
                 var nestedMap = AttributeMap<T>(initVal);
                 map.Add(nestedMap);
             }
@@ -107,7 +139,7 @@ namespace LibUtil.UtilAttribute
         // this attribute indicates that the field has a relevant logical name which we use in EAttributeName and in DV
         public static CAttributeMap<AAttributeTagAttribute> AttributeTagMap(object o)
             => AttributeMap<AAttributeTagAttribute>(o);
-        
+
         public static bool HasMapping(this CAttributeMap<AAttributeTagAttribute> map, EAttributeName attr)
             => map.Mappings().Any(m => m.Attribute().AttributeName() == attr);
         public static CAttributeMapping<AAttributeTagAttribute> Mapping(this CAttributeMap<AAttributeTagAttribute> map, EAttributeName attr)
