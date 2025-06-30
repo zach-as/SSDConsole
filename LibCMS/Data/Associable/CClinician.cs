@@ -107,8 +107,14 @@ namespace LibCMS.Data.Associable
 
         public override CEqualityExpression EqualityExpression()
         {
+            // If the equality expression has already been created, return it
+            // This works because the values of CAssociables do not change over time
+            if (eqExpression is not null) return eqExpression;
+
             var expression = SEqualityExpression.NewAndExpression();
             expression.AddEquals(Attribute_Pac, pacId);
+
+            eqExpression = expression; // save this expression for later
             return expression;
         }
     }

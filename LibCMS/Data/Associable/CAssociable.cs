@@ -41,7 +41,9 @@ namespace LibCMS.Data.Associable
         }
         #endregion association
 
+        protected CEqualityExpression? eqExpression;
         public abstract CEqualityExpression EqualityExpression();
+
         public object? AttributeValue(EAttributeName attrName)
         {
             var attrMap = SAttributeMap.AttributeTagMap(this);
@@ -53,7 +55,6 @@ namespace LibCMS.Data.Associable
         public override bool Equals(object? obj)
         {
             var other = obj as IEqualityComparable;
-            if (other is null) return false;
             return this.Matches(other);
         }
     }

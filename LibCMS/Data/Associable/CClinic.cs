@@ -54,6 +54,10 @@ namespace LibCMS.Data.Associable
 
         public override CEqualityExpression EqualityExpression()
         {
+            // If the equality expression has already been created, return it
+            // This works because the values of CAssociables do not change over time
+            if (eqExpression is not null) return eqExpression;
+
             // Name && (ID || (Ln1 && (Ln2 || Sprs)))
 
             var expression = new CEqualityExpression();
@@ -94,6 +98,7 @@ namespace LibCMS.Data.Associable
             expression.AddEquals(Attribute_Name, ex_name);
             expression.AddExpression(ex_addr);
 
+            eqExpression = expression; // save the expression for later
             return expression;
         }
     }
