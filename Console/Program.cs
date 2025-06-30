@@ -4,6 +4,7 @@ using LibDV.Connector;
 using LibDV.DVEntity;
 using LibUtil.UtilGlobal;
 using LibCMS.Data.Associable;
+using LibUtil.UtilDisplay;
 
 namespace Console
 {
@@ -11,6 +12,9 @@ namespace Console
     {
         static async Task Main(string[] args)
         {
+            // Initiate the display
+            SDisplay.BeginDisplay();
+
             // Retrieve the entity data from CMS
             var clinicians = await SConnectorCMS.GetClinicians();
             var clinics = await SConnectorCMS.GetClinics();

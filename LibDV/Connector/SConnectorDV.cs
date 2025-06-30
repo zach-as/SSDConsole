@@ -1,11 +1,5 @@
-﻿using Microsoft.Crm.Sdk.Messages;
-using Microsoft.PowerPlatform.Dataverse.Client;
-using Microsoft.Rest;
+﻿using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Xrm.Sdk.Metadata;
-using Microsoft.Xrm.Sdk.Query;
-using Newtonsoft.Json.Bson;
 
 namespace LibDV.Connector
 {
@@ -26,7 +20,7 @@ namespace LibDV.Connector
         internal const int CONDITION_LIMIT = 500; // the limit for the number of conditions in a single query
 
         private const string CONNECTION = $@"
-        AuthTsype = {AUTH_TYPE};
+        AuthType = {AUTH_TYPE};
         Url = {RESOURCE};
         AppId = {ID_CLIENT};
         RedirectUri = {URI_REDIRECT};

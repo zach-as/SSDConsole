@@ -2,30 +2,6 @@
   "version": 3,
   "targets": {
     "net8.0": {
-      "Microsoft.CrmSdk.CoreAssemblies/9.0.2.59": {
-        "type": "package",
-        "dependencies": {
-          "System.ServiceModel.Http": "4.10.3",
-          "System.ServiceModel.Primitives": "4.10.3",
-          "System.Text.Json": "8.0.5"
-        },
-        "compile": {
-          "lib/net462/Microsoft.Crm.Sdk.Proxy.dll": {
-            "related": ".xml"
-          },
-          "lib/net462/Microsoft.Xrm.Sdk.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/Microsoft.Crm.Sdk.Proxy.dll": {
-            "related": ".xml"
-          },
-          "lib/net462/Microsoft.Xrm.Sdk.dll": {
-            "related": ".xml"
-          }
-        }
-      },
       "Microsoft.Extensions.Caching.Abstractions/3.1.8": {
         "type": "package",
         "dependencies": {
@@ -231,19 +207,19 @@
           }
         }
       },
-      "Microsoft.Identity.Client/4.66.1": {
+      "Microsoft.Identity.Client/4.73.1": {
         "type": "package",
         "dependencies": {
           "Microsoft.IdentityModel.Abstractions": "6.35.0",
           "System.Diagnostics.DiagnosticSource": "6.0.1"
         },
         "compile": {
-          "lib/net6.0/Microsoft.Identity.Client.dll": {
+          "lib/net8.0/Microsoft.Identity.Client.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/Microsoft.Identity.Client.dll": {
+          "lib/net8.0/Microsoft.Identity.Client.dll": {
             "related": ".xml"
           }
         }
@@ -344,22 +320,6 @@
           },
           "lib/net8.0/Microsoft.Xrm.Sdk.dll": {
             "related": ".xml"
-          }
-        }
-      },
-      "Microsoft.Rest.ClientRuntime/2.3.24": {
-        "type": "package",
-        "dependencies": {
-          "Newtonsoft.Json": "10.0.3"
-        },
-        "compile": {
-          "lib/netstandard2.0/Microsoft.Rest.ClientRuntime.dll": {
-            "related": ".runtimeconfig.json"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/Microsoft.Rest.ClientRuntime.dll": {
-            "related": ".runtimeconfig.json"
           }
         }
       },
@@ -1437,25 +1397,6 @@
     }
   },
   "libraries": {
-    "Microsoft.CrmSdk.CoreAssemblies/9.0.2.59": {
-      "sha512": "ajdKZEWmCVaBtuP1UPaUuCtaGUzoQhY4mqY+jNKErfcZS1/128fEsh1Ins2wYX4M4PT7/oLREIMMlqEOoC6LAQ==",
-      "type": "package",
-      "path": "microsoft.crmsdk.coreassemblies/9.0.2.59",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "images/Dataverse.128x128.png",
-        "lib/LicenseTerms.docx",
-        "lib/Other Redistributable.txt",
-        "lib/Third Party Notices for Dynamics 365 SDK.docx",
-        "lib/net462/Microsoft.Crm.Sdk.Proxy.dll",
-        "lib/net462/Microsoft.Crm.Sdk.Proxy.xml",
-        "lib/net462/Microsoft.Xrm.Sdk.dll",
-        "lib/net462/Microsoft.Xrm.Sdk.xml",
-        "microsoft.crmsdk.coreassemblies.9.0.2.59.nupkg.sha512",
-        "microsoft.crmsdk.coreassemblies.nuspec"
-      ]
-    },
     "Microsoft.Extensions.Caching.Abstractions/3.1.8": {
       "sha512": "iBIdKjKa2nR4LdknV2JMSRpJVM5TOca25EckPm6SZQT6HfH8RoHrn9m14GUAkvzE+uOziXRoAwr8YIC6ZOpyXg==",
       "type": "package",
@@ -1667,10 +1608,10 @@
         "microsoft.extensions.primitives.nuspec"
       ]
     },
-    "Microsoft.Identity.Client/4.66.1": {
-      "sha512": "mE+m3pZ7zSKocSubKXxwZcUrCzLflC86IdLxrVjS8tialy0b1L+aECBqRBC/ykcPlB4y7skg49TaTiA+O2UfDw==",
+    "Microsoft.Identity.Client/4.73.1": {
+      "sha512": "NnDLS8QwYqO5ZZecL2oioi1LUqjh5Ewk4bMLzbgiXJbQmZhDLtKwLxL3DpGMlQAJ2G4KgEnvGPKa+OOgffeJbw==",
       "type": "package",
-      "path": "microsoft.identity.client/4.66.1",
+      "path": "microsoft.identity.client/4.73.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1679,15 +1620,16 @@
         "lib/net462/Microsoft.Identity.Client.xml",
         "lib/net472/Microsoft.Identity.Client.dll",
         "lib/net472/Microsoft.Identity.Client.xml",
-        "lib/net6.0-android31.0/Microsoft.Identity.Client.dll",
-        "lib/net6.0-android31.0/Microsoft.Identity.Client.xml",
-        "lib/net6.0-ios15.4/Microsoft.Identity.Client.dll",
-        "lib/net6.0-ios15.4/Microsoft.Identity.Client.xml",
-        "lib/net6.0/Microsoft.Identity.Client.dll",
-        "lib/net6.0/Microsoft.Identity.Client.xml",
+        "lib/net8.0-android34.0/Microsoft.Identity.Client.aar",
+        "lib/net8.0-android34.0/Microsoft.Identity.Client.dll",
+        "lib/net8.0-android34.0/Microsoft.Identity.Client.xml",
+        "lib/net8.0-ios18.0/Microsoft.Identity.Client.dll",
+        "lib/net8.0-ios18.0/Microsoft.Identity.Client.xml",
+        "lib/net8.0/Microsoft.Identity.Client.dll",
+        "lib/net8.0/Microsoft.Identity.Client.xml",
         "lib/netstandard2.0/Microsoft.Identity.Client.dll",
         "lib/netstandard2.0/Microsoft.Identity.Client.xml",
-        "microsoft.identity.client.4.66.1.nupkg.sha512",
+        "microsoft.identity.client.4.73.1.nupkg.sha512",
         "microsoft.identity.client.nuspec"
       ]
     },
@@ -1796,25 +1738,6 @@
         "lib/net8.0/Microsoft.Xrm.Sdk.xml",
         "microsoft.powerplatform.dataverse.client.1.2.9.nupkg.sha512",
         "microsoft.powerplatform.dataverse.client.nuspec"
-      ]
-    },
-    "Microsoft.Rest.ClientRuntime/2.3.24": {
-      "sha512": "hZH7XgM3eV2jFrnq7Yf0nBD4WVXQzDrer2gEY7HMNiwio2hwDsTHO6LWuueNQAfRpNp4W7mKxcXpwXUiuVIlYw==",
-      "type": "package",
-      "path": "microsoft.rest.clientruntime/2.3.24",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net452/Microsoft.Rest.ClientRuntime.dll",
-        "lib/net452/Microsoft.Rest.ClientRuntime.runtimeconfig.json",
-        "lib/net461/Microsoft.Rest.ClientRuntime.dll",
-        "lib/net461/Microsoft.Rest.ClientRuntime.runtimeconfig.json",
-        "lib/netstandard1.4/Microsoft.Rest.ClientRuntime.dll",
-        "lib/netstandard1.4/Microsoft.Rest.ClientRuntime.runtimeconfig.json",
-        "lib/netstandard2.0/Microsoft.Rest.ClientRuntime.dll",
-        "lib/netstandard2.0/Microsoft.Rest.ClientRuntime.runtimeconfig.json",
-        "microsoft.rest.clientruntime.2.3.24.nupkg.sha512",
-        "microsoft.rest.clientruntime.nuspec"
       ]
     },
     "Microsoft.VisualBasic/10.3.0": {
@@ -4803,9 +4726,8 @@
     "net8.0": [
       "LibCMS >= 1.0.0",
       "LibUtil >= 1.0.0",
-      "Microsoft.CrmSdk.CoreAssemblies >= 9.0.2.59",
-      "Microsoft.PowerPlatform.Dataverse.Client >= 1.2.9",
-      "Microsoft.Rest.ClientRuntime >= 2.3.24"
+      "Microsoft.Identity.Client >= 4.73.1",
+      "Microsoft.PowerPlatform.Dataverse.Client >= 1.2.9"
     ]
   },
   "packageFolders": {
@@ -4866,17 +4788,13 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
-          "Microsoft.CrmSdk.CoreAssemblies": {
+          "Microsoft.Identity.Client": {
             "target": "Package",
-            "version": "[9.0.2.59, )"
+            "version": "[4.73.1, )"
           },
           "Microsoft.PowerPlatform.Dataverse.Client": {
             "target": "Package",
             "version": "[1.2.9, )"
-          },
-          "Microsoft.Rest.ClientRuntime": {
-            "target": "Package",
-            "version": "[2.3.24, )"
           }
         },
         "imports": [
@@ -4898,17 +4816,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Package 'Microsoft.CrmSdk.CoreAssemblies 9.0.2.59' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.",
-      "libraryId": "Microsoft.CrmSdk.CoreAssemblies",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    }
-  ]
+  }
 }

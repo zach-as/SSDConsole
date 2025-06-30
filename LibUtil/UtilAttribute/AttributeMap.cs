@@ -62,7 +62,7 @@ namespace LibUtil.UtilAttribute
 
         // This function returns a mapping of all fields of the provided object that
         // have Attribute tags of the specified type along with the field names and values
-        public static CAttributeMap<T> AttributeMap<T>(object o) where T : System.Attribute
+        public static CAttributeMap<T> AttributeMap_old<T>(object o) where T : System.Attribute
         {
             // Does the object have any existing mappings?
             if (maps.TryGetValue(o, out var existingMaps))
@@ -75,7 +75,7 @@ namespace LibUtil.UtilAttribute
             }
 
             // If the map could not be found, create a new map and add it to the dictionary
-            var newMap = AttributeMap_internal<T>(o);
+            var newMap = AttributeMap<T>(o);
             if (!maps.ContainsKey(o))
                 maps[o] = new Dictionary<Type, CAttributeMap<Attribute>>();
                 
@@ -84,7 +84,7 @@ namespace LibUtil.UtilAttribute
 
             return newMap;
         }
-        private static CAttributeMap<T> AttributeMap_internal<T>(object o) where T : System.Attribute
+        public static CAttributeMap<T> AttributeMap<T>(object o) where T : System.Attribute
         {
             var map = new CAttributeMap<T>();
             if (o is null)
