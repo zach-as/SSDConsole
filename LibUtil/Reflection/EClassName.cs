@@ -23,6 +23,9 @@ namespace LibUtil.Reflection
 
         public string Name() => className;
         public string QualifiedName() => $"{ns.Name()}.{className}";
+
+        public ENamespace Namespace() => ns;
+        public EAssembly Assembly() => ns.Assembly();
     }
 
     public enum EClassName 
@@ -40,12 +43,17 @@ namespace LibUtil.Reflection
             => className.ClassNameAttribute().Name();
         public static string QualifiedName(this EClassName className)
             => className.ClassNameAttribute().QualifiedName();
-        public static Type GetType(this EClassName className)
+
+        private static EAssembly Assembly(this EClassName className)
+            => className.ClassNameAttribute().Assembly();
+
+        public static Type RetrieveType(this EClassName className)
         {
-            var classNameAttribute = className.ClassNameAttribute();
-            var type = Type.GetType(classNameAttribute.QualifiedName());
+            var assembly = className.Assembly().Load();
+            var qualifiedName = className.QualifiedName();
+            var type = assembly.GetType(qualifiedName);
             if (type is null)
-                throw new ArgumentException($"Type '{classNameAttribute.QualifiedName()}' not found.");
+                throw new ArgumentException($"Type '{qualifiedName}' not found.");
             else
                 return type;
         }

@@ -12,16 +12,21 @@ namespace LibUtil.Reflection
     internal class ANamespaceAttribute : System.Attribute
     {
         private string ns; // the namespace name as a string
-        private ENamespace? parent; // the namespace of the parent (if present)
-        internal ANamespaceAttribute(string ns, ENamespace parent)
+        private ENamespace? parent; // the namespace of the parent (if child namespace)
+        private EAssembly? assembly; // the assembly of the namespace (if root namespace)
+
+        // Constructor for child namespace
+        internal ANamespaceAttribute(ENamespace parent, string ns)
         {
             this.ns = ns;
             this.parent = parent;
         }
-        internal ANamespaceAttribute(string ns)
+        // Constructor for root namespace
+        internal ANamespaceAttribute(EAssembly assembly, string ns)
         {
+            this.assembly = assembly;
             this.ns = ns;
-        }
+        }   
 
         public string Name()
         {
@@ -29,18 +34,23 @@ namespace LibUtil.Reflection
                 return ns;
             return parent?.Name() + "." + ns;
         }
+
+        public EAssembly Assembly()
+            => assembly.HasValue ? 
+                assembly.Value : // if assembly is not null, return assembly
+                parent!.Value.Assembly(); // if assembly is null, return assembly of parent
     }
 
     public enum ENamespace 
     {
-        [ANamespace("LibUtil")]
+        [ANamespace(EAssembly.LibUtil, "LibUtil")]
         LibUtil,
-        [ANamespace("Reflection", LibUtil)]
+        [ANamespace(LibUtil, "Reflection")]
         LibUtil_Reflection,
 
-        [ANamespace("LibDV")]
+        [ANamespace(EAssembly.LibDV, "LibDV")]
         LibDV,
-        [ANamespace("Associable",LibDV)]
+        [ANamespace(LibDV, "Associable")]
         LibDV_Associable,
     }
 
@@ -52,5 +62,7 @@ namespace LibUtil.Reflection
         public static string Name(this ENamespace ns)
             => ns.NamespaceAttribute().Name();
 
+        public static EAssembly Assembly(this ENamespace ns)
+            => ns.NamespaceAttribute().Assembly();
     }
 }

@@ -49,7 +49,7 @@ namespace LibUtil.Reflection
         public static MethodInfo GetMethod(this EFuncName funcName)
         {
             var className = funcName.FuncNameAttribute().ClassName();
-            var func = className.GetType().GetMethod(funcName.Name());
+            var func = className.RetrieveType().GetMethod(funcName.Name());
             if (func is null)
                 throw new Exception($"Function {funcName.Name()} not found in {className.QualifiedName()}.");
             else
