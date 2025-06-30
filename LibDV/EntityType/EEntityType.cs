@@ -55,6 +55,9 @@ namespace LibDV.EntityType
         public static QueryExpression QueryExpression(this EEntityType entityType)
             => entityType.EntityAttribute().QueryExpression();
 
+        public static bool IsRelationship(this EEntityType entityType)
+            => entityType.EntityAttribute() is AEntityRelationshipAttribute;
+
     }
     #endregion entitytype_extension
 }

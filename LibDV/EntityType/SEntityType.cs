@@ -22,6 +22,8 @@ namespace LibDV.EntityType
             }
             return entityTypes;
         }
+        public static List<EEntityType> RelationshipTypes()
+            => EntityTypes().Where(t => t.IsRelationship()).ToList();
 
         // Retrieves an EEntityType from the provided logical name
         public static EEntityType EntityType(string logicalname)
