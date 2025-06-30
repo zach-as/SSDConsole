@@ -4,6 +4,7 @@ using Microsoft.Xrm.Sdk;
 using LibDV.DVEntity;
 using System.Drawing.Printing;
 using Microsoft.Xrm.Sdk.Messages;
+using LibDV.EntityType;
 
 namespace LibDV.Connector
 {
@@ -12,10 +13,19 @@ namespace LibDV.Connector
 
         #region fetch
         // public func to fetch existing entities from DV
-        public static CEntitySet FetchEntities(string logicalName)
+        public static CEntitySuperSet FetchAllEntities()
         {
-            throw new NotImplementedException();
+            var set = new CEntitySuperSet();
+            var entityTypes = SEntityType.EntityTypes();
+            foreach (var entityType in entityTypes)
+            {
+                var setOfType = FetchEntities(entityType);
+                set.AddSet(setOfType);
+            }
+            return set;
         }
+        public static CEntitySet FetchEntities(EEntityType entityType)
+            => FetchEntities(entityType.QueryExpression());
 
         // internal func to fetch existing entities from DV
         internal static CEntitySet FetchEntities(QueryExpression query, bool skipDisplay = false)
