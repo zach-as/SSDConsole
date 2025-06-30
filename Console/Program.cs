@@ -69,7 +69,7 @@ namespace Console
             allEntities.AddSet(allNewEntities);
             allEntities.AddSet(allExistingEntities);
 
-            var relationships = S
+            //var relationships = S
         }
     }
 }
