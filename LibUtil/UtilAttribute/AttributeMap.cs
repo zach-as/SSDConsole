@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -62,15 +63,15 @@ namespace LibUtil.UtilAttribute
         public static CAttributeMap<T> AttributeMap<T>(object o) where T : System.Attribute
         {
             var map = new CAttributeMap<T>();
-            var props = o.GetType().GetProperties();
-            foreach (var prop in props)
+            var fields = o.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            foreach (var field in fields)
             {
-                var initVal = prop.GetValue(o);
+                var initVal = field.GetValue(o);
                 object? finalVal = null;
 
-                var fieldInfo = o.GetType().GetField(prop.Name);
-                var targetAttrs = fieldInfo?.GetCustomAttributes(typeof(T), false) as T[];
-                var otherAttrs = ((fieldInfo?.GetCustomAttributes(typeof(Attribute), false) as Attribute[])?
+                var targetAttrs = field.GetCustomAttributes(typeof(T), false) as T[];
+                var otherAttrs = ((field.GetCustomAttributes(typeof(Attribute), false) as Attribute[])?
                     .Where(attr => attr is not T) ?? new List<Attribute>()).ToList();
 
                 // Check if there is an override value attribute present
@@ -84,11 +85,11 @@ namespace LibUtil.UtilAttribute
                 if (targetAttrs is not null)
                 {
                     foreach (var targetAttr in targetAttrs)
-                        map.Add(targetAttr, otherAttrs, prop.Name, finalVal);
+                        map.Add(targetAttr, otherAttrs, field.Name, finalVal);
                 }
 
-                var propType = prop.PropertyType;
-                if (propType.IsPrimitive) continue; // dont check for nested attrs in primitive types
+                var fieldType = field.GetType();
+                if (fieldType.IsPrimitive) continue; // dont check for nested attrs in primitive types
                 if (initVal is null) continue; // dont check for nested attrs for null fields
 
                 // if the property is a complex type, recursively check for attributes in it
