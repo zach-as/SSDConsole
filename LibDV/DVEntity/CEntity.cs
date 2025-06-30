@@ -35,6 +35,8 @@ namespace LibDV.DVEntity
         }
         public void AddSet(CEntitySet set)
             => AddSet(set.EntityType(), set);
+        public void AddSet(CEntitySuperSet set)
+            => set.Sets().Values.ToList().ForEach(s => AddSet(s));
         public int CountAll()
             => sets.Values.Select(set => set.Count()).Sum();
         public int Count(EEntityType type)
