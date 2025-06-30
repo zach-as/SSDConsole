@@ -46,12 +46,15 @@ namespace LibUtil.UtilAttribute
             else
             {
                 var method = funcName?.GetMethod();
-                var reqParams = method?.GetParameters().Where(p => p.IsIn).Count();
-                if (reqParams == 0 && inputs.Length == 1) // this occurs sometimes if a func requires none but the default field val is provided
-                    return funcName?.GetMethod().Invoke(owner, null);
+                if (method is null) return null;
+                object? caller = !(method?.IsStatic ?? true) ? owner : null; // if the method is static, we don't need an owner
+                var reqParams = method?.GetParameters().Count(); // how many input params there are
+
+                if (reqParams == 0)
+                    return method!.Invoke(caller, null);
                 if (reqParams == inputs.Length) // this is the ideal case
-                    return funcName?.GetMethod().Invoke(owner, inputs);
-                // something fucked up somewhere because reqParams != inputs.Length
+                    return method!.Invoke(caller, inputs);
+                // something fucked up somewhere because reqParams != inputs.Length && reqParams != 0
                 throw new ArgumentException($"Function {funcName?.Name()} requires {reqParams} input parameters, but {inputs.Length} were provided.");
             }
         }
