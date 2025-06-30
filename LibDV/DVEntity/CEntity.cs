@@ -28,7 +28,7 @@ namespace LibDV.DVEntity
         {
             if (sets.ContainsKey(type))
                 // If the set already exists, merge the new set into the existing one
-                sets[type].Add(set);
+                sets[type].AddSet(set);
             else
                 // Otherwise, add the new set
                 sets[type] = set;
@@ -106,11 +106,40 @@ namespace LibDV.DVEntity
             => entities.All(e => e.Exists());
         internal bool AnyExists()
             => entities.Any(e => e.Exists());
+        internal bool HasEntity(CEntity ce)
+            => entities.Contains(ce);
         internal CEntitySet Subset(int start, int size)
             => new CEntitySet(entities.Skip(start).Take(size).ToList());
-        internal void Add(CEntitySet newSet)
+        internal void AddSet(CEntitySet newSet)
             // Note that this does not check for duplicate entries, but it shouldn't be a problem... right?
             => entities.AddRange(newSet.Entities());
+
+        // This function identifies and retrieves only elements that are present in both sets
+        public CEntitySet Overlapping(CEntitySet otherSet)
+        {
+            var overlapping = new List<CEntity>();
+
+            foreach (var ce in Entities())
+            {
+                if (otherSet.HasEntity(ce))
+                    overlapping.Add(ce);
+            }
+
+            return new CEntitySet(overlapping);
+        }
+        // This function returns a CEntitySet that contains elements in which the provided entity set is not present
+        public CEntitySet Excluding(CEntitySet otherSet)
+        {
+            var excluding = new List<CEntity>();
+
+            foreach (var ce in Entities())
+            {
+                if (!otherSet.HasEntity(ce))
+                    excluding.Add(ce);
+            }
+
+            return new CEntitySet(excluding);
+        }
     }
 
     // An entity wrapper

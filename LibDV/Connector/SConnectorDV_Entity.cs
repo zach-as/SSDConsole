@@ -156,7 +156,7 @@ namespace LibDV.Connector
 
             // Recursively push the next batch
             var nextCreated = PushEntityCreate(set, batchSize, index + batchSize);
-            created.Add(nextCreated);
+            created.AddSet(nextCreated);
 
             // Return the combined created entities (IDs included)
             return created;
