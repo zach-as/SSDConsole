@@ -89,15 +89,15 @@ namespace LibUtil.UtilAttribute
             var map = new CAttributeMap<T>();
             if (o is null)
                 return map; // return empty map if the object is null
-            var fields = o.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var props = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-            foreach (var field in fields)
+            foreach (var prop in props)
             {
-                var initVal = field.GetValue(o);
-                object? finalVal = null;
+                var initVal = prop.GetValue(o);
+                object? finalVal = initVal;
 
-                var targetAttrs = field.GetCustomAttributes(typeof(T), false) as T[];
-                var otherAttrs = ((field.GetCustomAttributes(typeof(Attribute), false) as Attribute[])?
+                var targetAttrs = prop.GetCustomAttributes(typeof(T), false) as T[];
+                var otherAttrs = ((prop.GetCustomAttributes(typeof(Attribute), false) as Attribute[])?
                     .Where(attr => attr is not T) ?? new List<Attribute>()).ToList();
 
                 // Check if there is an override value attribute present
@@ -108,21 +108,19 @@ namespace LibUtil.UtilAttribute
                         .First()
                         .Value(o, initVal);
 
-                if (targetAttrs is not null)
-                {
-                    foreach (var targetAttr in targetAttrs)
-                        map.Add(targetAttr, otherAttrs, field.Name, finalVal);
-                }
+                // Add this field as a mapping if it has the target attribute
+                if (targetAttrs is not null && targetAttrs.Count() > 0)
+                    map.Add(targetAttrs[0], otherAttrs, prop.Name, finalVal);
 
-                var fieldType = field.GetType();
                 // dont check for nested attrs for null fields
-                if (initVal is null) continue; 
+                if (initVal is null) continue;
+                var valType = initVal.GetType();
                 // only check for nested attrs in complex types
-                if (fieldType.IsPrimitive ||
-                    fieldType == typeof(string) ||
-                    fieldType.IsEnum) continue;
+                if (valType.IsPrimitive ||
+                    valType == typeof(string) ||
+                    valType.IsEnum) continue;
                 // only check for nested attrs if the field has subfields
-                if (!fieldType.GetFields(BindingFlags.Public | BindingFlags.Instance).Any()) continue;
+                if (!valType.GetFields(BindingFlags.Public | BindingFlags.Instance).Any()) continue;
 
                 // if the field is a complex type with subfields, recursively check for attributes in it
                 var nestedMap = AttributeMap<T>(initVal);

@@ -3,7 +3,7 @@ using LibUtil.UtilGlobal;
 
 namespace LibUtil.UtilAttribute
 {
-    [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.All, Inherited = true, AllowMultiple = false)]
     public class AAttributeTagAttribute : System.Attribute
     {
         private EAttributeName attrName; // the enum representing the statically typed attribute names
@@ -21,7 +21,7 @@ namespace LibUtil.UtilAttribute
 
     // An attribute for overridiing the value of an attribute in a class.
     // This is most useful if the existing value in the relevant field should not be directly used.
-    [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.All, Inherited = true, AllowMultiple = false)]
     public class AOverrideValueAttribute : System.Attribute
     {
         private object? value; // a direct value override

@@ -87,8 +87,8 @@ namespace LibUtil.Equality
         {
             if (ex == null)
                 return EEqualityResult.Invalid;
-            if (!ex.Conditions().Any())
-                return EEqualityResult.True; // no conditions means always true
+            if (!ex.Conditions().Any() && !ex.Expressions().Any())
+                return EEqualityResult.True; // no conditions and sub-expressions means always true
 
             var op = ex.Operator();
             bool? runningOutcome = null;
@@ -101,7 +101,7 @@ namespace LibUtil.Equality
 
                 var conditionMet = evaluation.IsTrue();
 
-                if (op == EEqualityExpressionOperator.And && runningOutcome == false)
+                if (op == EEqualityExpressionOperator.And && conditionMet == false)
                     return EEqualityResult.False; // short-circuit for AND if any condition is false for optimization
 
                 // Compound this evaluation result with all previous ones according to the operator
@@ -116,7 +116,7 @@ namespace LibUtil.Equality
 
                 var expressionMet = evaluation.IsTrue();
 
-                if (op == EEqualityExpressionOperator.And && runningOutcome == false)
+                if (op == EEqualityExpressionOperator.And && expressionMet == false)
                     return EEqualityResult.False; // short-circuit for AND if any condition is false for optimization
 
                 // Compound this evaluation result with all previous ones according to the operator
