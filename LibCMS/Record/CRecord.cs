@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using System.Web;
 using LibCMS.Data.Associable;
 using LibCMS.Data;
+using LibUtil.UtilDisplay;
 
 namespace LibCMS.Record
 {
@@ -84,7 +85,8 @@ namespace LibCMS.Record
         internal void AddRecordInput(CRecordResponse response)
         {
             if (response is null || !response.HasRecords()) return;
-            
+
+            Console.WriteLine(response.Records().Count());
             foreach (CRecordItem record in response.Records())
             {
                 AddItem(record);    
@@ -95,15 +97,15 @@ namespace LibCMS.Record
         {
             CClinician? clinician = null;
             CClinic? clinic = null;
-            CMedicalGroup? organization = null;
+            CMedicalGroup? medicalGroup = null;
 
             // Attempt to retrieve the clinician with the PAC ID in the current item from clinicians
             // This will return a default Clinician object if there is no Clinician with the existing Pac ID in clinicians
-            clinician = Clinicians().FirstOrDefault(c => c.pacId == item.IDPacInd);
+            clinician = Clinicians().Find(c => c.pacId == item.IDPacInd);
 
             if (clinician == null)
             {
-                // CreateEntities a new clinician and add it to clinicians
+                // Creates a new clinician and add it to clinicians
                 clinician = new CClinician(item);
                 Clinicians().Add(clinician);
             }
@@ -113,24 +115,27 @@ namespace LibCMS.Record
             {
                 // This repeats the same process for clinicians, only applied to organizations
                 // After this line, currentOrganization will == the relevant Organization or the default value
-                organization = Organizations().FirstOrDefault(o => o.pac == item.IDPacOrg);
+                medicalGroup = Organizations().Find(o => o.pac == item.IDPacOrg);
 
-                if (organization == null)
+                if (medicalGroup == null)
                 {
-                    organization = new CMedicalGroup(item);
-                    Organizations().Add(organization);
+                    medicalGroup = new CMedicalGroup(item);
+                    Organizations().Add(medicalGroup);
                 }
 
                 // Associate the identified organization with the clinician
-                organization.Associate(clinician);
+                medicalGroup.Associate(clinician);
             }
+
             //------------------------------------------------------------------------------------------------------------------------
 
             // Create a temp clinic for comparison purposes
             CClinic compareClinic = new CClinic(item);
-            clinic = Clinics().FirstOrDefault(c => c.Equals(compareClinic)); // use the custom comparison operators
+            // This will first check the immutable hash code values of the two clinics
+            // In the case of collisions, it will then check the equality expression of the two clinics
+            var existingClinic = Clinics().Find(c => compareClinic.GetHashCode() == c.GetHashCode());
 
-            if (clinic is null)
+            if (existingClinic is null)
             {
                 // Save the temp clinic as a permanent clinic
                 clinic = compareClinic;
@@ -138,6 +143,8 @@ namespace LibCMS.Record
             }
             else
             {
+                clinic = existingClinic;
+
                 // Increment the number of clinicians at this clinic
                 clinic.numClinicians++;
 
@@ -155,7 +162,7 @@ namespace LibCMS.Record
 
             // Associate the clinic with the organization (if valid) and the clinician
             clinic.Associate(clinician);
-            if (organization is not null) clinic.Associate(organization);
+            if (medicalGroup is not null) clinic.Associate(medicalGroup);
 
             timeLastUpdated = DateTime.UtcNow;
         }

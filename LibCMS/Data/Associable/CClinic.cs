@@ -42,11 +42,8 @@ namespace LibCMS.Data.Associable
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(location.addressID,
-                                    name,
+            return HashCode.Combine(name,
                                     location.addressLine1,
-                                    location.addressLine2,
-                                    location.line2Suppressed,
                                     location.city,
                                     location.state,
                                     location.zip);

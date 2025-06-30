@@ -49,7 +49,7 @@ namespace LibCMS.Data.Associable
             var attrMap = SAttributeMap.AttributeTagMap(this);
             if (!attrMap.HasMapping(attrName))
                 return null;
-            return attrMap.Mapping(attrName);
+            return attrMap.Mapping(attrName).Value();
         }
 
         public override bool Equals(object? obj)

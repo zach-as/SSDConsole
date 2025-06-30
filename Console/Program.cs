@@ -4,6 +4,7 @@ using LibDV.Connector;
 using LibDV.DVEntity;
 using LibUtil.UtilGlobal;
 using LibCMS.Data.Associable;
+using LibUtil.UtilDisplay;
 
 namespace Console
 {
@@ -11,13 +12,16 @@ namespace Console
     {
         static async Task Main(string[] args)
         {
+            // Initiate the display
+            SDisplay.BeginDisplay();
+
             // Retrieve the entity data from CMS
             var clinicians = await SConnectorCMS.GetClinicians();
             var clinics = await SConnectorCMS.GetClinics();
             var medicalGroups = await SConnectorCMS.GetMedicalGroups();
 
             // Retrieve the specialty data from CMS and upload it to DV
-            var specialties = await SSpecialty.Specialties();
+            /*var specialties = await SSpecialty.Specialties();
             SConnectorDV.AddOptionSetData(CGlobal.OptionSet_ClinicianSpecialtyChoice(), specialties);
 
             // Format entity data from CMS into DV entity data
@@ -29,7 +33,7 @@ namespace Console
             var allEntities = new CEntitySuperSet();
             allEntities.AddSet(clinicianEntities);
             allEntities.AddSet(clinicEntities);
-            allEntities.AddSet(medicalGroupEntities);
+            allEntities.AddSet(medicalGroupEntities);*/
 
 
         }

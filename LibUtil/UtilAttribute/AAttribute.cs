@@ -7,16 +7,15 @@ namespace LibUtil.UtilAttribute
     public class AAttributeTagAttribute : System.Attribute
     {
         private EAttributeName attrName; // the enum representing the statically typed attribute names
-        private string logicalName; // the logical name of this attribute as used in dataverse
+
         public AAttributeTagAttribute(EAttributeName attrName)
         {
             this.attrName = attrName;
-            logicalName = CGlobal.Prefix() + attrName.Name();
         }
 
         public EAttributeName AttributeName() => attrName;
-        public override string ToString() => logicalName;
-        public string LogicalName() => logicalName;
+        public override string ToString() => LogicalName();
+        public string LogicalName() => CGlobal.Prefix() + attrName.Name();
     }
 
     // An attribute for overridiing the value of an attribute in a class.

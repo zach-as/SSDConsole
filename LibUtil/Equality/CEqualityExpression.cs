@@ -123,7 +123,7 @@ namespace LibUtil.Equality
                 runningOutcome = op.Compound(runningOutcome, expressionMet);
             }
 
-            return (runningOutcome ?? false) ? EEqualityResult.True : EEqualityResult.False;
+            return (runningOutcome ?? true) ? EEqualityResult.True : EEqualityResult.False;
         }
 
         public static CEqualityExpression NewAndExpression()

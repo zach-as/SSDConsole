@@ -49,8 +49,8 @@ namespace LibCMS.Connector
             SDisplay.Print("Pulling records from CMS. This may take a few minutes.");
 
             CParameters parameters = new CParameters();
-            //parameters.Limit = 60;
-            int? recordTotal = null;// 60;
+            parameters.Limit = 30;
+            int? recordTotal = 30;
             int recordsRecorded = 0;
 
             do
@@ -62,8 +62,8 @@ namespace LibCMS.Connector
                 if (response is null) throw new Exception("Failed to build record response from text.");
                 if (recordTotal is null || recordTotal == 0) recordTotal = response.RecordCountDB; // note the total # of records
 
-                if (!SDisplay.InProgress()) SDisplay.StartProgressBar("CMS records pulled and formatted:", recordTotal);
-                
+                if (!SDisplay.InProgress()) SDisplay.StartProgressBar("CMS records pulled and formatted", recordTotal);
+
                 if(records is null) records = new CRecordOutput();
                 records.AddRecordInput(response); // Convert the response to most usable form (clinicians, clinics, orgs, etc)
 
