@@ -86,6 +86,8 @@ namespace LibDV.Connector
         #region push_update
 
         // Push entity updates to DV (entities must already exist in DV)
+        public static void PushEntityUpdate(CEntitySuperSet set)
+            => set.Sets().Values.ToList().ForEach(s => PushEntityUpdate(s));
         public static void PushEntityUpdate(CEntitySet set, int batchSize = PAGE_SIZE, int index = 0)
         {
             var entities = set.Entities();
@@ -127,6 +129,17 @@ namespace LibDV.Connector
         #endregion push_update
 
         #region push_create
+
+        public static CEntitySuperSet PushEntityCreate(CEntitySuperSet sets)
+        {
+            var created = new CEntitySuperSet();
+            foreach (var set in sets.Sets())
+            {
+                var createdSet = PushEntityCreate(set.Value);
+                created.AddSet(createdSet);
+            }
+            return created;
+        }
 
         // Push newly created entities to DV
         public static CEntitySet PushEntityCreate(CEntitySet set, int batchSize = PAGE_SIZE, int index = 0)
