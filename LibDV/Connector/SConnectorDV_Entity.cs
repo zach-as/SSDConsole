@@ -26,6 +26,12 @@ namespace LibDV.Connector
         }
         public static CEntitySet FetchEntities(EEntityType entityType)
             => FetchEntities(entityType.QueryExpression());
+        public static CEntitySuperSet FetchEntities(params EEntityType[] entityTypes)
+        {
+            var set = new CEntitySuperSet();
+            entityTypes.ToList().ForEach(t => set.AddSet(FetchEntities(t)));
+            return set;
+        }
 
         // internal func to fetch existing entities from DV
         internal static CEntitySet FetchEntities(QueryExpression query, bool skipDisplay = false)
