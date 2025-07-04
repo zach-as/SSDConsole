@@ -33,6 +33,10 @@ namespace LibDV.DVEntity
                 // Otherwise, add the new set
                 sets[type] = set;
         }
+        // Adds the provided unsorted list of all entity types to this super set
+        public void AddEntities(List<CEntity> list)
+            => list.GroupBy(ce => ce.EntityType())
+                .ToList().ForEach(g => AddSet(g.Key, new CEntitySet(g.ToList())));
         public void AddSet(CEntitySet set)
             => AddSet(set.EntityType(), set);
         public void AddSet(CEntitySuperSet set)
@@ -41,6 +45,8 @@ namespace LibDV.DVEntity
             => sets.Values.Select(set => set.Count()).Sum();
         public int Count(EEntityType type)
             => sets.ContainsKey(type) ? sets[type].Count() : 0;
+        public bool HasEntity(CEntity ce)
+            => sets.Values.Any(set => set.HasEntity(ce));
     }
 
     // A set of entities
