@@ -73,5 +73,25 @@ namespace LibDV.Relationship
 
             return aMatch && bMatch;
         }
+
+        public static CEntitySuperSet BuildRelationships(List<CAssociable> associables)
+        {
+            var set = new CEntitySuperSet();
+            foreach (var a in associables)
+            {
+                var relEnts = new List<CEntity>();
+                var ent = new CEntity(a);
+                foreach (var relA in a.Associations())
+                {
+                    var relEnt = NewRelationship(ent, new CEntity(relA));
+                    if (!relEnts.Contains(relEnt) && !set.HasEntity(relEnt)) // ensure we don't add duplicates
+                    {
+                        relEnts.Add(relEnt);
+                    }
+                }
+                set.AddEntities(relEnts); // add all relationships for this entity to the set
+            }
+            return set;
+        }
     }
 }
