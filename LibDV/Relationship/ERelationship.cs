@@ -64,10 +64,10 @@ namespace LibDV.Relationship
             => t.RelationshipAttribute().EntB();
         // Retrieve the columnset containing the columns used in the provided relationship type
         internal static ColumnSet ColumnSet(this ERelationshipType t)
-            => t.EntityAttribute().ColumnSet();
+            => t.ColumnSet();
         // Retrieve a query expression used to identify all information for every relationship of the provided type
         internal static QueryExpression QueryExpression(this ERelationshipType t)
-            => t.EntityAttribute().QueryExpression();
+            => t.QueryExpression();
         
     }
 }
