@@ -34,12 +34,15 @@ namespace LibDV.DVEntity
                 // Otherwise, add the new set
                 sets[type] = set;
         }
+        public void AddSet(CEntitySet set)
+        {
+            if (set.Count() > 0)
+                AddSet(set.EntityType(), set);
+        }
         // Adds the provided unsorted list of all entity types to this super set
         public void AddEntities(List<CEntity> list)
             => list.GroupBy(ce => ce.EntityType())
                 .ToList().ForEach(g => AddSet(g.Key, new CEntitySet(g.ToList())));
-        public void AddSet(CEntitySet set)
-            => AddSet(set.EntityType(), set);
         public void AddSet(CEntitySuperSet set)
             => set.Sets().Values.ToList().ForEach(s => AddSet(s));
         public int CountAll()
@@ -224,28 +227,34 @@ namespace LibDV.DVEntity
             };
 
             // for each attribute in the entity, add an equality condition
-            foreach (var attr in entity.Attributes)
+            foreach (var attrKvp in entity.Attributes)
             {
-                var logicalName = attr.Key;
-                // Use the logical name of the attribute
+                var logicalName = attrKvp.Key;
+
+                // If an attribute enum matching this logical name is not found, skip this attribute
                 var attrNameExists = SAttributeName.LogicalNameExists(logicalName);
                 if (!attrNameExists)
-                {
-                    // If the logical name does not exist, skip this attribute
                     continue;
-                }
 
-                // Convert the attribute key to an EAttributeName
+                // Convert the logical name to an EAttributeName enum
                 var attrName = SAttributeName.EnumFromLogical(logicalName);
-                expression.AddEquals(attrName, attr.Value);
+
+                // If this attribute is not marked as readable from DV, skip it
+                // We can only safely compare attributes that are retrieved from DV
+                var attrEnum = SAttribute.GetAttribute(attrName);
+                if (!attrEnum.HasDVRead())
+                    continue;
+
+                expression.AddEquals(attrName, attrKvp.Value);
                 addedAttrNames.Add(attrName);
             }
 
             var missingAttrNames = SAttributeName.AttrNames()
-                .Where(attrName => !addedAttrNames.Contains(attrName))
+                .Where(attrName => !addedAttrNames.Contains(attrName)) // find attributes that were not added to the expression
+                .Where(attrName => SAttribute.GetAttribute(attrName).HasDVRead()) // only include attributes that are readable from DV
                 .ToList();
 
-            // for each attribute NOT in the entity, add a null condition
+            // for each attribute NOT in the entity that is readable from DV, add a null condition
             missingAttrNames.ForEach(
                 attr => expression.AddNull(attr)
             );
