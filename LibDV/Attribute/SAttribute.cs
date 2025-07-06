@@ -32,6 +32,8 @@ namespace LibDV.Attribute
         internal static List<EAttribute> GetAttributes(Entity e)
             => GetAttributes(e.EntityType());
 
+        internal static EAttribute GetAttribute(EAttributeName attrName)
+            => GetAttribute(attrName.LogicalName());
         internal static EAttribute GetAttribute(string attrName)
         {
             try
