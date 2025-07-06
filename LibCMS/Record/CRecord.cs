@@ -86,7 +86,6 @@ namespace LibCMS.Record
         {
             if (response is null || !response.HasRecords()) return;
 
-            Console.WriteLine(response.Records().Count());
             foreach (CRecordItem record in response.Records())
             {
                 AddItem(record);    
