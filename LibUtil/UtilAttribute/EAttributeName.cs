@@ -76,6 +76,14 @@ namespace LibUtil.UtilAttribute
         [Description("cliniciancount")]
         Attribute_ClinicianCount,
 
+        // The attributes for relationships
+        [Description("clinician")]
+        Attribute_Clinician,
+        [Description("clinic")]
+        Attribute_Clinic,
+        [Description("medicalgroup")]
+        Attribute_MedicalGroup,
+
         [Description("logicalname")]
         Entity_LogicalName,
         [Description("id")]

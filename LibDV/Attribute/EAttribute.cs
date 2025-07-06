@@ -47,6 +47,18 @@ namespace LibDV.Attribute
         [ADVRead()]
         ClinicAtMedicalGroupId,
 
+        // These attributes are used in relationship tables
+
+        [AAttribute(Attribute_Clinician, EEntityType.ClinicianAtMedicalGroup, EEntityType.ClinicianAtClinic)]
+        [ADVRead(), ADVWrite()]
+        Clinician,
+        [AAttribute(Attribute_Clinic, EEntityType.ClinicAtMedicalGroup, EEntityType.ClinicianAtClinic)]
+        [ADVRead(), ADVWrite()]
+        Clinic,
+        [AAttribute(Attribute_MedicalGroup, EEntityType.ClinicianAtMedicalGroup, EEntityType.ClinicAtMedicalGroup)]
+        [ADVRead(), ADVWrite()]
+        MedicalGroup,
+
         // These are the remaining attributes that are not used in comparison operations
         [AAttribute(Attribute_PhoneNumber, EEntityType.Clinic)]
         [ADVWrite()]
