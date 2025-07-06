@@ -49,11 +49,24 @@ namespace LibDV.EntityType
 
         // Returns a ColumnSet that contains all the attributes that are relevant to this entity type.
         public static ColumnSet ColumnSet(this EEntityType entityType)
-            => entityType.EntityAttribute().ColumnSet();
+        {
+            // Retrieve all attributes that are relevant to this entity
+            var attrs = SAttribute.GetAttributes(entityType);
+            // Returns a ColumnSet that contains all the attributes that are relevant to this entity.
+            return new ColumnSet(attrs.Where(a => a.HasDVRead()).Select(a => a.LogicalName()).ToArray());
+        }
 
         // Returns a basic QueryExpression that will return all occurences of the EEntityType with the specified columns in ColumnSet()
         public static QueryExpression QueryExpression(this EEntityType entityType)
-            => entityType.EntityAttribute().QueryExpression();
+            => new QueryExpression
+            {
+                EntityName = entityType.LogicalName(),
+                ColumnSet = entityType.ColumnSet(),
+                Orders = { new OrderExpression {
+                            AttributeName = entityType.LogicalName() + "id", // Default ID attribute
+                            OrderType = OrderType.Ascending // Default to ascending order
+                         }}
+            };
 
         public static bool IsRelationship(this EEntityType entityType)
             => entityType.EntityAttribute() is AEntityRelationshipAttribute;

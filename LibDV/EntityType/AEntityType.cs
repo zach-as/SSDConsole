@@ -28,23 +28,8 @@ namespace LibDV.EntityType
         internal string SchemaName() => schemaName;
         internal string LogicalName() => logicalName;
 
-        internal ColumnSet ColumnSet()
-        {
-            // Retrieve all attributes that are relevant to this entity
-            var attrs = SAttribute.GetAttributes(SEntityType.EntityType(logicalName));
-            // Returns a ColumnSet that contains all the attributes that are relevant to this entity.
-            return new ColumnSet(attrs.Where(a => a.HasDVRead()).Select(a => a.LogicalName()).ToArray());
-        }
-        internal  QueryExpression QueryExpression()
-            => new QueryExpression
-            {
-                EntityName = logicalName,
-                ColumnSet = ColumnSet(),
-                Orders = { new OrderExpression {
-                            AttributeName = logicalName + "id", // Default ID attribute
-                            OrderType = OrderType.Ascending // Default to ascending order
-                         }}
-            };
+        
+        
     }
 
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
