@@ -34,7 +34,7 @@ namespace LibDV.OptionSet
         internal List<COptionSetEntry> Entries() => entries;
 
         internal bool HasLabel(string label)
-            => Entries().Any(o => o.Equals(label));
+            => Entries().Any(o => o.Label().Equals(label));
 
         internal List<string> Labels()
             => Entries()

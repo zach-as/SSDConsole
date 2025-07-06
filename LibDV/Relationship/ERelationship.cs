@@ -39,8 +39,8 @@ namespace LibDV.Relationship
         internal AEntityRelationshipAttribute EntityAttribute() => internalAttribute;
 
     }
-    
-    internal static partial class SRelationship
+
+    public static partial class SRelationship
     {
         internal static ARelationshipAttribute RelationshipAttribute(this ERelationshipType t)
             => t.InternalAttribute<ARelationshipAttribute>();

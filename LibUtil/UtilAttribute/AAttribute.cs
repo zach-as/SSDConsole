@@ -1,5 +1,6 @@
 ﻿using LibUtil.Reflection;
 using LibUtil.UtilGlobal;
+using System.Reflection;
 
 namespace LibUtil.UtilAttribute
 {
@@ -20,6 +21,7 @@ namespace LibUtil.UtilAttribute
 
     // An attribute for overridiing the value of an attribute in a class.
     // This is most useful if the existing value in the relevant field should not be directly used.
+    // USAGE ON METHOD: Method may be static or instance, but must not have any parameters.
     [AttributeUsage(AttributeTargets.All, Inherited = true, AllowMultiple = false)]
     public class AOverrideValueAttribute : System.Attribute
     {
@@ -35,27 +37,31 @@ namespace LibUtil.UtilAttribute
             this.funcName = funcName;
         }
 
+        private object? FuncValue(object? owner, MethodInfo? method, params object?[] inputs)
+        {
+            if (method is null) return null;
+            object? caller = !(method?.IsStatic ?? true) ? owner : null; // if the method is static, we don't need an owner
+            var reqParams = method?.GetParameters().Count(); // how many input params there are
+
+            if (reqParams == 0)
+                return method!.Invoke(caller, null);
+            if (reqParams == inputs.Length) // this is the ideal case
+                return method!.Invoke(caller, inputs);
+            // something fucked up somewhere because reqParams != inputs.Length && reqParams != 0
+            throw new ArgumentException($"Function {method?.Name} requires {reqParams} input parameters, but {inputs.Length} were provided.");
+
+        }
+
         public object? Value(object? owner, params object?[] inputs)
         {
-            // If no func name is provided, return either null or the direct value
+            bool hasDel = inputs is not null && inputs.Length > 0 && inputs[0] is Delegate;
+            Delegate? del = hasDel ? (Delegate)inputs![0]! : null; // the first input is a delegate if it exists
+
+            // If no func name is provided, return either null, the direct value, or the delegate value (if del present)
             if (funcName is null)
-                return value;
+                return hasDel ? FuncValue(owner, del!.Method, inputs!.Skip(1)) : value;
 
-            // If a function name is provided, call the function with the inputs
-            else
-            {
-                var method = funcName?.GetMethod();
-                if (method is null) return null;
-                object? caller = !(method?.IsStatic ?? true) ? owner : null; // if the method is static, we don't need an owner
-                var reqParams = method?.GetParameters().Count(); // how many input params there are
-
-                if (reqParams == 0)
-                    return method!.Invoke(caller, null);
-                if (reqParams == inputs.Length) // this is the ideal case
-                    return method!.Invoke(caller, inputs);
-                // something fucked up somewhere because reqParams != inputs.Length && reqParams != 0
-                throw new ArgumentException($"Function {funcName?.Name()} requires {reqParams} input parameters, but {inputs.Length} were provided.");
-            }
+            return FuncValue(owner, funcName?.GetMethod(), inputs!);
         }
         public object? Value(params object?[] inputs)
             => Value(null, inputs);

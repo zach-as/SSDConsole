@@ -1,4 +1,5 @@
 ﻿using LibCMS.Data.Associable;
+using LibDV.Attribute;
 using LibDV.EntityType;
 using LibUtil.Equality;
 using LibUtil.UtilAttribute;
@@ -47,6 +48,20 @@ namespace LibDV.DVEntity
             => sets.ContainsKey(type) ? sets[type].Count() : 0;
         public bool HasEntity(CEntity ce)
             => sets.Values.Any(set => set.HasEntity(ce));
+        public CEntitySuperSet Excluding(CEntitySuperSet other)
+            => new CEntitySuperSet(
+                sets.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Excluding(other.Set(kvp.Key))
+                )
+            );
+        public CEntitySuperSet Overlapping(CEntitySuperSet other)
+            => new CEntitySuperSet(
+                sets.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Overlapping(other.Set(kvp.Key))
+                )
+            );
     }
 
     // A set of entities
@@ -115,7 +130,14 @@ namespace LibDV.DVEntity
         internal bool AnyExists()
             => entities.Any(e => e.Exists());
         internal bool HasEntity(CEntity ce)
-            => entities.Contains(ce);
+        {
+            foreach(var e in entities)
+            {
+                if (e.Equals(ce))
+                    return true; // Found a matching entity
+            }
+            return false; // No matching entity found
+        }
         internal CEntitySet Subset(int start, int size)
             => new CEntitySet(entities.Skip(start).Take(size).ToList());
         internal void AddSet(CEntitySet newSet)
@@ -148,6 +170,7 @@ namespace LibDV.DVEntity
 
             return new CEntitySet(excluding);
         }
+
     }
 
     // An entity wrapper
@@ -188,9 +211,11 @@ namespace LibDV.DVEntity
         {
             var expression = new CEqualityExpression();
 
-            // Add the logical name and ID conditions
+            // Add the logical name condition
             expression.AddEquals(EAttributeName.Entity_LogicalName, entity.LogicalName);
-            expression.AddEquals(EAttributeName.Entity_Id, entity.Id);
+            // Only add the ID condition if it is not empty
+            if (entity.Id != Guid.Empty)
+                expression.AddEquals(EAttributeName.Entity_Id, entity.Id);
 
             var addedAttrNames = new List<EAttributeName>() 
             { 
@@ -254,5 +279,34 @@ namespace LibDV.DVEntity
         internal Entity Entity() => entity;
         // Returns true if this entity exists in DV
         internal bool Exists() => Id() != Guid.Empty;
+
+        public override bool Equals(object? obj)
+        {
+            return SEquality.Matches(this, obj as IEqualityComparable);
+        }
+
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            var attrs = SAttribute.GetAttributes(EntityType());
+            foreach(var attr in attrs)
+            {
+                if (attr.LogicalName().Contains("Id"))
+                    continue; // Skip ID attributes, as they are handled separately
+                var value = AttributeValue(attr.AttributeName());
+                if (value != null)
+                {
+                    hash.Add(value);
+                }
+            }
+            return hash.ToHashCode();
+        }
+
+        public override string ToString()
+        {
+            if (EntityType() == EEntityType.Clinician)
+                return AttributeValue(EAttributeName.Attribute_FirstName) + " " + AttributeValue(EAttributeName.Attribute_LastName);
+            return entity?.ToString() ?? "null";
+        }
     }
 }

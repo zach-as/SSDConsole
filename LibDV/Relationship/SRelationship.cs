@@ -5,7 +5,7 @@ using Microsoft.Xrm.Sdk;
 
 namespace LibDV.Relationship
 {
-    internal static partial class SRelationship
+    public static partial class SRelationship
     {
         #region getrelationshiptype
         private static List<ERelationshipType>? relationships;

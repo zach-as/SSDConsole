@@ -27,7 +27,7 @@ namespace LibDV.Associable
         #endregion clinician
 
         #region entity
-        
+
         #endregion entity
     }
 }

@@ -2,6 +2,8 @@
 using static LibUtil.UtilAttribute.EAttributeName;
 using LibUtil.UtilAttribute;
 using LibUtil.Equality;
+using LibCMS.Specialty;
+using LibUtil.Reflection;
 
 namespace LibCMS.Data.Associable
 {
@@ -18,6 +20,18 @@ namespace LibCMS.Data.Associable
         // This is the number of clinicians that operate at this clinic
         [AAttributeTag(Attribute_ClinicianCount)]
         public int numClinicians { get; set; }
+
+        // This represents all primary specialties held by clinicians affiliated with this clinic
+        [AAttributeTag(Attribute_PrimarySpecialties)]
+        [AOverrideValue(EFuncName.LibDV_SAssociable_GetSpecialtyCodes)]
+        public List<string> PrimarySpecialties()
+            => SSpecialty.PrimarySpecialties(this);
+
+        // This represents all secondary specialties held by clinicians affiliated with this clinic
+        [AAttributeTag(Attribute_SecondarySpecialties)]
+        [AOverrideValue(EFuncName.LibDV_SAssociable_GetSpecialtyCodes)]
+        public List<string> SecondarySpecialties()
+            => SSpecialty.SecondarySpecialties(this);
 
         // This is the address of this clinic
         public CAddress location { get; set; }

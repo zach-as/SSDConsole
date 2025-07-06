@@ -6,17 +6,19 @@ using LibUtil.UtilGlobal;
 using LibCMS.Data.Associable;
 using LibUtil.UtilDisplay;
 using LibDV.EntityType;
+using LibDV.Relationship;
 
 namespace Console
 {
     internal class Program
     {
-        static async Task Main(string[] args)
+        static async Task Main(string[] args)                   
         {
             // Initiate the display
             SDisplay.BeginDisplay();
 
             // Retrieve the entity data from CMS
+            var associables = await SConnectorCMS.GetAssociables(); // contains all clinician, clinic, and medicalGroup info from CMS
             var clinicians = await SConnectorCMS.GetClinicians();
             var clinics = await SConnectorCMS.GetClinics();
             var medicalGroups = await SConnectorCMS.GetMedicalGroups();
@@ -69,7 +71,13 @@ namespace Console
             allEntities.AddSet(allNewEntities);
             allEntities.AddSet(allExistingEntities);
 
-            //var relationships = S
+            // Retrieve all existing relationship info between entitites in DV
+            var allExistingRelationships = SConnectorDV.FetchEntities(SEntityType.RelationshipTypes().ToArray());
+            // Build new relationships based on the associables from CMS and exclude existing relationships found in DV
+            var allNewRelationships = SRelationship.BuildRelationships(associables)
+                                        .Excluding(allExistingRelationships);
+            // Push the new relationships to DV
+            SConnectorDV.PushEntityCreate(allNewRelationships);
         }
     }
 }

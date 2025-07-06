@@ -32,6 +32,9 @@ namespace LibUtil.Reflection
     {
         [AClassName("SAssociable", ENamespace.LibDV_Associable)]
         LibDV_SAssociable,
+        [AClassName("SSpecialtyCode", ENamespace.LibDV_Associable)]
+        LibDV_SSpecialtyCode,
+
 
     }
 

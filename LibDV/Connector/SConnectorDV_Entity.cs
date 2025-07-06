@@ -100,6 +100,7 @@ namespace LibDV.Connector
             var entityCount = set.Count();
             var logicalName = set.LogicalName();
 
+            SDisplay.Print("Attempting to update entities of type {logicalName}.");
             if (entityCount == 0)
             {
                 SDisplay.Print("No entities to update. Skipping.");
@@ -154,6 +155,7 @@ namespace LibDV.Connector
             var entityCount = set.Count();
             var logicalName = set.LogicalName();
 
+            SDisplay.Print($"Attempting to create entities of type {logicalName}.");
             if (entityCount == 0)
             {
                 SDisplay.Print("No entities to create. Skipping.");

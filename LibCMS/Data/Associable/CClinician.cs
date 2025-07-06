@@ -1,4 +1,5 @@
 ﻿using LibCMS.Record;
+using LibCMS.Specialty;
 using LibUtil.Equality;
 using LibUtil.Reflection;
 using LibUtil.UtilAttribute;
@@ -34,10 +35,12 @@ namespace LibCMS.Data.Associable
 
         // This is the clinician's primary specialty.
         [AAttributeTag(Attribute_PrimarySpecialty)]
+        [AOverrideValue(EFuncName.LibDV_SAssociable_GetSpecialtyCode)]
         public string primarySpecialty { get; set; }
 
         // This is an array of the clinician's listed secondary specialties
         [AAttributeTag(Attribute_SecondarySpecialties)]
+        [AOverrideValue(EFuncName.LibDV_SAssociable_GetSpecialtyCodes)]
         public string[] secondarySpecialties { get; set; }
 
         // This is the suffix of the clinician (Jr., Sr., etc)

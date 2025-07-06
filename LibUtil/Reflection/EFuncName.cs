@@ -35,6 +35,14 @@ namespace LibUtil.Reflection
         // This function accepts exactly one parameter, which is the string input.
         [AClassFunc("Sex", EClassName.LibDV_SAssociable)]
         LibDV_SAssociable_Sex,
+        // This function accepts a string input representing a clinician specialty
+        // and returns an OptionSetValue representing a specific specialty code in DV.
+        [AClassFunc("GetSpecialtyCode", EClassName.LibDV_SSpecialtyCode)]
+        LibDV_SAssociable_GetSpecialtyCode,
+        // This function accepts multiple string inputs representing clinician specialties
+        // and returns an OptionSetValueCollection representing multiple specialty codes in DV.
+        [AClassFunc("GetSpecialtyCodes", EClassName.LibDV_SSpecialtyCode)]
+        LibDV_SAssociable_GetSpecialtyCodes,
 
     }
 

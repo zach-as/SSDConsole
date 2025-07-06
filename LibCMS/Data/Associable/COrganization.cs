@@ -2,6 +2,8 @@
 using static LibUtil.UtilAttribute.EAttributeName;
 using LibUtil.UtilAttribute;
 using LibUtil.Equality;
+using LibCMS.Specialty;
+using LibUtil.Reflection;
 
 namespace LibCMS.Data.Associable
 {
@@ -18,6 +20,18 @@ namespace LibCMS.Data.Associable
         // This indicates if this organization accepts medicare payments in full or in part
         [AAttributeTag(Attribute_FullMedicare)]
         public bool acceptsFullMedicare { get; set; }
+
+        // This represents all primary specialties held by clinicians affiliated with this medical group
+        [AAttributeTag(Attribute_PrimarySpecialties)]
+        [AOverrideValue(EFuncName.LibDV_SAssociable_GetSpecialtyCodes)]
+        public List<string> PrimarySpecialties()
+            => SSpecialty.PrimarySpecialties(this);
+
+        // This represents all secondary specialties held by clinicians affiliated with this medical group
+        [AAttributeTag(Attribute_SecondarySpecialties)]
+        [AOverrideValue(EFuncName.LibDV_SAssociable_GetSpecialtyCodes)]
+        public List<string> SecondarySpecialties()
+            => SSpecialty.SecondarySpecialties(this);
 
         internal CMedicalGroup (CRecordItem record)
         {
