@@ -34,6 +34,7 @@ namespace LibCMS.Data.Associable
             => SSpecialty.SecondarySpecialties(this);
 
         // This is the address of this clinic
+        [AAttributeTagNested()]
         public CAddress location { get; set; }
 
         internal CClinic (CRecordItem record)

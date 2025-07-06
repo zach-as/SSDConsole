@@ -50,7 +50,7 @@ namespace Console
 
             // Push the new entity data to DV
             // This will also generate IDs for each entity and update the information in allNewEntities accordingly
-            allNewEntities = SConnectorDV.PushEntityCreate(allNewEntities);
+            /*allNewEntities = SConnectorDV.PushEntityCreate(allNewEntities);
 
             // Identify the entities from CMS that already exist in DV and should be updated
             var existingClinicians = clinicianEntities.Overlapping(DVClinicians);
@@ -74,10 +74,10 @@ namespace Console
             // Retrieve all existing relationship info between entitites in DV
             var allExistingRelationships = SConnectorDV.FetchEntities(SEntityType.RelationshipTypes().ToArray());
             // Build new relationships based on the associables from CMS and exclude existing relationships found in DV
-            var allNewRelationships = SRelationship.BuildRelationships(associables)
+            var allNewRelationships = SRelationship.BuildRelationships(associables, allEntities)
                                         .Excluding(allExistingRelationships);
             // Push the new relationships to DV
-            SConnectorDV.PushEntityCreate(allNewRelationships);
+            SConnectorDV.PushEntityCreate(allNewRelationships);*/
         }
     }
 }

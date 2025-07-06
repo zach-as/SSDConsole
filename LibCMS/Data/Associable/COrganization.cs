@@ -13,6 +13,9 @@ namespace LibCMS.Data.Associable
         [AAttributeTag(Attribute_Pac)]
         public string pac { get; set; }
 
+        [AAttributeTag(Attribute_Name)]
+        public string name { get; set; }
+
         // This is the number of clinicians affiliated with this organization
         [AAttributeTag(Attribute_ClinicianCount)]
         public int numClinicians { get; set; }
@@ -36,6 +39,7 @@ namespace LibCMS.Data.Associable
         internal CMedicalGroup (CRecordItem record)
         {
             pac = record.IDPacOrg;
+            name = pac;
             acceptsFullMedicare = record.MedicareFullOrg == "Y" ? true : false;
             int numClinicians = 1;
             int.TryParse(record.NumClinicians, out numClinicians);

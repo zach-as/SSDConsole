@@ -74,16 +74,20 @@ namespace LibDV.Relationship
             return aMatch && bMatch;
         }
 
-        public static CEntitySuperSet BuildRelationships(List<CAssociable> associables)
+        public static CEntitySuperSet BuildRelationships(List<CAssociable> associables, CEntitySuperSet allEntities)
         {
             var set = new CEntitySuperSet();
             foreach (var a in associables)
             {
                 var relEnts = new List<CEntity>();
                 var ent = new CEntity(a);
+                // override entity with the one from the set, if it exists
+                // we mainly do this to ensure that the entity has the correct ID
+                ent = new CEntity(allEntities.GetEntity(ent), ent); 
                 foreach (var relA in a.Associations())
                 {
                     var relEnt = NewRelationship(ent, new CEntity(relA));
+                    relEnt = new CEntity(allEntities.GetEntity(relEnt), relEnt);
                     if (!relEnts.Contains(relEnt) && !set.HasEntity(relEnt)) // ensure we don't add duplicates
                     {
                         relEnts.Add(relEnt);

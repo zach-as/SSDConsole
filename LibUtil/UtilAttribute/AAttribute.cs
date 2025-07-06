@@ -19,6 +19,10 @@ namespace LibUtil.UtilAttribute
         public string LogicalName() => CGlobal.Prefix() + attrName.Name();
     }
 
+    // The presence of this attribute tag on a field or property indicates that there are children attributes to inspect
+    [AttributeUsage(AttributeTargets.All, Inherited = true, AllowMultiple = false)]
+    public class AAttributeTagNestedAttribute : System.Attribute { }
+
     // An attribute for overridiing the value of an attribute in a class.
     // This is most useful if the existing value in the relevant field should not be directly used.
     // USAGE ON METHOD: Method may be static or instance, but must not have any parameters.

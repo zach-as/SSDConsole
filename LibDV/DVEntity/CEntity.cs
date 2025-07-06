@@ -49,6 +49,12 @@ namespace LibDV.DVEntity
             => sets.Values.Select(set => set.Count()).Sum();
         public int Count(EEntityType type)
             => sets.ContainsKey(type) ? sets[type].Count() : 0;
+        public CEntity? GetEntity(CEntity ce)
+            => sets.Values
+                .Where(set => set.LogicalName() == ce.LogicalName())
+                .Where(set => set.HasEntity(ce))
+                .ElementAtOrDefault(0)?.GetEntity(ce)
+                ?? null;
         public bool HasEntity(CEntity ce)
             => sets.Values.Any(set => set.HasEntity(ce));
         public CEntitySuperSet Excluding(CEntitySuperSet other)
@@ -132,15 +138,17 @@ namespace LibDV.DVEntity
             => entities.All(e => e.Exists());
         internal bool AnyExists()
             => entities.Any(e => e.Exists());
-        internal bool HasEntity(CEntity ce)
+        internal CEntity? GetEntity(CEntity ce)
         {
-            foreach(var e in entities)
+            foreach (var e in entities)
             {
                 if (e.Equals(ce))
-                    return true; // Found a matching entity
+                    return e; // Found a matching entity
             }
-            return false; // No matching entity found
+            return null; // No matching entity found
         }
+        internal bool HasEntity(CEntity ce)
+            => GetEntity(ce) is not null;
         internal CEntitySet Subset(int start, int size)
             => new CEntitySet(entities.Skip(start).Take(size).ToList());
         internal void AddSet(CEntitySet newSet)
@@ -190,8 +198,23 @@ namespace LibDV.DVEntity
             this.entity = entity;
         }
         // creates a new CEntity from two inputs, prioritizing a where conflict occurs
-        internal CEntity(CEntity a, CEntity b)
+        internal CEntity(CEntity? a, CEntity? b)
         {
+            if (a == null && b == null)
+                throw new Exception("Creating new CEntity() from null inputs.");
+            if (a == null)
+            {
+                entity = b.Entity();
+                return;
+            }
+            if (b == null)
+            {
+                entity = a.Entity();
+                return;
+            }
+            if (a.LogicalName() != b.LogicalName())
+                throw new Exception($"Creating new CEntity() from two entities of different types: {a.LogicalName()} and {b.LogicalName()}.");
+            
             entity = new Entity(a.LogicalName());
             var aAttr = a.Entity().Attributes;
             var bAttr = b.Entity().Attributes;
@@ -216,9 +239,13 @@ namespace LibDV.DVEntity
 
             // Add the logical name condition
             expression.AddEquals(EAttributeName.Entity_LogicalName, entity.LogicalName);
-            // Only add the ID condition if it is not empty
+
+            // The other entity ID must either be empty or an exact match
+            var id_expr = new CEqualityExpression(EEqualityExpressionOperator.Or);
+            id_expr.AddEquals(EAttributeName.Entity_Id, Guid.Empty);
             if (entity.Id != Guid.Empty)
-                expression.AddEquals(EAttributeName.Entity_Id, entity.Id);
+                id_expr.AddEquals(EAttributeName.Entity_Id, entity.Id);
+            expression.AddExpression(id_expr);
 
             var addedAttrNames = new List<EAttributeName>() 
             { 
@@ -238,6 +265,8 @@ namespace LibDV.DVEntity
 
                 // Convert the logical name to an EAttributeName enum
                 var attrName = SAttributeName.EnumFromLogical(logicalName);
+                if (addedAttrNames.Contains(attrName))
+                    continue; // don't add the same attr twice
 
                 // If this attribute is not marked as readable from DV, skip it
                 // We can only safely compare attributes that are retrieved from DV
@@ -249,7 +278,7 @@ namespace LibDV.DVEntity
                 addedAttrNames.Add(attrName);
             }
 
-            var missingAttrNames = SAttributeName.AttrNames()
+            /*var missingAttrNames = SAttributeName.AttrNames()
                 .Where(attrName => !addedAttrNames.Contains(attrName)) // find attributes that were not added to the expression
                 .Where(attrName => SAttribute.GetAttribute(attrName).HasDVRead()) // only include attributes that are readable from DV
                 .ToList();
@@ -257,7 +286,7 @@ namespace LibDV.DVEntity
             // for each attribute NOT in the entity that is readable from DV, add a null condition
             missingAttrNames.ForEach(
                 attr => expression.AddNull(attr)
-            );
+            );*/
 
             return expression;
         }
