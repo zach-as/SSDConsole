@@ -5,6 +5,8 @@ namespace LibUtil.Equality
 {
     public interface IEqualityComparable
     {
+        // This is an instanced version of the above static class. This should pass the instance of itself to the static class.
+        public abstract CEqualityExpression EqualityExpression();
         // This should return a CEqualityExpression representing
         // the conditions to be met for some comparable to be equal to this comparable
         public static abstract CEqualityExpression EqualityExpression(IEqualityComparable? comp);
