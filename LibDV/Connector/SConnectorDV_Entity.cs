@@ -111,9 +111,10 @@ namespace LibDV.Connector
             if (entityCount > batchSize) // set batch size to upper bounds of entity count if necessary
                 batchSize = entities.Count;
 
-            SDisplay.Print($"Pushing [ {index + batchSize} / {entityCount} ] entities of type {logicalName} to DV. {entityCount - index} remaining.");
 
             var batch = set.Subset(index, batchSize);
+            SDisplay.Print($"Pushing [ {batch.Count()} / {entityCount} ] entities of type {logicalName} to DV. {entityCount - (index + batch.Count())} remaining.");
+
             PushEntityUpdate_Request(batch);
 
             if (index + batchSize >= entities.Count)
@@ -139,6 +140,12 @@ namespace LibDV.Connector
 
         public static CEntitySuperSet PushEntityCreate(CEntitySuperSet sets)
         {
+            SDisplay.Print("Attempting to create entities...");
+            if (sets.CountAll() == 0)
+            {
+                SDisplay.Print("No entities to create. Skipping.");
+                return new CEntitySuperSet();
+            }
             var created = new CEntitySuperSet();
             foreach (var set in sets.Sets())
             {
