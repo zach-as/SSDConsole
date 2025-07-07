@@ -55,26 +55,26 @@ namespace LibCMS.Record
         }
 
         // A list of all clinicians, extracted from CRecordResponse
-        private List<CClinician>? clinicians {  get; set; }
-        internal List<CClinician> Clinicians()
+        private HashSet<CClinician>? clinicians {  get; set; }
+        internal HashSet<CClinician> Clinicians()
         {
-            if (clinicians is null) clinicians = new List<CClinician>();
+            if (clinicians is null) clinicians = new HashSet<CClinician>();
             return clinicians;
         }
 
         // A list of all clinics, extracted from CRecordResponse
-        private List<CClinic>? clinics { get; set; }
-        internal List<CClinic> Clinics()
+        private HashSet<CClinic>? clinics { get; set; }
+        internal HashSet<CClinic> Clinics()
         {
-            if (clinics is null) clinics = new List<CClinic>();
+            if (clinics is null) clinics = new HashSet<CClinic>();
             return clinics;
         }
 
         // A list of all organizations, extracted from CRecordResponse
-        private List<CMedicalGroup>? organizations { get; set; }
-        internal List<CMedicalGroup> Organizations()
+        private HashSet<CMedicalGroup>? organizations { get; set; }
+        internal HashSet<CMedicalGroup> MedicalGroups()
         {
-            if (organizations is null) organizations = new List<CMedicalGroup>();
+            if (organizations is null) organizations = new HashSet<CMedicalGroup>();
             return organizations;
         }
 
@@ -95,32 +95,65 @@ namespace LibCMS.Record
 
         private void AddItem(CRecordItem item)
         {
-            CClinician? clinician = null;
-            CClinic? clinic = null;
-            CMedicalGroup? medicalGroup = null;
+            // Create new instances of the clinician, clinic, and organization based on the item
+            // These instances are used for both searching for existing records and adding new ones
+            CClinician clinician = new CClinician(item);
+            CClinic clinic = new CClinic(item);
+            CMedicalGroup medicalGroup = new CMedicalGroup(item);
 
-            // Attempt to retrieve the clinician with the PAC ID in the current item from clinicians
-            // This will return a default Clinician object if there is no Clinician with the existing Pac ID in clinicians
-            clinician = Clinicians().Find(c => c.pacId == item.IDPacInd);
+            // Check if there are existing records and, if so, overwrite them
+            clinician = Clinicians().TryGetValue(clinician, out CClinician? existingClinician) ? existingClinician : clinician;
+            clinic = Clinics().TryGetValue(clinic, out CClinic? existingClinic) ? existingClinic : clinic;
+            medicalGroup = MedicalGroups().TryGetValue(medicalGroup, out CMedicalGroup? existingMedicalGroup) ? existingMedicalGroup : medicalGroup;
 
-            if (clinician == null)
+            var medicalGroupValid = !string.IsNullOrEmpty(item.IDPacOrg);
+
+            // Handle associations
+            clinician.Associate(clinic);
+            if (medicalGroupValid)
             {
-                // Creates a new clinician and add it to clinicians
-                clinician = new CClinician(item);
-                Clinicians().Add(clinician);
+                clinician.Associate(medicalGroup);
+                clinic.Associate(medicalGroup);
             }
 
+            // If the clinic already exists, try to update its information from this clinic
+            var clinicExists = Clinics().Contains(clinic);
+            if (clinicExists)
+            {
+                if (clinic.location.line2Suppressed && item.Line2Supressed != "Y")
+                {
+                    clinic.location = new CAddress(item); // update the location to reflect the new record
+                }
+                if (clinic.telephoneNumber == string.Empty && item.PhoneNumber != string.Empty)
+                {
+                    clinic.telephoneNumber = item.PhoneNumber; // update the phone number
+                }
+            }
+
+            clinic.numClinicians++; // Increment the number of clinicians at this clinic
+
+            // Handle additions
+            Clinicians().Add(clinician);
+            Clinics().Add(clinic);
+            if (medicalGroupValid)
+                MedicalGroups().Add(medicalGroup);
+
+            // Record the last updated time
+            timeLastUpdated = DateTime.UtcNow;
+
+            /*
+            Clinicians().Add(clinician);
             // Some records will contain providers not affiliated with any organization
             if (!string.IsNullOrEmpty(item.IDPacOrg))
             {
                 // This repeats the same process for clinicians, only applied to organizations
                 // After this line, currentOrganization will == the relevant Organization or the default value
-                medicalGroup = Organizations().Find(o => o.pac == item.IDPacOrg);
+                medicalGroup = MedicalGroups().Find(o => o.pac == item.IDPacOrg);
 
                 if (medicalGroup == null)
                 {
                     medicalGroup = new CMedicalGroup(item);
-                    Organizations().Add(medicalGroup);
+                    MedicalGroups().Add(medicalGroup);
                 }
 
                 // Associate the identified organization with the clinician
@@ -163,8 +196,7 @@ namespace LibCMS.Record
             // Associate the clinic with the organization (if valid) and the clinician
             clinic.Associate(clinician);
             if (medicalGroup is not null) clinic.Associate(medicalGroup);
-
-            timeLastUpdated = DateTime.UtcNow;
+            */
         }
     }
 

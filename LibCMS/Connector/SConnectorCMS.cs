@@ -38,6 +38,7 @@ namespace LibCMS.Connector
 
         #region Records
         private static CRecordOutput? records;
+        private static int totalRecords = 0;
         private static async Task<CRecordOutput> Records()
         {
             await UpdateRecords();
@@ -52,7 +53,7 @@ namespace LibCMS.Connector
             SDisplay.Print("Pulling records from CMS. This may take a few minutes.");
 
             CParameters parameters = new CParameters();
-
+            parameters.Limit = 30;
             if (records is null) records = new CRecordOutput();
             var requests = await BuildRequests(parameters);
 
@@ -65,7 +66,7 @@ namespace LibCMS.Connector
 
             SDisplay.Print($"Received {responses.Count()} responses from CMS. Processing records.");
             SDisplay.StartProgressBar("Processing record sets", responses.Count(),
-                                        new SDisplay.ProgressBarInfo("recordsadded", "Records processed"));
+                                        new SDisplay.ProgressBarInfo("recordsadded", "Records processed", totalRecords));
 
             foreach (var response in responses)
             {
@@ -99,7 +100,7 @@ namespace LibCMS.Connector
 
         private static async Task<HttpResponseMessage> SendRequest(CParameters parameters)
         {
-            var request = await Send(new CHttpRequest(new CParameters()));
+            var request = await Send(new CHttpRequest(parameters));
             
             if (request is null) throw new Exception("Failed to send request to CMS.");
             if (!request.IsSuccessStatusCode)
@@ -131,7 +132,8 @@ namespace LibCMS.Connector
             var recordResponse = await ProcessRecordResponse(httpResponse); // convert the response to usable data
 
             // TODO: Reset this back to RecordCountDB when done testing
-            var recordTotal = recordResponse.RecordCountDB;
+            var recordTotal = 50; // recordResponse.RecordCountDB;
+            totalRecords = recordTotal;
             var recordsPulled = recordResponse.Records().Count();
             var queryLimit = parameters.Limit ?? 2000; // default to 2000 if not specified
 
@@ -203,11 +205,11 @@ namespace LibCMS.Connector
 
         #region PublicMethods
         public static async Task<List<CClinician>> GetClinicians()
-            => (await Records()).Clinicians();
+            => (await Records()).Clinicians().ToList();
         public static async Task<List<CClinic>> GetClinics()
-            => (await Records()).Clinics();
+            => (await Records()).Clinics().ToList();
         public static async Task<List<CMedicalGroup>> GetMedicalGroups()
-            => (await Records()).Organizations();
+            => (await Records()).MedicalGroups().ToList();
 
         public static async Task<List<CAssociable>> GetAssociables()
         {

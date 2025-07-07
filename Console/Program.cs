@@ -48,11 +48,10 @@ namespace Console
             allNewEntities.AddSet(newClinics);
             allNewEntities.AddSet(newMedicalGroups);
 
-
             // Push the new entity data to DV
             // This will also generate IDs for each entity and update the information in allNewEntities accordingly
             allNewEntities = SConnectorDV.PushEntityCreate(allNewEntities);
-
+            
             // Identify the entities from CMS that already exist in DV and should be updated
             var existingClinicians = clinicianEntities.Overlapping(DVClinicians);
             var existingClinics = clinicEntities.Overlapping(DVClinics);
@@ -79,7 +78,7 @@ namespace Console
                                         .Excluding(allExistingRelationships);
             // Push the new relationships to DV
             SConnectorDV.PushEntityCreate(allNewRelationships);
-
+            
             SDisplay.WaitEnd();
         }
     }
