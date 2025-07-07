@@ -227,6 +227,11 @@ namespace LibDV.DVEntity
             {
                 entity[attr.Key] = attr.Value;
             }
+            // First try to use a's ID then b's
+            if (a.Id() != Guid.Empty)
+                entity.Id = a.Id(); 
+            else if (b.Id() != Guid.Empty)
+                entity.Id = b.Id(); 
         }
         internal CEntity()
         {
@@ -234,18 +239,40 @@ namespace LibDV.DVEntity
         }
 
         public CEqualityExpression EqualityExpression()
+            => EqualityExpression(this);
+        public static CEqualityExpression EqualityExpression(IEqualityComparable? comp)
         {
-            var expression = new CEqualityExpression();
+            var ce = comp as CEntity;
+
+            if (ce == null)
+                throw new ArgumentException($"IEqualityComparable comp must be of type CEntity, but is: {comp}");
+
+            // Generate an empty expr from the relevant associables if present
+            // This expr will be used as the structure for the present expression
+            var emptyExpr = ce.EntityType() switch
+            {
+                EEntityType.Clinic => CClinic.EqualityExpression(null),
+                EEntityType.Clinician => CClinician.EqualityExpression(null),
+                EEntityType.MedicalGroup => CMedicalGroup.EqualityExpression(null),
+                _ => null,
+            };
+
+            // IF a template expression is found, use it to create the final expression
+            if (emptyExpr != null)
+                return SEqualityExpression.NewExpressionFromTemplate(emptyExpr, ce);
+
+            // Otherwise, compare the entity's logical name and ID, and all attributes that are readable from DV
+            var finalExpr = new CEqualityExpression();
 
             // Add the logical name condition
-            expression.AddEquals(EAttributeName.Entity_LogicalName, entity.LogicalName);
+            finalExpr.AddEquals(EAttributeName.Entity_LogicalName, ce!.LogicalName);
 
             // The other entity ID must either be empty or an exact match
             var id_expr = new CEqualityExpression(EEqualityExpressionOperator.Or);
             id_expr.AddEquals(EAttributeName.Entity_Id, Guid.Empty);
-            if (entity.Id != Guid.Empty)
-                id_expr.AddEquals(EAttributeName.Entity_Id, entity.Id);
-            expression.AddExpression(id_expr);
+            if (ce!.Id() != Guid.Empty)
+                id_expr.AddEquals(EAttributeName.Entity_Id, ce!.Id());
+            finalExpr.AddExpression(id_expr);
 
             var addedAttrNames = new List<EAttributeName>() 
             { 
@@ -254,7 +281,7 @@ namespace LibDV.DVEntity
             };
 
             // for each attribute in the entity, add an equality condition
-            foreach (var attrKvp in entity.Attributes)
+            foreach (var attrKvp in ce!.Entity().Attributes)
             {
                 var logicalName = attrKvp.Key;
 
@@ -274,7 +301,7 @@ namespace LibDV.DVEntity
                 if (!attrEnum.HasDVRead())
                     continue;
 
-                expression.AddEquals(attrName, attrKvp.Value);
+                finalExpr.AddEquals(attrName, attrKvp.Value);
                 addedAttrNames.Add(attrName);
             }
 
@@ -288,7 +315,7 @@ namespace LibDV.DVEntity
                 attr => expression.AddNull(attr)
             );*/
 
-            return expression;
+            return finalExpr;
         }
         public object? AttributeValue(EAttributeName attrName)
         {
