@@ -56,6 +56,8 @@ namespace LibCMS.Data.Associable
                     throw new Exception($"Unidentified IEqualityComparable in CAssociable.EqualityExpression({comp})");
             }
         }
+        public CEqualityExpression EqualityExpression()
+            => EqualityExpression(this);
 
         public object? AttributeValue(EAttributeName attrName)
         {

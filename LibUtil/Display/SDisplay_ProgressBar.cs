@@ -56,7 +56,7 @@ namespace LibUtil.UtilDisplay
             private string text = string.Empty;
             private int count = 0;
             private int? count_max = null;
-            internal ProgressBarInfo(string id, string text, int? count_max = null)
+            public ProgressBarInfo(string id, string text, int? count_max = null)
             {
                 this.id = id;
                 this.text = text;

@@ -1,6 +1,7 @@
 ﻿using LibCMS.Data.Associable;
 using LibDV.DVEntity;
 using LibDV.EntityType;
+using LibUtil.UtilDisplay;
 using Microsoft.Xrm.Sdk;
 
 namespace LibDV.Relationship
@@ -76,25 +77,43 @@ namespace LibDV.Relationship
 
         public static CEntitySuperSet BuildRelationships(List<CAssociable> associables, CEntitySuperSet allEntities)
         {
+            string relId = "relId";
+            SDisplay.Print($"Building relationship sets for {associables.Count()} associables.");
+            SDisplay.StartProgressBar("Associables processed", associables.Count(),
+                                        new SDisplay.ProgressBarInfo(relId, "Relationships built"));
+
+            var associablesProcessed = new List<CAssociable>();
+
             var set = new CEntitySuperSet();
             foreach (var a in associables)
             {
-                var relEnts = new List<CEntity>();
+                var rels = new List<CEntity>();
                 var ent = new CEntity(a);
                 // override entity with the one from the set, if it exists
                 // we mainly do this to ensure that the entity has the correct ID
                 ent = new CEntity(allEntities.GetEntity(ent), ent); 
                 foreach (var relA in a.Associations())
                 {
-                    var relEnt = NewRelationship(ent, new CEntity(relA));
-                    relEnt = new CEntity(allEntities.GetEntity(relEnt), relEnt);
-                    if (!relEnts.Contains(relEnt) && !set.HasEntity(relEnt)) // ensure we don't add duplicates
+                    var isProcessed = associablesProcessed.Find(ap => relA.GetHashCode() == ap.GetHashCode()) is CAssociable ap
+                                            && ap.Equals(relA);
+                    if (isProcessed) continue; // skip if already processed
+                    
+                    var relEnt = new CEntity(relA);
+                    relEnt = new CEntity(allEntities.GetEntity(relEnt), relEnt); // override entity with the one from the set, if it exists
+                    var rel = NewRelationship(ent, relEnt);
+                    if (!rels.Contains(rel) && !set.HasEntity(rel)) // ensure we don't add duplicates
                     {
-                        relEnts.Add(relEnt);
+                        rels.Add(rel);
+                        SDisplay.UpdateProgressBar(relId);
                     }
                 }
-                set.AddEntities(relEnts); // add all relationships for this entity to the set
+                set.AddEntities(rels); // add all relationships for this entity to the set
+                SDisplay.UpdateProgressBar();
+                associablesProcessed.Add(a);
             }
+
+            SDisplay.StopProgressBar();
+            SDisplay.Success("Relationship sets built.");
             return set;
         }
     }

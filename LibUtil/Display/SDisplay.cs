@@ -50,6 +50,14 @@ namespace LibUtil.UtilDisplay
             });
         }
 
+        public static void WaitEnd()
+        {
+            while(messages.Count() > 0 || interruptMessages.Count() > 0)
+            {
+                System.Threading.Thread.Sleep(TIME_BETWEEN_UPDATES);
+            }
+        }
+
         // this will print a message to the console with high priority
         public static void Interrupt(string message, MessageSeverity severity)
             => interruptMessages.Add(new Message(message, MessageSource.Interrupt, severity));

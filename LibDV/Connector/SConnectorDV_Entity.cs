@@ -75,12 +75,11 @@ namespace LibDV.Connector
 
                 if (entities.Count == 0)
                 {
-                    SDisplay.Print($"No entities found of type {logicalName}.",
-                                            SDisplay.MessageSeverity.Warning);
+                    SDisplay.Warning($"No entities found of type {logicalName}.");
                 }
                 else
                 {
-                    SDisplay.Print($"Fetched {entities.Count} entities of type {logicalName}.");
+                    SDisplay.Success($"Fetched {entities.Count} entities of type {logicalName}.");
                 }
             }
 

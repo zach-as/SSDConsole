@@ -285,6 +285,10 @@ namespace LibDV.DVEntity
             {
                 var logicalName = attrKvp.Key;
 
+                // Don't add the ID of the entity itself as it is already handled
+                if (logicalName == ce.LogicalName() + "id")
+                    continue;
+
                 // If an attribute enum matching this logical name is not found, skip this attribute
                 var attrNameExists = SAttributeName.LogicalNameExists(logicalName);
                 if (!attrNameExists)

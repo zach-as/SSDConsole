@@ -71,14 +71,14 @@ namespace Console
             var allEntities = new CEntitySuperSet();
             allEntities.AddSet(allNewEntities);
             allEntities.AddSet(allExistingEntities);
-            /*
+            
             // Retrieve all existing relationship info between entitites in DV
             var allExistingRelationships = SConnectorDV.FetchEntities(SEntityType.RelationshipTypes().ToArray());
             // Build new relationships based on the associables from CMS and exclude existing relationships found in DV
             var allNewRelationships = SRelationship.BuildRelationships(associables, allEntities)
                                         .Excluding(allExistingRelationships);
             // Push the new relationships to DV
-            SConnectorDV.PushEntityCreate(allNewRelationships);*/
+            SConnectorDV.PushEntityCreate(allNewRelationships);
 
             SDisplay.WaitEnd();
         }
