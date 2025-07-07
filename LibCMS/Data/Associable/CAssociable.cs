@@ -42,7 +42,20 @@ namespace LibCMS.Data.Associable
         #endregion association
 
         protected CEqualityExpression? eqExpression;
-        public abstract CEqualityExpression EqualityExpression();
+        public static CEqualityExpression EqualityExpression(IEqualityComparable? comp)
+        {
+            switch(comp)
+            {
+                case CClinic clinic:
+                    return CClinic.EqualityExpression(clinic);
+                case CClinician clinician:
+                    return CClinician.EqualityExpression(clinician);
+                case CMedicalGroup medicalGroup:
+                    return CMedicalGroup.EqualityExpression(medicalGroup);
+                default:
+                    throw new Exception($"Unidentified IEqualityComparable in CAssociable.EqualityExpression({comp})");
+            }
+        }
 
         public object? AttributeValue(EAttributeName attrName)
         {

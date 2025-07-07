@@ -108,16 +108,20 @@ namespace LibCMS.Data.Associable
             return HashCode.Combine(pacId, npi, enrlId, firstName, middleName, lastName);
         }
 
-        public override CEqualityExpression EqualityExpression()
+        public static new CEqualityExpression EqualityExpression(IEqualityComparable? comp)
         {
+            var clinician = comp as CClinician;
+
             // If the equality expression has already been created, return it
             // This works because the values of CAssociables do not change over time
-            if (eqExpression is not null) return eqExpression;
+            if (clinician?.eqExpression is not null) return clinician.eqExpression;
 
             var expression = SEqualityExpression.NewAndExpression();
-            expression.AddEquals(Attribute_Pac, pacId);
+            expression.AddEquals(Attribute_Pac, clinician?.pacId);
 
-            eqExpression = expression; // save this expression for later
+            if (clinician is not null)
+                clinician.eqExpression = expression; // save this expression for later
+
             return expression;
         }
     }

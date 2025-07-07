@@ -60,17 +60,20 @@ namespace LibCMS.Data.Associable
             return HashCode.Combine(pac);
         }
 
-        public override CEqualityExpression EqualityExpression()
+        public static new CEqualityExpression EqualityExpression(IEqualityComparable? comp)
         {
+            var medicalGroup = comp as CMedicalGroup;
 
             // If the equality expression has already been created, return it
             // This works because the values of CAssociables do not change over time
-            if (eqExpression is not null) return eqExpression;
+            if (medicalGroup?.eqExpression is not null) return medicalGroup.eqExpression;
 
             var expression = SEqualityExpression.NewAndExpression();
-            expression.AddEquals(Attribute_Pac, pac);
+            expression.AddEquals(Attribute_Pac, medicalGroup?.pac);
 
-            eqExpression = expression; // save the expression for later
+            if (medicalGroup is not null)
+                medicalGroup.eqExpression = expression; // save the expression for later
+
             return expression;
         }
 

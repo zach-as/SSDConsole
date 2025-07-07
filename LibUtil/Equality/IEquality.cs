@@ -7,7 +7,7 @@ namespace LibUtil.Equality
     {
         // This should return a CEqualityExpression representing
         // the conditions to be met for some comparable to be equal to this comparable
-        public abstract CEqualityExpression EqualityExpression();
+        public static abstract CEqualityExpression EqualityExpression(IEqualityComparable comp);
 
         // This should return the value of the attribute with the given name
         // if the attribute is not present, it should return null

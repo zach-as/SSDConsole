@@ -64,11 +64,13 @@ namespace LibCMS.Data.Associable
                                     location.zip);
         }
 
-        public override CEqualityExpression EqualityExpression()
+        public static new CEqualityExpression EqualityExpression(IEqualityComparable? comp)
         {
+            var clinic = comp as CClinic;
+
             // If the equality expression has already been created, return it
             // This works because the values of CAssociables do not change over time
-            if (eqExpression is not null) return eqExpression;
+            if (clinic?.eqExpression is not null) return clinic.eqExpression;
 
             // Name && (ID || (Ln1 && (Ln2 || Sprs)))
 
@@ -76,19 +78,19 @@ namespace LibCMS.Data.Associable
 
             // An expression representing equality to the clinic's name
             var ex_name = SEqualityExpression.NewAndExpression();
-            ex_name.AddEquals(Attribute_Name, name);
+            ex_name.AddEquals(Attribute_Name, clinic?.name);
 
             // An expression representing equality to the clinic's address ID
             var ex_id = SEqualityExpression.NewAndExpression();
-            ex_id.AddEquals(Attribute_AddressId, location.addressID);
+            ex_id.AddEquals(Attribute_AddressId, clinic?.location.addressID);
 
             // An expression representing equality to the clinic's address line 2
             var ex_ln2 = SEqualityExpression.NewAndExpression();
-            ex_ln2.AddEquals(Attribute_AddressLine2, location.addressLine2);
+            ex_ln2.AddEquals(Attribute_AddressLine2, clinic?.location.addressLine2);
 
             // An expression representing equality to the clinic's address line 2 suppressed
             var ex_sprs = SEqualityExpression.NewAndExpression();
-            ex_sprs.AddEquals(Attribute_Line2Suppressed, location.line2Suppressed);
+            ex_sprs.AddEquals(Attribute_Line2Suppressed, clinic?.location.line2Suppressed);
 
             var ex_addr = SEqualityExpression.NewOrExpression();
             var ex_addr_1 = SEqualityExpression.NewAndExpression();
@@ -99,7 +101,7 @@ namespace LibCMS.Data.Associable
             ex_addr_2.AddExpression(ex_sprs);
 
             // Ln1 && (Ln2 || Sprs)
-            ex_addr_1.AddEquals(Attribute_AddressLine1, location.addressLine1);
+            ex_addr_1.AddEquals(Attribute_AddressLine1, clinic?.location.addressLine1);
             ex_addr_1.AddExpression(ex_addr_2);
 
             // ID || (Ln1 && (Ln2 || Sprs))
@@ -110,7 +112,9 @@ namespace LibCMS.Data.Associable
             expression.AddEquals(Attribute_Name, ex_name);
             expression.AddExpression(ex_addr);
 
-            eqExpression = expression; // save the expression for later
+            if (clinic is not null)
+                clinic.eqExpression = expression; // save the expression for later
+
             return expression;
         }
     }
