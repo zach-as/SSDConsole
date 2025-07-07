@@ -130,5 +130,23 @@ namespace LibUtil.Equality
             => new CEqualityExpression(EEqualityExpressionOperator.And);
         public static CEqualityExpression NewOrExpression()
             => new CEqualityExpression(EEqualityExpressionOperator.Or);
+
+        // This function creates a new CEqualityExpression based on a template expression
+        // All of the values of the template expression are replaced with the values from the IEqualityComparable object
+        public static CEqualityExpression NewExpressionFromTemplate(CEqualityExpression tempExpr, IEqualityComparable comp)
+        {
+            var finalExpr = new CEqualityExpression(tempExpr.Operator());
+            foreach (var cond in tempExpr.Conditions())
+            {
+                var newCond = SEqualityCondition.NewConditionFromTemplate(cond, comp);
+                finalExpr.AddCondition(newCond);
+            }
+            foreach (var expr in tempExpr.Expressions())
+            {
+                var newExpr = SEqualityExpression.NewExpressionFromTemplate(expr, comp);
+                finalExpr.AddExpression(newExpr);
+            }
+            return finalExpr;
+        }
     }
 }

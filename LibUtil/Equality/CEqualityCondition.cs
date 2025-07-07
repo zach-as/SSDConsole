@@ -28,6 +28,7 @@ namespace LibUtil.Equality
         public object? Value() => conditionVal.Value();
         public override string ToString()
             => $"UtilAttribute {AttributeName()} {comparator.Description()} {Value()}";
+        internal CEqualityConditionValue ConditionVal() => conditionVal;
     }
 
     internal static partial class SEqualityCondition
@@ -59,6 +60,13 @@ namespace LibUtil.Equality
             => NewCondition(attrName, comp, new CEqualityConditionValueFunc(valFunc));
         internal static CEqualityCondition NewCondition(EAttributeName attrName, EEqualityComparator comp, IEqualityComparable owner, EAttributeName valAttr)
             => NewCondition(attrName, comp, new CEqualityConditionValueAttr(owner, valAttr));
+
+        // This function creates a new CEqualityCondition based on a template condition
+        // All of the values of the template condition are replaced with the values from the IEqualityComparable object
+        internal static CEqualityCondition NewConditionFromTemplate(CEqualityCondition tempCond, IEqualityComparable comp)
+            => NewCondition(tempCond.AttributeName(),
+                            tempCond.Comparator(),
+                            new CEqualityConditionValueAttr(comp, tempCond.AttributeName()));
 
     }
 }

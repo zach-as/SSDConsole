@@ -31,6 +31,7 @@ namespace LibUtil.Equality
             this.valueFunc = valueFunc;
         }
         internal override object? Value() => valueFunc();
+        internal Func<object?> ValueFunc() => valueFunc;
     }
 
     internal class CEqualityConditionValueAttr : CEqualityConditionValue
@@ -46,5 +47,7 @@ namespace LibUtil.Equality
 
         internal override object? Value()
             => owner.AttributeValue(attrName);
+        internal IEqualityComparable Owner() => owner;
+        internal EAttributeName AttrName() => attrName;
     }
 }
