@@ -5,6 +5,7 @@ using LibCMS.Record;
 using LibCMS.Http;
 using LibCMS.Data.Associable;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace LibCMS.Connector
 {
@@ -14,6 +15,7 @@ namespace LibCMS.Connector
 
         // The threshold for how much time must pass before records are forcefully updated
         private static TimeSpan MIN_UPDATE_TIME = TimeSpan.FromDays(1);
+        private static int MAX_CONCURRENT_CONNECTIONS = 20; // the api rate limit from CMS
 
         #region Client
         // baseAddress should only be provided when initializing the client
@@ -50,21 +52,24 @@ namespace LibCMS.Connector
             SDisplay.Print("Pulling records from CMS. This may take a few minutes.");
 
             CParameters parameters = new CParameters();
-            parameters.Limit = 30;
 
             if (records is null) records = new CRecordOutput();
             var requests = await BuildRequests(parameters);
 
             SDisplay.Print($"Built {requests.Count} requests to pull records from CMS. Processing.");
 
-            var responses = await Task.WhenAll(requests); // send all requests in parallel
+            var splitRequests = SplitList(requests, MAX_CONCURRENT_CONNECTIONS); // split the requests into smaller batches to avoid overwhelming the API
+            var responses = new List<HttpResponseMessage?>();
+            foreach (var reqs in splitRequests)
+                responses.AddRange(await Task.WhenAll(reqs)); // send all requests in parallel
 
-            SDisplay.Print($"Received {responses.Length} responses from CMS. Processing records.");
-            SDisplay.StartProgressBar("Processing record sets", responses.Length);
+            SDisplay.Print($"Received {responses.Count()} responses from CMS. Processing records.");
+            SDisplay.StartProgressBar("Processing record sets", responses.Count(),
+                                        new SDisplay.ProgressBarInfo("recordsadded", "Records processed"));
 
             foreach (var response in responses)
             {
-                var recordResponse = await ProcessRecordResponse(response); // convert the response to usable data in a struct
+                var recordResponse = await ProcessRecordResponse(response!); // convert the response to usable data in a struct
                 records.AddRecordInput(recordResponse); // Convert the data to most usable form (clinicians, clinics, medical groups, etc)
                 SDisplay.UpdateProgressBar();
             }
@@ -72,44 +77,29 @@ namespace LibCMS.Connector
             SDisplay.StopProgressBar();
             SDisplay.Print("Records from CMS queried and processed.");
 
-            /*do
+        }
+
+        private static List<List<T>> SplitList<T>(List<T> list, int maxLen)
+        {
+            List<List<T>> subLists = new List<List<T>>();
+
+            int subListLen = maxLen;
+            for (int i = 0; i < list.Count(); i += subListLen)
             {
-                var message = Send(new CHttpRequest(parameters)); // query CMS
-                var response = CRecordResponse.BuildFromHttpResponse(message); // convert text to usable data
+                if (i + subListLen > list.Count())
+                {
+                    subListLen = list.Count() - i; // if the remaining items are less than maxLen, adjust the length
+                }
+                var subList = list.Skip(i).Take(subListLen).ToList();
+                subLists.Add(subList);
+            }
 
-                records.AddRecordInput(initResponse); // Convert the response to most usable form (clinicians, clinics, orgs, etc)
-
-                var tasks = new List<Task<HttpResponseMessage>>(); // list of send tasks to run in parallel
-                var responses = new List<CRecordResponse>(); // list of responses to convert into usable forms
-
-
-                if (response is null) throw new Exception("Failed to build record httpResponse from text.");
-                if (recordTotal is null || recordTotal == 0) recordTotal = response.RecordCountDB; // note the total # of records
-
-                if (!SDisplay.InProgress()) SDisplay.StartProgressBar("CMS records pulled and formatted", recordTotal);
-
-
-                int recordsPulled = response.Records().Count();
-                
-                SDisplay.UpdateProgressBar(recordsPulled);
-                
-                // Increment the offset so that the query will return the next set of records (default 2000 at a time)
-                parameters.Offset += recordsPulled;
-
-                // update the number of records recorded so we know when to stop looping
-                recordsRecorded += recordsPulled;
-
-                // keep looping until we have all the records
-            } while (recordTotal is not null
-                    && recordsRecorded < recordTotal);
-
-            SDisplay.StopProgressBar();*/
-
+            return subLists;
         }
 
         private static async Task<HttpResponseMessage> SendRequest(CParameters parameters)
         {
-            var request = await Send(new CHttpRequest(parameters));
+            var request = await Send(new CHttpRequest(new CParameters()));
             
             if (request is null) throw new Exception("Failed to send request to CMS.");
             if (!request.IsSuccessStatusCode)
@@ -141,7 +131,7 @@ namespace LibCMS.Connector
             var recordResponse = await ProcessRecordResponse(httpResponse); // convert the response to usable data
 
             // TODO: Reset this back to RecordCountDB when done testing
-            var recordTotal = 50; //recordResponse.RecordCountDB;
+            var recordTotal = recordResponse.RecordCountDB;
             var recordsPulled = recordResponse.Records().Count();
             var queryLimit = parameters.Limit ?? 2000; // default to 2000 if not specified
 

@@ -88,7 +88,8 @@ namespace LibCMS.Record
 
             foreach (CRecordItem record in response.Records())
             {
-                AddItem(record);    
+                AddItem(record);
+                SDisplay.UpdateProgressBar("recordsadded");
             }
         }
 
