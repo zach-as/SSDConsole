@@ -41,7 +41,7 @@ namespace LibCMS.Data
             addressLine1 = record.AddrLine1;
             addressLine2 = record.AddrLine2;
             line2Suppressed = record.Line2Supressed == "Y" ? true : false;
-            city = record.City;
+            city = record.City.ToUpper();
             state = record.State;
             zip = record.Zip;
             addressID = record.IdAddr;
