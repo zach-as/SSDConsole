@@ -11,10 +11,10 @@ namespace LibCMS.Data.Associable
         #region association
 
         [JsonIgnore]
-        private List<CAssociable>? associations;
-        public List<CAssociable> Associations()
+        private HashSet<CAssociable>? associations;
+        public HashSet<CAssociable> Associations()
         {
-            if (associations is null) associations = new List<CAssociable>();
+            if (associations is null) associations = new HashSet<CAssociable>();
             return associations;
         }
         internal bool Associate(CAssociable associable)
