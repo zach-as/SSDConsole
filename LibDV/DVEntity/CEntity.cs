@@ -40,7 +40,7 @@ namespace LibDV.DVEntity
                 AddSet(set.EntityType(), set);
         }
         // Adds the provided unsorted list of all entity types to this super set
-        public void AddEntities(List<CEntity> list)
+        public void AddEntities(IEnumerable<CEntity> list)
             => list.GroupBy(ce => ce.EntityType())
                 .ToList().ForEach(g => AddSet(g.Key, new CEntitySet(g.ToList())));
         public void AddSet(CEntitySuperSet set)
@@ -77,36 +77,36 @@ namespace LibDV.DVEntity
     public class CEntitySet
     {
         private string logicalName = string.Empty;
-        private List<CEntity> entities;
+        private HashSet<CEntity> entities;
 
-        public CEntitySet(List<CAssociable> associables)
+        public CEntitySet(IEnumerable<CAssociable> associables)
         {
-            entities = new List<CEntity>();
-            associables.ForEach(a => entities.Add(new CEntity(a)));
+            entities = new HashSet<CEntity>();
+            associables.ToList().ForEach(a => entities.Add(new CEntity(a)));
             SetLogicalName();
         }
 
-        internal CEntitySet(List<Entity> entities)
+        internal CEntitySet(IEnumerable<Entity> entities)
         {
-            this.entities = new List<CEntity>();
-            entities.ForEach(e => this.entities.Add(new CEntity(e)));
+            this.entities = new HashSet<CEntity>();
+            entities.ToList().ForEach(e => this.entities.Add(new CEntity(e)));
             SetLogicalName();
         }
-        internal CEntitySet(List<CEntity> entities)
+        internal CEntitySet(IEnumerable<CEntity> entities)
         {
-            this.entities = entities;
+            this.entities = new HashSet<CEntity>(entities);
             SetLogicalName();
         }
         internal CEntitySet(EntityCollection entityCol)
         {
-            entities = new List<CEntity>();
+            entities = new HashSet<CEntity>();
             entityCol.Entities.ToList().ForEach(
                 e => entities.Add(new CEntity(e)));
             SetLogicalName();
         }
         internal CEntitySet()
         {
-            entities = new List<CEntity>();
+            entities = new HashSet<CEntity>();
             SetLogicalName();
         }
 
@@ -120,7 +120,7 @@ namespace LibDV.DVEntity
 
         internal string LogicalName()
             => logicalName;
-        internal List<CEntity> Entities()
+        internal HashSet<CEntity> Entities()
             => entities;
         internal EEntityType EntityType()
             => SEntityType.EntityType(LogicalName());
@@ -139,48 +139,34 @@ namespace LibDV.DVEntity
         internal bool AnyExists()
             => entities.Any(e => e.Exists());
         internal CEntity? GetEntity(CEntity ce)
-        {
-            foreach (var e in entities)
-            {
-                if (e.Equals(ce))
-                    return e; // Found a matching entity
-            }
-            return null; // No matching entity found
-        }
+            => entities.TryGetValue(ce, out CEntity? outEnt) ? outEnt : null;
         internal bool HasEntity(CEntity ce)
             => GetEntity(ce) is not null;
         internal CEntitySet Subset(int start, int size)
-            => new CEntitySet(entities.Skip(start).Take(size).ToList());
+            => new CEntitySet(entities.Skip(start).Take(size));
         internal void AddSet(CEntitySet newSet)
             // Note that this does not check for duplicate entries, but it shouldn't be a problem... right?
-            => entities.AddRange(newSet.Entities());
+            => entities.UnionWith(newSet.Entities());
 
         // This function identifies and retrieves only elements that are present in both sets
         public CEntitySet Overlapping(CEntitySet otherSet)
         {
-            var overlapping = new List<CEntity>();
+            var initOverlapping = entities.Intersect(otherSet.Entities());
+            var overlapping = new HashSet<CEntity>();
 
-            foreach (var ce in Entities())
+            // For each entity that exists in both sets, return a new CEntity that combines the two
+            // Note that this assumes Intersect() returns a set composed of elements from the first set that are found in the second set
+            // If this is not true, then this may not work as expected...
+            foreach (var ce in initOverlapping)
             {
-                if (otherSet.HasEntity(ce))
-                    overlapping.Add(new CEntity(ce, otherSet.Entities().Find(e => e.Equals(ce))!));
+                overlapping.Add(new CEntity(ce, otherSet.GetEntity(ce)));
             }
 
             return new CEntitySet(overlapping);
         }
         // This function returns a CEntitySet that contains elements in which the provided entity set is not present
         public CEntitySet Excluding(CEntitySet otherSet)
-        {
-            var excluding = new List<CEntity>();
-
-            foreach (var ce in Entities())
-            {
-                if (!otherSet.HasEntity(ce))
-                    excluding.Add(ce);
-            }
-
-            return new CEntitySet(excluding);
-        }
+            => new CEntitySet(entities.Except(otherSet.entities));
 
     }
 
@@ -336,8 +322,15 @@ namespace LibDV.DVEntity
                 return value;
             }
 
-            // Attribute not found on entity
-            return null;
+            var attrType = attrName.DataType();
+
+            // Attribute not found on entity, return specified defaults
+            return attrType switch
+            {
+                Type strType when attrType == typeof(string) => "",
+                //Type guidType when attrType == typeof(Guid) => Guid.Empty,
+                _ => null,
+            };
         }
 
         internal string LogicalName() => entity.LogicalName;
@@ -355,21 +348,25 @@ namespace LibDV.DVEntity
         }
 
         public override int GetHashCode()
+        => EntityType() switch
         {
-            var hash = new HashCode();
-            var attrs = SAttribute.GetAttributes(EntityType());
-            foreach(var attr in attrs)
-            {
-                if (attr.LogicalName().Contains("Id"))
-                    continue; // Skip ID attributes, as they are handled separately
-                var value = AttributeValue(attr.AttributeName());
-                if (value != null)
-                {
-                    hash.Add(value);
-                }
-            }
-            return hash.ToHashCode();
-        }
+            EEntityType.Clinician => CClinician.GenerateHashCode(this),
+            EEntityType.Clinic => CClinic.GenerateHashCode(this),
+            EEntityType.MedicalGroup => CMedicalGroup.GenerateHashCode(this),
+            EEntityType.ClinicianAtClinic => HashCode.Combine(
+                                                AttributeValue(EAttributeName.Attribute_Clinician), 
+                                                AttributeValue(EAttributeName.Attribute_Clinic)),
+            EEntityType.ClinicianAtMedicalGroup => HashCode.Combine(
+                                                AttributeValue(EAttributeName.Attribute_Clinician),
+                                                AttributeValue(EAttributeName.Attribute_MedicalGroup)),
+            EEntityType.ClinicAtMedicalGroup => HashCode.Combine(
+                                                AttributeValue(EAttributeName.Attribute_Clinic),
+                                                AttributeValue(EAttributeName.Attribute_MedicalGroup)),
+            _ => throw new Exception($"Unknown EntityType() of {EntityType()} in GetHashCode().")
+        };
+
+        public static int GenerateHashCode(IEqualityComparable comp)
+            => (comp as CEntity)?.GetHashCode() ?? 0;
 
         public override string ToString()
         {
