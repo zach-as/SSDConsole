@@ -59,6 +59,11 @@ namespace LibCMS.Data.Associable
         {
             return HashCode.Combine(pac);
         }
+        public static new int GenerateHashCode(IEqualityComparable comp)
+        {
+            // Generate a hash code based on the comp's pac id
+            return HashCode.Combine(comp.AttributeValue(Attribute_Pac));
+        }
 
         public static new CEqualityExpression EqualityExpression(IEqualityComparable? comp)
         {

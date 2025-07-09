@@ -15,5 +15,9 @@ namespace LibUtil.Equality
         // if the attribute is not present, it should return null
         // this is used to get the value of an attribute for comparison purposes
         public abstract object? AttributeValue(EAttributeName attributeName);
+
+        // This should return the hash code of the object as if it were an instance, but only statically
+        // this should work by making use of AttributeValue()
+        public static abstract int GenerateHashCode(IEqualityComparable comp);
     }
 }

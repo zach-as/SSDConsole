@@ -60,6 +60,12 @@ namespace LibCMS.Data.Associable
             return HashCode.Combine(name,
                                     location.addressLine1);
         }
+        public static new int GenerateHashCode(IEqualityComparable comp)
+        {
+            // Generate a hash code based on the comp's name and address line 1
+            return HashCode.Combine(comp.AttributeValue(Attribute_Name),
+                                    comp.AttributeValue(Attribute_AddressLine1));
+        }
 
         public static new CEqualityExpression EqualityExpression(IEqualityComparable? comp)
         {

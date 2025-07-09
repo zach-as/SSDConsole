@@ -105,7 +105,14 @@ namespace LibCMS.Data.Associable
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(pacId, npi, enrlId, firstName, middleName, lastName);
+            return HashCode.Combine(pacId, npi, enrlId);
+        }
+        public static new int GenerateHashCode(IEqualityComparable comp)
+        {
+            // Generate a hash code based on the comp's pac, npi, and enrl ids
+            return HashCode.Combine(comp.AttributeValue(Attribute_Pac),
+                                    comp.AttributeValue(Attribute_Npi),
+                                    comp.AttributeValue(Attribute_Enrl));
         }
 
         public static new CEqualityExpression EqualityExpression(IEqualityComparable? comp)

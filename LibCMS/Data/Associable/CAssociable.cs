@@ -43,21 +43,24 @@ namespace LibCMS.Data.Associable
 
         protected CEqualityExpression? eqExpression;
         public static CEqualityExpression EqualityExpression(IEqualityComparable? comp)
-        {
-            switch(comp)
+            => comp switch
             {
-                case CClinic clinic:
-                    return CClinic.EqualityExpression(clinic);
-                case CClinician clinician:
-                    return CClinician.EqualityExpression(clinician);
-                case CMedicalGroup medicalGroup:
-                    return CMedicalGroup.EqualityExpression(medicalGroup);
-                default:
-                    throw new Exception($"Unidentified IEqualityComparable in CAssociable.EqualityExpression({comp})");
-            }
-        }
+                CClinic clinic => CClinic.EqualityExpression(clinic),
+                CClinician clinician => CClinician.EqualityExpression(clinician),
+                CMedicalGroup medicalGroup => CMedicalGroup.EqualityExpression(medicalGroup),
+                _ => throw new Exception($"Unidentified IEqualityComparable in CAssociable.EqualityExpression({comp})"),
+            };
+
         public CEqualityExpression EqualityExpression()
             => EqualityExpression(this);
+        public static int GenerateHashCode(IEqualityComparable comp)
+            => comp switch
+            {
+                CClinic clinic => CClinic.GenerateHashCode(clinic),
+                CClinician clinician => CClinician.GenerateHashCode(clinician),
+                CMedicalGroup medicalGroup => CMedicalGroup.GenerateHashCode(medicalGroup),
+                _ => throw new Exception($"Unidentified IEqualityComparable in CAssociable.GenerateHashCode({comp})"),
+            };
 
         public object? AttributeValue(EAttributeName attrName)
         {
