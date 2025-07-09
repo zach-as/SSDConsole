@@ -102,11 +102,27 @@ namespace LibCMS.Record
             CMedicalGroup medicalGroup = new CMedicalGroup(item);
 
             // Check if there are existing records and, if so, overwrite them
-            clinician = Clinicians().TryGetValue(clinician, out CClinician? existingClinician) ? existingClinician : clinician;
-            clinic = Clinics().TryGetValue(clinic, out CClinic? existingClinic) ? existingClinic : clinic;
-            medicalGroup = MedicalGroups().TryGetValue(medicalGroup, out CMedicalGroup? existingMedicalGroup) ? existingMedicalGroup : medicalGroup;
+            var clinicianExists = Clinicians().TryGetValue(clinician, out CClinician? existingClinician);
+            var clinicExists = Clinics().TryGetValue(clinic, out CClinic? existingClinic);
+            var medicalGroupExists = MedicalGroups().TryGetValue(medicalGroup, out CMedicalGroup? existingMedicalGroup);
 
             var medicalGroupValid = !string.IsNullOrEmpty(item.IDPacOrg);
+
+            // If the clinic already exists, try to update its information from this record
+            if (clinicExists)
+            {
+                if (existingClinic!.location.line2Suppressed && item.Line2Supressed != "Y")
+                    existingClinic!.location = clinic.location; // update the location to reflect the new record
+                if (existingClinic!.telephoneNumber == string.Empty && item.PhoneNumber != string.Empty)
+                    existingClinic!.telephoneNumber = clinic.telephoneNumber; // update the phone number
+            }
+
+            if (clinicianExists)
+                clinician = existingClinician!;
+            if (clinicExists)
+                clinic = existingClinic!;
+            if (medicalGroupExists)
+                medicalGroup = existingMedicalGroup!;
 
             // Handle associations
             clinician.Associate(clinic);
@@ -116,27 +132,16 @@ namespace LibCMS.Record
                 clinic.Associate(medicalGroup);
             }
 
-            // If the clinic already exists, try to update its information from this clinic
-            var clinicExists = Clinics().Contains(clinic);
-            if (clinicExists)
-            {
-                if (clinic.location.line2Suppressed && item.Line2Supressed != "Y")
-                {
-                    clinic.location = new CAddress(item); // update the location to reflect the new record
-                }
-                if (clinic.telephoneNumber == string.Empty && item.PhoneNumber != string.Empty)
-                {
-                    clinic.telephoneNumber = item.PhoneNumber; // update the phone number
-                }
-            }
+            // Handle additions
+            if (!clinicianExists)
+                Clinicians().Add(clinician);
+            if (!clinicExists)
+                Clinics().Add(clinic);
+            if (!medicalGroupExists && medicalGroupValid)
+                MedicalGroups().Add(medicalGroup);
+
 
             clinic.numClinicians++; // Increment the number of clinicians at this clinic
-
-            // Handle additions
-            Clinicians().Add(clinician);
-            Clinics().Add(clinic);
-            if (medicalGroupValid)
-                MedicalGroups().Add(medicalGroup);
 
             // Record the last updated time
             timeLastUpdated = DateTime.UtcNow;
