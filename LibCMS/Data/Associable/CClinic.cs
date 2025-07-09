@@ -58,10 +58,7 @@ namespace LibCMS.Data.Associable
         public override int GetHashCode()
         {
             return HashCode.Combine(name,
-                                    location.addressLine1,
-                                    location.city,
-                                    location.state,
-                                    location.zip);
+                                    location.addressLine1);
         }
 
         public static new CEqualityExpression EqualityExpression(IEqualityComparable? comp)
@@ -76,41 +73,32 @@ namespace LibCMS.Data.Associable
 
             var expression = new CEqualityExpression();
 
-            // An expression representing equality to the clinic's name
-            var ex_name = SEqualityExpression.NewAndExpression();
-            ex_name.AddEquals(Attribute_Name, clinic?.name);
-
-            // An expression representing equality to the clinic's address ID
-            var ex_id = SEqualityExpression.NewAndExpression();
-            ex_id.AddEquals(Attribute_AddressId, clinic?.location.addressID);
-
             // An expression representing equality to the clinic's address line 2
-            var ex_ln2 = SEqualityExpression.NewAndExpression();
-            ex_ln2.AddEquals(Attribute_AddressLine2, clinic?.location.addressLine2);
-
-            // An expression representing equality to the clinic's address line 2 suppressed
-            var ex_sprs = SEqualityExpression.NewAndExpression();
-            ex_sprs.AddEquals(Attribute_Line2Suppressed, clinic?.location.line2Suppressed);
+            var ex_ln2_match = SEqualityExpression.NewAndExpression();
+            ex_ln2_match.AddEquals(Attribute_AddressLine2, clinic?.location.addressLine2); // Ln2
+            var ex_ln2_sprs = SEqualityExpression.NewAndExpression();
+            ex_ln2_sprs.AddNotEquals(Attribute_AddressLine2, clinic?.location.addressLine2); // !Ln2
+            ex_ln2_sprs.AddNotEquals(Attribute_Line2Suppressed, clinic?.location.line2Suppressed); //!Sprs
 
             var ex_addr = SEqualityExpression.NewOrExpression();
             var ex_addr_1 = SEqualityExpression.NewAndExpression();
             var ex_addr_2 = SEqualityExpression.NewOrExpression();
 
-            // Ln2 || Sprs
-            ex_addr_2.AddExpression(ex_ln2);
-            ex_addr_2.AddExpression(ex_sprs);
+            // Ln2 || (!Ln2 && !Sprs)
+            ex_addr_2.AddExpression(ex_ln2_match); // Ln2
+            ex_addr_2.AddExpression(ex_ln2_sprs); // !Ln2 && !Sprs == Ln2
 
             // Ln1 && (Ln2 || Sprs)
-            ex_addr_1.AddEquals(Attribute_AddressLine1, clinic?.location.addressLine1);
-            ex_addr_1.AddExpression(ex_addr_2);
+            ex_addr_1.AddEquals(Attribute_AddressLine1, clinic?.location.addressLine1); // Ln1
+            ex_addr_1.AddExpression(ex_addr_2); // Ln2 || (!Ln2 && !Sprs)
 
             // ID || (Ln1 && (Ln2 || Sprs))
-            ex_addr.AddExpression(ex_id);
-            ex_addr.AddExpression(ex_addr_1);
+            ex_addr.AddEquals(Attribute_AddressId, clinic?.location.addressID); // ID
+            ex_addr.AddExpression(ex_addr_1); // Ln1 && (Ln2 || (!Ln2 && !Sprs))
 
             // Name && (ID || (Ln1 && (Ln2 || Sprs)))
-            expression.AddEquals(Attribute_Name, ex_name);
-            expression.AddExpression(ex_addr);
+            expression.AddEquals(Attribute_Name, clinic?.name); // Name
+            expression.AddExpression(ex_addr); // ID || (Ln1 && (Ln2 || (!Ln2 && !Sprs)))
 
             if (clinic is not null)
                 clinic.eqExpression = expression; // save the expression for later
